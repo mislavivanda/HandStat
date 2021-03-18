@@ -34,11 +34,6 @@ const useStyles = makeStyles((theme)=>({
         width:'25%',
         maxWidth:50,
     },
-    gameInfoBox:{
-        borderColor:theme.palette.primary.main,
-        borderStyle:'solid',
-        borderWidth:3
-    },
     ligaBox:{
         display:'flex',
         width:'100%',
@@ -94,7 +89,7 @@ function Utakmica_statistika(props) {
                     <Box style={{ flexGrow:1,display:'flex',alignItems:'center',justifyContent:'center'}}><Typography align='center' variant='h6' style={{color:'#FFFFFF'}}>{'UTAKMICA BROJ: '+ brojUtakmice}</Typography></Box>
             </AppBar>
             <Grid  container direction='column' justify='space-evenly' alignItems='center' style={{marginTop:100}}>{/*glavni container*/}
-                <Grid item className={classes.gameInfoBox} container direction='column' justify='space-evenly' alignItems='center' xs={12}>{/*gornji box sa podacima*/}
+                <Grid item  container direction='column' justify='space-evenly' alignItems='center' xs={12}>{/*gornji box sa podacima*/}
                     <Grid item container direction='row' justify='center' xs={12}>                                                    {/*tek kada se postave najtecanje i kolo u gameInfo komponenti ih ispisujemo*/}
                         <Box className={classes.ligaBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h5'>{((kolo!==0)&&natjecanje)? (kolo+'. KOLO '+natjecanje.naziv) : ''}</Typography></Box>
                     </Grid>

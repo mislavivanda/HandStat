@@ -35,6 +35,11 @@ const useStyles=makeStyles((theme)=>({
     flexDirection:'row',
     justifyContent:'center',
     width:'65%'
+   },
+   odabraniBox:{//classa koju imaju odabrani clanovi
+       borderColor:theme.palette.secondary.main,
+       borderStyle:'solid',
+       borderWidth:3.5
    }
 }))
 //komponenta u kojoj se izlistavaju igraci/golmani i ostali clanovi u tim boxu
@@ -97,12 +102,12 @@ function clanKlubaKlik(maticni_broj,ime,prezime,klub_id,tip)//funkcija koja se p
         }))//da znamo jeli golman,igrac ili osoblje za spremit u bazu,
     }
 }
-
+ {/*KONDIICONALNA PRIMJENA VIŠE KLASA-> DOLJE U BOXU ,INAČE SE VIŠE KLASA NA 1 ELEMENT RJEŠAVA PREKO TEMPLATE STRINGOVA*/}
      return (
          <Fragment>
              {
               ((tip===1 || tip===2))?//igrac ili golman         ako je odabran taj clan i ako nije prethodno odabran bio( null ili razlicit maticni broj)-> kliknili smo prvi put na njega-> obojamo ga, u suprotnome je ovo drugi klik na njega i odznacit cemo ga, ako bude treci klik na njega onda moramo dozovlit da ga opet oznacimo
-              <Box className={classes.glavniBox} style={{ backgroundColor: (odabraniClan && odabraniClan.maticni_broj===maticni_broj)? '#000000':'#FFFFFF' }}>{/*istaknuti odabranog člana*/}
+             <Box className={`${classes.glavniBox} ${(odabraniClan && odabraniClan.maticni_broj===maticni_broj)? classes.odabraniBox : ''}`} >{/*istaknuti odabranog člana*/}
                   <Button disabled={(timDomaciSpremljen&&timGostiSpremljen)? false : true}  onClick={()=> clanKlubaKlik(maticni_broj,ime,prezime,klub,tip)} disableRipple style={{flexGrow:1}}>
                   {/*sve dok nisu spremljene postave OBA TIMA NE MOŽEMO KLIKAT NA ČLANOVE TIMA ZA DOGAĐAJE,AKO SU OBA SPREMLJENA ONDA MOŽEMO */}
                   <Box className={classes.buttonBox}>
@@ -114,7 +119,7 @@ function clanKlubaKlik(maticni_broj,ime,prezime,klub_id,tip)//funkcija koja se p
                   {(spremljenTim)? null : <IconButton onClick={()=>ukloniClanaTima(maticni_broj,dres,ime,prezime,tip)} title='Ukloni' color='secondary'  disableRipple><RemoveCircleIcon/></IconButton>}
               </Box>
                   :
-                  <Box  className={classes.glavniBox} style={{ backgroundColor: (odabraniClan && odabraniClan.maticni_broj===maticni_broj)? '#000000':'#FFFFFF' }}>
+                  <Box  className={`${classes.glavniBox} ${(odabraniClan && odabraniClan.maticni_broj===maticni_broj)? classes.odabraniBox : ''}`}>
                       <Button disabled={((timDomaciSpremljen&&timGostiSpremljen))? false : true} onClick={()=>clanKlubaKlik(maticni_broj,ime,prezime,klub,tip)} disableRipple style={{flexGrow:1}}>
                       <Box className={classes.buttonBox}>{/*umisto spremljen tim imat state od oba tima jesu li spremljena*/}
                           <Box><Typography color='secondary'>{maticni_broj}</Typography></Box>

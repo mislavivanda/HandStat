@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
      this.hasMany(models.igracutakmica,{foreignKey:'klub_id'});
      this.hasMany(models.golmanutakmica,{foreignKey:'klub_id'});
      this.hasMany(models.stozerutakmica,{foreignKey:'klub_id'});
-     this.belongsToMany(models.natjecanje,{through: 'rezultati',as:'natjecanjaodkluba',foreignKey: 'natjecanje_id'});//trenutne i prošle poveznoasti + podaci relevantni za tablicu
-    }
+     this.belongsToMany(models.natjecanje,{through: 'rezultati',as:'natjecanjaodklubarez',foreignKey: 'natjecanje_id'});//trenutne i prošle poveznoasti + podaci relevantni za tablicu
+    }                                                            //ALIASI MORAJU BITI JEDINSTVENI!!!
   };
   klub.init({
     drzava: DataTypes.STRING,

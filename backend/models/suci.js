@@ -11,7 +11,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   suci.init({
-    maticni_broj: DataTypes.STRING,
+    maticni_broj:{
+      type:DataTypes.STRING,
+      primaryKey:true
+    },
     ime: DataTypes.STRING,
     prezime: DataTypes.STRING,
     nacionalnost: DataTypes.STRING,

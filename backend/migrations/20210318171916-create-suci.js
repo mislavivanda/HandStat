@@ -23,13 +23,16 @@ module.exports = {
         type: Sequelize.STRING
       },
       image_path: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        defaultValue:null
       },
       broj_utakmica: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:1
       },
       prosjecna_ocjena: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
+        defaultValue:0
       }
     });
   },

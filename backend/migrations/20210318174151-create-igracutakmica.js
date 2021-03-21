@@ -9,34 +9,44 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       golovi: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       pokusaji: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       sedmerac_golovi: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       sedmerac_pokusaji: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       iskljucenja: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       zuti: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       crveni: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       plavi: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       tehnicke: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       asistencije: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       }
     });
   },

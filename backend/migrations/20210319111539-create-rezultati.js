@@ -23,19 +23,24 @@ module.exports = {
         onDelete: "SET NULL",
       },
       pobjede: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       porazi: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       nerjeseni: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       bodovi: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       gol_razlika: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       }
     });
   },

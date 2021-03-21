@@ -14,7 +14,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       broj_dresa: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:null
       },
       nacionalnost: {
         type: Sequelize.STRING
@@ -23,15 +24,18 @@ module.exports = {
         type: Sequelize.DATE
       },
       visina: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:null
       },
       tezina: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:null
       },
       image_path: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        defaultValue:null
       },
-      rola: {
+      rola: {//jeli igrac=1,golman=2,trener=3,sluzbeni predstavnik=4,tehniko=5 i fizio=6
         type: Sequelize.SMALLINT
       }
     });

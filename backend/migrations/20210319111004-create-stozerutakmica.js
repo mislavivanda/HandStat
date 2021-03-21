@@ -9,13 +9,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       zuti: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       crveni: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       plavi: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       }
     });
   },

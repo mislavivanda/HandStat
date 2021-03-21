@@ -15,10 +15,12 @@ module.exports = {
         type: Sequelize.SMALLINT
       },
       rez_domaci: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:null
       },
       rez_gosti: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:null
       }
     });
   },

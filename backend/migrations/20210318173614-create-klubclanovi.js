@@ -9,20 +9,25 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       pobjede: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       porazi: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       nerjeseno: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       od: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue:new Date()
       },
       //oni kojima je 
       do: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue:null
       }
     });
   },

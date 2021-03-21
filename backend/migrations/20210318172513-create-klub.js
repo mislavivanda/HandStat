@@ -21,7 +21,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       image_path: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        defaultValue:null
       }
     });
   },

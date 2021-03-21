@@ -17,8 +17,10 @@ module.exports = {
         type: Sequelize.DATE
       },
       image_path: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        defaultValue:null
       },
+      //1=nadzornik,2=zapisnicar,3=mjerac vremena,4=lijecnik, pristup ko admin imaju svi osim lijecnika
       rola: {
         type: Sequelize.SMALLINT
       }

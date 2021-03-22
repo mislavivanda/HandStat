@@ -23,7 +23,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   utakmica.init({
-    broj_utakmice: DataTypes.STRING,
+    broj_utakmice:{
+      type:DataTypes.STRING,
+      primaryKey:true
+    },
     kolo: DataTypes.SMALLINT,
     datum: DataTypes.STRING,
     vrijeme: DataTypes.STRING,

@@ -28,8 +28,8 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey:true
     },
     kolo: DataTypes.SMALLINT,
-    datum: DataTypes.STRING,
-    vrijeme: DataTypes.STRING,
+    datum: DataTypes.DATE,
+    vrijeme: DataTypes.DATE,
     gledatelji: DataTypes.SMALLINT,
     rezultat_domaci: DataTypes.SMALLINT,
     rezultat_gosti: DataTypes.SMALLINT,

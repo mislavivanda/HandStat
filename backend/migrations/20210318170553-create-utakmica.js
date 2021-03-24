@@ -11,28 +11,33 @@ module.exports = {
         type: Sequelize.SMALLINT
       },
       datum: {
-        type: Sequelize.STRING
+        type: Sequelize.DATE
       },
       vrijeme: {
-        type: Sequelize.STRING
+        type: Sequelize.DATE
       },
       gledatelji: {
         type: Sequelize.SMALLINT
       },
       rezultat_domaci: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       rezultat_gosti: {
-        type: Sequelize.SMALLINT
+        type: Sequelize.SMALLINT,
+        defaultValue:0
       },
       sudac1_ocjena:{
-        type:Sequelize.FLOAT
+        type:Sequelize.FLOAT,
+        defaultValue:0
       },
       sudac2_ocjena:{
-        type:Sequelize.FLOAT
+        type:Sequelize.FLOAT,
+        defaultValue:0
       },
-      status: {//pocetak,poluvreme,kraj...
-        type: Sequelize.SMALLINT
+      status: {//nije jos pocelo ali upisano=1,igra=2,pauza=3,kraj=4
+        type: Sequelize.SMALLINT,
+        defaultValue:1
       }
     });
   },

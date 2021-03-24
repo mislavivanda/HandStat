@@ -8,21 +8,41 @@ const {GraphQLObjectType,
         GraphQLNonNull,
         GraphQLFloat,
         GraphQLSchema,
-        GraphQLList}=graphql;
+        GraphQLList,
+        GraphQLBoolean,
+        Kind}=graphql;//KIND SADRŽI SVE TIPOVE VARIJABLI AKO JE POTREBNO U RESOLVERIMA PROVJERAVAT JELI PRIMLJENA VARIJALBA ISPRAVNOG TIPA
 //Definicija našeg vlastitog skalarnog tipa,datum nije defaultni skalarni tip
 const Datum = new GraphQLScalarType({
 name: 'Datum',
 description: 'Format datuma u bazi 1984-10-08 15:05:22+01 pretvaramo u JS date u oba smjera',
 serialize(value){//format datuma koji će ići u response,priprema format za slanje klijentu
-    return new Date(value);
+  let date=new Date(Date.parse(value));
+  let date_format=date.getDate().toString()+'.'+(date.getMonth()+1).toString()+'.'+date.getFullYear().toString();
+  return date_format;
 },
 parseValue(value)//i parse value i parseLiteral parsiraju DOLAZNE/INPUT PODATKE NPR U MUTACIJAMA,RAZLIKA: parseValue: parsira podatke dobivene u JSON formatu
 {
-  return new Date(value)
-},                                                                                       //  parseLiteral: parsira vriiednosti dobivene u AST(stablo,ugnijezdeni) formatu od graphqla
+  return new Date(Date.parse(ast.value))
+},   //  parseLiteral: parsira vriiednosti dobivene u AST(stablo,ugnijezdeni) formatu od graphqla-> TAKO IH PRIMAMO U MUTACIJAMA
 parseLiteral(ast){
-  return new Date(ast.value)
+  return new Date(Date.parse(ast.value))//potrbno parsirati string u date objekt jer će inače javit grešku
 }
+});
+const Vrijeme=new GraphQLScalarType({
+  name: 'Vrijeme',
+  description: 'Unos vremena utakmice, u bazi spremljen kao datum',
+  serialize(value){//format datuma koji će ići u response,priprema format za slanje klijentu
+    let date=new Date(Date.parse(value));
+    let date_format=date.getHours().toString()+':'+date.getMinutes().toString();
+    return date_format;
+  },
+  parseValue(value)//i parse value i parseLiteral parsiraju DOLAZNE/INPUT PODATKE NPR U MUTACIJAMA,RAZLIKA: parseValue: parsira podatke dobivene u JSON formatu
+  {
+    return new Date(Date.parse(ast.value))
+  },   //  parseLiteral: parsira vriiednosti dobivene u AST(stablo,ugnijezdeni) formatu od graphqla
+  parseLiteral(ast){
+    return new Date(Date.parse(ast.value))
+  }
 });
 const MoguciDogadaji=new GraphQLObjectType({
   name:'MoguciDogadaji',
@@ -397,7 +417,7 @@ const Utakmica=new GraphQLObjectType({
     broj_utakmice:{type:GraphQLString},
     kolo:{type:GraphQLInt},
     datum:{type:Datum},
-    vrijeme:{type:GraphQLString},
+    vrijeme:{type:Vrijeme},
     gledatelji:{type:GraphQLInt},
     rezultat_domaci:{type:GraphQLInt},
     rezultat_gosti:{type:GraphQLInt},
@@ -537,6 +557,34 @@ const DogadajiUtakmice=new GraphQLObjectType({
     }
   })
 })
+const GolPozicija=new GraphQLObjectType({
+  name:'PozicijaGola',
+  fields:()=>({
+    id:{type:GraphQLInt},
+    pozicija:{type:GraphQLInt},
+    gol:{type:GraphQLBoolean},
+    akter:{
+      type:ClanTima,
+      resolve(parent,args){
+        return models.clanovitima.findOne({
+          where:{
+            maticni_broj:parent.maticni_broj
+          }
+        })
+      }
+    },
+    dogadaj:{
+      type:MoguciDogadaji,
+      resolve(parent,args){
+        return models.dogadaj.findOne({
+          where:{
+            id:parent.dogadaj_id
+          }
+        })
+      }
+    }
+  })
+})
 const RootQuery=new GraphQLObjectType({
   name:'Svi_queryi_za_entrypoint',
   fields:{//ovde ne triba funkcija jer ih sve ovde definiramo
@@ -666,6 +714,191 @@ const RootQuery=new GraphQLObjectType({
     }
   }
 })
+//Kod pisanja u graphiql moramo poceti sa prefiskom mutation zatim u zagrade stavimo argumente i u tijelu specificiramo KOJA POLJA OD NOVO STVORENOG OBJEKTA ŽELIMO DA NAM VRATI GRAPHQL SERVER
+//!!!!!ako želimo vratiti polja dodanog objekta-> potrebno returnat promise KAO I INAČE U RESOLVERU INAČE ĆE BITI null vraćen za dane filedove
+//KAKO MUTACIJE MOGU VRAĆATI ATRIBUTE STVOFRENOG OBJEKTA-> I U KOD NJIH JE POTREBNO SPECIFICRATI POVRATNI TIP
+const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novih sadržaja u bazu
+  name:'Mutacije',
+  fields:{
+    dodajutakmicu:{
+      type:Utakmica,
+      args:{
+        broj_utakmice:{type:GraphQLString},
+        kolo:{type:GraphQLInt},
+        datum:{type:Datum},
+        vrijeme:{type:Vrijeme},
+        gledatelji:{type:GraphQLInt},
+        natjecanje_id:{type:GraphQLInt},
+        dvorana:{type:GraphQLInt},
+        nadzornik_id:{type:GraphQLString},
+        lijecnik_id:{type:GraphQLString},
+        zapisnicar_id:{type:GraphQLString},
+        mjvremena_id:{type:GraphQLString},
+        sudac1_id:{type:GraphQLString},
+        sudac2_id:{type:GraphQLString},
+        timdomaci_id:{type:GraphQLInt},
+        timgosti_id:{type:GraphQLInt}
+      },
+      resolve(parent,args){
+        return models.utakmica.create({
+          broj_utakmice:args.broj_utakmice,
+          kolo:args.kolo,
+          datum:args.datum,
+          vrijeme:args.vrijeme,
+          gledatelji:args.gledatelji,
+          natjecanje_id:args.natjecanje_id,
+          mjesto_id:args.dvorana,
+          nadzornik_id:args.nadzornik_id,
+          lijecnik_id:args.lijecnik_id,
+          zapisnicar_id:args.zapisnicar_id,
+          mjvremena_id:args.mjvremena_id,
+          sudac1_id:args.sudac1_id,
+          sudac2_id:args.sudac2_id,
+          domaci_id:args.timdomaci_id,
+          gosti_id:args.timgosti_id
+        })
+      }
+    },
+    spremitimzautakmicu:{//Potrebno je da mutacija barem nešto vrati pa makar to bilo null,ako želimo da vrati null onda definiramo NOVI SCALAR TYPE VOID KOJI JE UVIJEK NULL I NJEGA STAVIMO ZA TYPE
+      type:GraphQLBoolean,//VRATIMO TRUE AKO JE USPJEŠNO
+      args:{
+        broj_utakmice:{type:GraphQLString},//niz maticnih brojava koji su stringovi
+        klub_id:{type:GraphQLInt},
+        igraci_id:{type:new GraphQLList(GraphQLString)},
+        golmani_id:{type:new GraphQLList(GraphQLString)},
+        trener_id:{type:GraphQLString},
+        sluzpredstavnik_id:{type:GraphQLString},
+        tehniko_id:{type:GraphQLString},
+        fizio_id:{type:GraphQLString}
+      },
+      async resolve(parent,args){//ako nam treba async await sintaksa samo je dodamo na resolve funkciju
+        try {
+          for(let i=0;i<args.igraci_id.length;i++)
+          {
+            await models.igracutakmica.create({//CREATE PO DEFAULTU SAM VRAĆA OBJEKT U KOJEM SE NALAZI NOVO KREIRANI/UNESENI REDAK TABLICE
+              broj_utakmice:args.broj_utakmice,
+              klub_id:args.klub_id,
+              maticni_broj:args.igraci_id[i]
+            });
+          }
+          for(let i=0;i<args.golmani_id.length;i++)
+          {
+            await models.golmanutakmica.create({
+              broj_utakmice:args.broj_utakmice,
+              klub_id:args.klub_id,
+              maticni_broj:args.golmani_id[i]
+            })
+          }
+          await models.stozerutakmica.create({
+            broj_utakmice:args.broj_utakmice,
+            klub_id:args.klub_id,
+            maticni_broj:args.trener_id
+          });
+          await models.stozerutakmica.create({
+            broj_utakmice:args.broj_utakmice,
+            klub_id:args.klub_id,
+            maticni_broj:args.sluzpredstavnik_id
+          });
+          await models.stozerutakmica.create({
+            broj_utakmice:args.broj_utakmice,
+            klub_id:args.klub_id,
+            maticni_broj:args.tehniko_id
+          });
+          await models.stozerutakmica.create({
+            broj_utakmice:args.broj_utakmice,
+            klub_id:args.klub_id,
+            maticni_broj:args.fizio_id
+          });
+          return true;
+        } catch (error) {
+          console.log('Error in saving tim '+error);
+          throw(error);
+        }
+      }
+    },
+    spremidogadaj:{
+      type:DogadajiUtakmice,//vrati dogadaj ako je uspjesno spremljen
+      args:{
+        broj_utakmice:{type:GraphQLString},
+        vrijeme:{type:GraphQLString},
+        klubgrb:{type:GraphQLInt},//domaci ili gostujuci tim
+        maticni_broj:{type:GraphQLString},
+        dogadaj_id:{type:GraphQLInt},
+        domaci:{type:GraphQLInt},
+        gosti:{type:GraphQLInt},
+      },
+      resolve(parent,args){
+        return models.dogadajiutakmice.create({//AKO NE POŠALJEMO NEKI PARSMETAR U MUTACIJI ON ĆE PO DEFAULTU BITI NULL I SEQUELIZE GA NEĆE UOPĆE SPREMATI U QUERYU NEGO ĆE ON ZAUZET DEFAULT VRIJEDNOST
+          vrijeme:args.vrijeme,
+          tim:args.klubgrb,
+          rez_domaci:args.domaci,
+          rez_gosti:args.gosti,
+          broj_utakmice:args.broj_utakmice,
+          dogadaj_id:args.dogadaj_id,
+          maticni_broj:args.maticni_broj
+        });
+      }
+    },
+    spremigolpoziciju:{
+      type:GolPozicija,//vrati true ako je dobro sve
+      args:{
+        pozicija:{type:GraphQLInt},
+        gol:{type:GraphQLBoolean},
+        broj_utakmice:{type:GraphQLString},
+        maticni_broj:{type:GraphQLString},
+        dogadaj_id:{type:GraphQLInt}
+      },
+      resolve(parent,args){
+        return models.pozicijegola.create({
+          pozicija:args.pozicija,
+          gol:args.gol,
+          broj_utakmice:args.broj_utakmice,
+          maticni_broj:args.maticni_broj,
+          dogadaj_id:args.dogadaj_id
+        })
+      }
+    },
+    azurirajstatusutakmice:{
+      type:GraphQLInt,//vrati postavljeni status
+      args:{
+        status:{type:GraphQLInt},
+        broj_utakmice:{type:GraphQLString},
+      },
+      resolve(parent,args){
+        return models.utakmica.update({status:args.status},{
+          where:{
+            broj_utakmice:args.broj_utakmice
+          }
+        }).then(()=>args.status);
+      }
+    },
+    zavrsiutakmicu:{//kada ide zavrsiti utakmicu onda korisnik unosi ocjene sudaca i postavlja se i konacni rezultat utakmice i status na kraj
+      type:GraphQLString,//vratit broj utakmice koja je zavrsena
+      args:{
+        broj_utakmice:{type:GraphQLString},
+        rez_domaci:{type:GraphQLInt},
+        rez_gosti:{type:GraphQLInt},
+        sudac1_ocjena:{type:GraphQLFloat},
+        sudac2_ocjena:{type:GraphQLFloat}
+      },
+      resolve(parent,args){
+        return models.utakmica.update({
+          rezultat_domaci:args.rez_domaci,
+          rezultat_gosti:args.rez_gosti,
+          sudac1_ocjena:args.sudac1_ocjena,
+          sudac2_ocjena:args.sudac2_ocjena,
+          status:4
+        },{
+          where:{
+            broj_utakmice:args.broj_utakmice
+          }
+        }).then(()=>args.broj_utakmice);
+      }
+    }
+
+  }
+})
 module.exports=new GraphQLSchema({//definicija sheme koju stavljamo u express graphql server
-  query:RootQuery
+  query:RootQuery,
+  mutation:Mutation
 })

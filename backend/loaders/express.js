@@ -14,14 +14,8 @@ module.exports=(app,httplogger)=>{//U OVOJ FUNKCIJI LOADAMO SVE ŠTO JE POTREBNO
     //ZA RESPONSE: {"data":{"hello":"Hello world!"}}}-> NA OVAJ NAČIN ĆE NPR APPOLO LIBRARY LAKO MOĆ ODRŽAVATI CACHE I GLEDAT KOJI SU SE DJELOVI PROMIJENILI A KOJI NE
     app.use('/graphql', graphqlHTTP({
        schema,
-       graphiql:true
+       graphiql:true,
+       customFormatErrorFn:(err) => ({ message: err.message, status: (err.status || 500) })//error handleanje kada throwamo error unutar resolvera
     }));
-    app.use((err, req, res, next) => {//midleware error handler-> ima 4 argumenta-> bit ce zadnja u midleware stacku i pozivom nexta u slucaju errora ce greska sigurno doci do nje i biti handleana i dobit cemo resposne
-        res.status(err.status || 500);//STATUS ZA SVE GRESKE NA STRANIC SERVERA CE BITI 500-> PRESUMJERIMO SVE GRESKE NA OVAJ ERROR HANDLER MIDDLEWARE POZIVOM next(error)
-        res.json({
-          error: {
-            message: err.message,
-          },
-        });
-      });
+    
 }

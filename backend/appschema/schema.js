@@ -1,4 +1,5 @@
 const { Op } = require("sequelize");
+const {nodelogger}=require('../loaders/logger.js');
 const graphql=require('graphql');
 const models=require('../models');//u njemu se nalaze svi loadani modeli bitni za resolvere
 const {GraphQLObjectType,
@@ -146,9 +147,12 @@ const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
             format.push(temp);
           }
           return format;
-        })
-      }
-    },
+        }).catch((error) => {
+          nodelogger.error('Greška u dohvaćanju igrača unutar Tim objekta '+error);
+          throw(error);
+      })
+    }
+  },
     golmani:{
       type:new GraphQLList(ClanTima),
       resolve(parent,args){
@@ -176,9 +180,12 @@ const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
             format.push(temp);
           }
           return format;
-        })
-      }
-    },
+        }).catch((error) => {
+          nodelogger.error('Greška u dohvaćanju golmana unutar Tim objekta '+error);
+          throw(error);
+      })
+    }
+  },
     treneri:{
       type:new GraphQLList(ClanTima),
       resolve(parent,args){
@@ -205,9 +212,12 @@ const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
             format.push(temp);
           }
           return format;
-        })
-      }
-    },
+        }).catch((error) => {
+          nodelogger.error('Greška u dohvaćanju trenera unutar Tim objekta '+error);
+          throw(error);
+      })
+    }
+  },
     sluzbenipredstavnici:{
       type:new GraphQLList(ClanTima),
       resolve(parent,args){
@@ -234,9 +244,12 @@ const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
             format.push(temp);
           }
           return format;
-        })
-      }
-    },
+        }).catch((error) => {
+          nodelogger.error('Greška u dohvaćanju sluzbenih predstavnika unutar Tim objekta '+error);
+          throw(error);
+      })
+    }
+  },
     tehniko:{
       type:new GraphQLList(ClanTima),
       resolve(parent,args){
@@ -264,9 +277,12 @@ const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
           }
           console.log('Format tehniko'+JSON.stringify(format));
           return format;
-        })
-      }
-    },
+        }).catch((error) => {
+          nodelogger.error('Greška u dohvaćanju tehnika unutar Tim objekta '+error);
+          throw(error);
+      })
+    }
+  },
     fizio:{
       type:new GraphQLList(ClanTima),
       resolve(parent,args){
@@ -293,7 +309,10 @@ const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
             format.push(temp);
           }
           return format;
-        })
+        }).catch((error) => {
+          nodelogger.error('Greška u dohvaćanju fiziotarapeuta unutar Tim objekta '+error);
+          throw(error);
+        });
       }
     }
   })
@@ -314,12 +333,17 @@ const IgracStatistika=new GraphQLObjectType({
     igrac:{//igrac cija je to statistika
       type:ClanTima,
       resolve(parent,args){
-        return models.clanovitima.findOne({
-          where:{
-            rola:1,//dodatnui osigurac iako je maticni broj sam dovoljan
-            maticni_broj:parent.maticni_broj//maticni broj koji je sadrzan u retku tablice za statistiku igraca i koji će se vratiti iz resolvera za ispis statistike svih igraca
-          }
-        })
+        try {
+          return models.clanovitima.findOne({
+            where:{
+              rola:1,//dodatnui osigurac iako je maticni broj sam dovoljan
+              maticni_broj:parent.maticni_broj//maticni broj koji je sadrzan u retku tablice za statistiku igraca i koji će se vratiti iz resolvera za ispis statistike svih igraca
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška u dohvaćanju clana tima unutar IgracStatistika objekta '+error);
+          throw(error);
+        }
       }
     }
   })
@@ -340,12 +364,17 @@ const GolmanStatistika=new GraphQLObjectType({
     golman:{
       type:ClanTima,
       resolve(parent,args){
-      return models.clanovitima.findOne({
-        where:{
-          rola:2,
-          maticni_broj:parent.maticni_broj//maticni broj ce doci iz resolvera od ispisa statistike cijelog tima iz niza objekata koji sadrze podatke o statistici golmana medu kojima se nalazi i maticni_broj
+        try {
+          return models.clanovitima.findOne({
+            where:{
+              rola:2,
+              maticni_broj:parent.maticni_broj//maticni broj ce doci iz resolvera od ispisa statistike cijelog tima iz niza objekata koji sadrze podatke o statistici golmana medu kojima se nalazi i maticni_broj
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška u dohvaćanju clana tima unutar GolmanStatistika objekta '+error);
+          throw(error);
         }
-      })
     }
   }
   })
@@ -359,16 +388,21 @@ const StozerStatistika=new GraphQLObjectType({
     clan:{
       type:ClanTima,
       resolve(parent,args){
-        return models.clanovitima.findOne({
-          where:{
-            [Op.and]: [{ maticni_broj: parent.maticni_broj },
-                        {  rola:{
-                            [Op.in]:[3,4,5,6]
-                          } 
-                        }
-                        ],      
-          }
-        });
+        try {
+          return models.clanovitima.findOne({
+            where:{
+              [Op.and]: [{ maticni_broj: parent.maticni_broj },
+                          {  rola:{
+                              [Op.in]:[3,4,5,6]
+                            } 
+                          }
+                          ],      
+            }
+          });
+        } catch (error) {
+          nodelogger.error('Greška u dohvaćanju clana tima unutar StozerStatistika objekta '+error);
+          throw(error);
+        }
       }
     }
   })
@@ -379,34 +413,49 @@ const TimStatistika=new GraphQLObjectType({
     igraci:{
       type:new GraphQLList(IgracStatistika),
       resolve(parent,args){
-        return models.igracutakmica.findAll({
-          where:{
-            broj_utakmice:parent.broj_utakmice,//iz parent objekti koji smo dobili iz resolvera u queryu koji samo prosljeduje primljene parametre
-            klub_id:parent.klub_id//bitna i utakmica i klub za koji igra(jer su 2 kluba na toj utakmici)
-          }
-        })
+        try {
+          return models.igracutakmica.findAll({
+            where:{
+              broj_utakmice:parent.broj_utakmice,//iz parent objekti koji smo dobili iz resolvera u queryu koji samo prosljeduje primljene parametre
+              klub_id:parent.klub_id//bitna i utakmica i klub za koji igra(jer su 2 kluba na toj utakmici)
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška u dohvaćanju statistike igrača unutar TimStaitstika objekta '+error);
+          throw(error);
+        }
       }
     },
     golmani:{
       type:new GraphQLList(GolmanStatistika),
       resolve(parent,args){
-        return models.golmanutakmica.findAll({
-          where:{
-            broj_utakmice:parent.broj_utakmice,
-            klub_id:parent.klub_id
-          }
-        })
+        try {
+          return models.golmanutakmica.findAll({
+            where:{
+              broj_utakmice:parent.broj_utakmice,
+              klub_id:parent.klub_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška u dohvaćanju staitstike golmana unutar TimStatistika objekta '+error);
+          throw(error);
+        }
       }
     },
     stozer:{
       type:new GraphQLList(StozerStatistika),
       resolve(parent,args){
-        return models.stozerutakmica.findAll({
-          where:{
-            broj_utakmice:parent.broj_utakmice,
-            klub_id:parent.klub_id
-          }
-        })
+        try {
+          return models.stozerutakmica.findAll({
+            where:{
+              broj_utakmice:parent.broj_utakmice,
+              klub_id:parent.klub_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška u dohvaćanju statistike stožera unutar TimStatistika objekta '+error);
+          throw(error);
+        }
       }
     }
   })
@@ -428,100 +477,150 @@ const Utakmica=new GraphQLObjectType({
       type:Natjecanje,//parent dolazi u igru kod nestanja više tipova-> npr ako je resolver unutar domaci_id od utakmice onda će resolver koji ide otrkiti
       //koji je to klub moći pristupiti idu od tog tima u utakmici preko parent.tim_id jer je utakmica parent objekt od ugnijezden tim objekta
       resolve(parent,args){
-        return models.natjecanje.findOne({
-          where:{
-            id:parent.natjecanje_id
-          }
-        });
+        try {
+          return models.natjecanje.findOne({
+            where:{
+              id:parent.natjecanje_id
+            }
+          });
+        } catch (error) {
+          nodelogger.error('Greška kod dohvaćanja natjecanja unutar Utakmica objekta '+error);
+          throw(error);
+        }
       }
     },
     lokacija:{//DA BI OVI DIO BIO USPJEŠAN ONO ŠTO SE VRATI IZ RESOLVER MORA ZADOVOLJVATI SHEMU OD TIPA DVORNANA INAČE ĆE BITI GREŠKA
       type:Dvorana,
       resolve(parent,args){
-        return models.mjestodvorana.findOne({
-          where:{
-            id:parent.mjesto_id
-          }
-        })
+        try {
+          return models.mjestodvorana.findOne({
+            where:{
+              id:parent.mjesto_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvaćanja dvorane unutar Utakmica objekta '+error);
+          throw(error);
+        }
       }
     },
     nadzornik:{
       type:SluzbenaOsoba,
       resolve(parent,args){//POVEZANOSTI 1:N I VEZE MEĐU ELEMENTIMA DEFINIRAMO NA OVAJ NAČIN, NIKAD U SEQUELIZE NE ODREĐUJEMO ATRIBUTE KOJE DOHVAĆAMO NEGO DOHVAĆAMO SVE DA SU U SKLADU SA SHEMOM A ONDA U QUERY SPECIFICARMO KOJA POLJA ŽELIMO UKLJUČITI
-        return models.sluzbenoosoblje.findOne({
-          where:{
-            maticni_broj:parent.nadzornik_id
-          }
-        })
+        try {
+          return models.sluzbenoosoblje.findOne({
+            where:{
+              maticni_broj:parent.nadzornik_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvaćanja ndozrnika unutar Utakmica objekta '+error);
+          throw(error);
+        }
       }
     },
     lijecnik:{
       type:SluzbenaOsoba,
       resolve(parent,args){
-        return models.sluzbenoosoblje.findOne({
-          where:{
-            maticni_broj:parent.lijecnik_id
-          }
-        })
+        try {
+          return models.sluzbenoosoblje.findOne({
+            where:{
+              maticni_broj:parent.lijecnik_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvaćanja liječnika unutar Utakmica objekta '+error);
+          throw(error);
+        }
       }
     },
     zapisnicar:{
       type:SluzbenaOsoba,
       resolve(parent,args){
-        return models.sluzbenoosoblje.findOne({
-          where:{
-            maticni_broj:parent.zapisnicar_id
-          }
-        })
+        try {
+          return models.sluzbenoosoblje.findOne({
+            where:{
+              maticni_broj:parent.zapisnicar_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvaćanja zapisničara unutar Utakmica objekta '+error);
+          throw(error);
+        }
       }
     },
     mjeracvremena:{
       type:SluzbenaOsoba,
       resolve(parent,args){
-        return models.sluzbenoosoblje.findOne({
-          where:{
-            maticni_broj:parent.mjvremena_id
-          }
-        })
+        try {
+          return models.sluzbenoosoblje.findOne({
+            where:{
+              maticni_broj:parent.mjvremena_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvaćanja mjeraca vremena unutar Utakmica objekta '+error);
+          throw(error);
+        }
       }
     },
     sudac1:{
       type:Sudac,
       resolve(parent,args){
-        return models.suci.findOne({
-          where:{
-            maticni_broj:parent.sudac1_id
-          }
-        })
+        try {
+          return models.suci.findOne({
+            where:{
+              maticni_broj:parent.sudac1_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvaćanja sudca1 unutar Utakmica objekta '+error);
+          throw(error);
+        }
       },
       sudac2:{
         type:Sudac,
         resolve(parent,args){
-          return models.suci.findOne({
-            where:{
-              maticni_broj:parent.sudac2_id
-            }
-          })
+          try {
+            return models.suci.findOne({
+              where:{
+                maticni_broj:parent.sudac2_id
+              }
+            })
+          } catch (error) {
+            nodelogger.error('Greska kod dohvaćanja sudca2 unutar Utakmica objekta '+error);
+            throw(error);
+          }
         }
       },
       domaci:{
         type:Klub,
         resolve(parent,args){
-          return models.klub.findOne({
-            where:{
-              id:parent.domaci_id
-            }
-          })
+          try {
+            return models.klub.findOne({
+              where:{
+                id:parent.domaci_id
+              }
+            })
+          } catch (error) {
+            nodelogger.error('Greška kod dohvaćanja domaćeg kluba unutar Utakmica objekta '+error);
+            throw(error);
+          }
         }
       },
       gosti:{
         type:Klub,
         resolve(parent,args){
-          return models.klub.findOne({
-            where:{
-              id:parent.domaci_id
-            }
-          })
+          try {
+            return models.klub.findOne({
+              where:{
+                id:parent.domaci_id
+              }
+            })
+          } catch (error) {
+            nodelogger.error('Greska kod dohvaćanja gostujućeg kluba unutar Utakmica objekta '+error);
+            throw(error);
+          }
         }
       }
     }
@@ -538,21 +637,31 @@ const DogadajiUtakmice=new GraphQLObjectType({
     dogadaj:{
       type:MoguciDogadaji,
       resolve(parent,args){
-        return models.dogadaj.findOne({
-          where:{
-            id:parent.dogadaj_id
-          }
-        })
+        try {
+          return models.dogadaj.findOne({
+            where:{
+              id:parent.dogadaj_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata događaja unutar DogadajiUtakmice objekta '+error);
+          throw(error);
+        }
       }
     },
     akter:{
       type:ClanTima,
       resolve(parent,args){
-        return models.clanovitima.findOne({
-          where:{
-            maticni_broj:parent.maticni_broj
-          }
-        })
+        try {
+          return models.clanovitima.findOne({
+            where:{
+              maticni_broj:parent.maticni_broj
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata clana tima unutar DogadajiUtakmice objekta '+error);
+          throw(error);
+        }
       }
     }
   })
@@ -566,21 +675,31 @@ const GolPozicija=new GraphQLObjectType({
     akter:{
       type:ClanTima,
       resolve(parent,args){
-        return models.clanovitima.findOne({
-          where:{
-            maticni_broj:parent.maticni_broj
-          }
-        })
+        try {
+          return models.clanovitima.findOne({
+            where:{
+              maticni_broj:parent.maticni_broj
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata clana tima unutar GolPozicija objekta '+error);
+          throw(error);
+        }
       }
     },
     dogadaj:{
       type:MoguciDogadaji,
       resolve(parent,args){
-        return models.dogadaj.findOne({
-          where:{
-            id:parent.dogadaj_id
-          }
-        })
+        try {
+          return models.dogadaj.findOne({
+            where:{
+              id:parent.dogadaj_id
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata događaja unutar GolPOzicija objekta '+error);
+          throw(error);
+        }
       }
     }
   })
@@ -593,11 +712,16 @@ const RootQuery=new GraphQLObjectType({
       type:Utakmica,
       args:{broj_utakmice:{type:GraphQLString}},//specificiramo sve argumente querya
       resolve(parent,args){
-        return models.utakmica.findOne({
-          where:{
-            broj_utakmice:args.broj_utakmice
-          }
-        }); 
+        try {
+          return models.utakmica.findOne({
+            where:{
+              broj_utakmice:args.broj_utakmice
+            }
+          }); 
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata podataka utakmice '+error);
+          throw(error);
+        }
       }
       //Nije potrebno da resolver bude async i radimo await u njemu jer će graphql sam čekati da dobije neki odgovor uvreturnu koji može usporediti s danom shemom i tipom tog querya
       //Ako oćemo nešto ispisivat unutar resolvera onda su nam bitni promisesi i onda koristimo ili .then ili async await
@@ -609,82 +733,134 @@ const RootQuery=new GraphQLObjectType({
     natjecanja:{//dohvat svih najtecanja kod odabira
       type:new GraphQLList(Natjecanje),
       resolve(parent,args){
-        return models.natjecanje.findAll({});
+        try {
+          return models.natjecanje.findAll({});
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata svih najtecanja '+error);
+          throw(error);
+        }
+      }
+    },
+    dvorane:{
+      type:new GraphQLList(Dvorana),
+      resolve(parent,args){
+        try {
+          return models.mjestodvorana.findAll({});
+        } catch (error) {
+          nodelogger.error('Greška kod dohvaćanja svih dvorana '+error);
+          throw(error);
+        }
       }
     },
     nadzornici:{//dohvat svih nadzornika
       type:new GraphQLList(SluzbenaOsoba),
       resolve(parent,args){
-        return models.sluzbenoosoblje.findAll({
-          where:{
-            rola:1
-          }
-        })
+        try {
+          return models.sluzbenoosoblje.findAll({
+            where:{
+              rola:1
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata svih nadzornika '+error);
+          throw(error);
+        }
       }
     },
     lijecnici:{
       type:new GraphQLList(SluzbenaOsoba),
       resolve(parent,args){
-        return  models.sluzbenoosoblje.findAll({
-          where:{
-            rola:4
-          }
-        })
+        try {
+          return  models.sluzbenoosoblje.findAll({
+            where:{
+              rola:4
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata svih liječnika '+error);
+          throw(error);
+        }
       }
     },
     zapisnicari:{
       type:new GraphQLList(SluzbenaOsoba),
       resolve(parent,args){
-        return  models.sluzbenoosoblje.findAll({
-          where:{
-            rola:2
-          }
-        })
+        try {
+          return  models.sluzbenoosoblje.findAll({
+            where:{
+              rola:2
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata svih zapisničara '+error);
+          throw(error);
+        }
       }
     },
     mjeracivremena:{
       type:new GraphQLList(SluzbenaOsoba),
       resolve(parent,args){
-        return  models.sluzbenoosoblje.findAll({
-          where:{
-            rola:3
-          }
-        })
+        try {
+          return  models.sluzbenoosoblje.findAll({
+            where:{
+              rola:3
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata svih mjerača vremena '+error);
+          throw(error);
+        }
       }
     },
     suci:{
       type:new GraphQLList(Sudac),
       resolve(parent,args){
-        return models.suci.findAll({})
+        try {
+          return models.suci.findAll({})
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata svih sudaca '+error);
+          throw(error);
+        }
       }
     },
     klubovi:{
       type:new GraphQLList(Klub),
       args:{natjecanje_id:{type:GraphQLInt}},//dohvat SAMO ONIH KLUBOVA IZ ODABRANOG NATJECANJA
       resolve(parent,args){
-        return models.klub.findAll({
-          include:{
-            model:models.natjecanje,
-            as:'kluboviodnatjecanja',
-            through: { attributes: [] },
-            where:{
-              id:args.natjecanje_id
+        try {
+          return models.klub.findAll({
+            include:{
+              model:models.natjecanje,
+              as:'kluboviodnatjecanja',
+              through: { attributes: [] },
+              where:{
+                id:args.natjecanje_id
+              }
             }
-          }
-        })
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata svih klubova odabranog natjecanja '+error);
+          throw(error);
+        }
       }
     },
     dogadaji:{//dohvat svih mogućih događaja koji se mogu dogoditi
       type:new GraphQLList(MoguciDogadaji),
       resolve(parent,args){
-        return models.dogadaj.findAll({});
+        try {
+          return models.dogadaj.findAll({});
+        } catch (error) {
+          nodelogger.error('Greška kod dohvata svih mogućih događaja '+error);
+          throw(error);
+        }
       }
     },
     timclanovi:{//vraća sve moguće članove tima od igrača i golmana do stožera
       type:Tim,
       args:{klub_id:{type:GraphQLInt}},
       resolve(parent,args){//OVAJ RESOLVER ĆE VRATITI ID OD KLUBA U OBJECT TYPE TIM U KOJEM MU MOŽEMO PRISTUPATI I KOJI ĆE POMOĆU NJEGA DOBITI SVE POTREBNE CLANOVE TIMA
-        return {
+        return {//NIJE POTREBNO TRY CATCH ERROR HANDLEANJE JER NEMA SINKRONIH OPERAIJA+ KAD SE THROWA ERROR UNUTAR TIM OBJEKTA ON SE NEĆE PROPAGIRATI NAZAD U OVAJ RESOLVER NEGO ĆE IĆI ODMAH NA ERROR HANDLEANJE
+          //ODNOSNO PRVI RESOLVERI KAD SE IZVRSE ONI SU GOTOVI I NEMA VIŠE POVRATKA U NJIH, ERROR HANDLEANJE ĆE SE ODRADIT UNUTAR TIM OBJEKTA
           id:args.klub_id
         }
       }
@@ -695,21 +871,26 @@ const RootQuery=new GraphQLObjectType({
             klub_id:{type:GraphQLInt}
       },
       resolve(parent,args){//samo vratimo argumente u resolveru koje ćemo koristiti u TimStatistika object typeu za resolvanje
-        return {
-          broj_utakmice:args.broj_utakmice,
-          klub_id:args.klub_id
-        }
+          return {
+            broj_utakmice:args.broj_utakmice,
+            klub_id:args.klub_id
+          }
       }
     },
     dogadajiutakmice:{//vraća sve događaje utakmice za pojedinu utakmicu
       type:new GraphQLList(DogadajiUtakmice),
       args:{broj_utakmice:{type:GraphQLString}},
       resolve(parent,args){
-        return models.dogadajiutakmice.findAll({
-          where:{
-            broj_utakmice:args.broj_utakmice
-          }
-        })
+        try {
+          return models.dogadajiutakmice.findAll({
+            where:{
+              broj_utakmice:args.broj_utakmice
+            }
+          })
+        } catch (error) {
+          nodelogger.error('Greska kod dohvata događaja utakmice '+error);
+          throw(error);
+        }
       }
     }
   }
@@ -740,23 +921,29 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         timgosti_id:{type:GraphQLInt}
       },
       resolve(parent,args){
-        return models.utakmica.create({
-          broj_utakmice:args.broj_utakmice,
-          kolo:args.kolo,
-          datum:args.datum,
-          vrijeme:args.vrijeme,
-          gledatelji:args.gledatelji,
-          natjecanje_id:args.natjecanje_id,
-          mjesto_id:args.dvorana,
-          nadzornik_id:args.nadzornik_id,
-          lijecnik_id:args.lijecnik_id,
-          zapisnicar_id:args.zapisnicar_id,
-          mjvremena_id:args.mjvremena_id,
-          sudac1_id:args.sudac1_id,
-          sudac2_id:args.sudac2_id,
-          domaci_id:args.timdomaci_id,
-          gosti_id:args.timgosti_id
-        })
+        try {
+          return models.utakmica.create({
+            broj_utakmice:args.broj_utakmice,
+            kolo:args.kolo,
+            datum:args.datum,
+            vrijeme:args.vrijeme,
+            gledatelji:args.gledatelji,
+            natjecanje_id:args.natjecanje_id,
+            mjesto_id:args.dvorana,
+            nadzornik_id:args.nadzornik_id,
+            lijecnik_id:args.lijecnik_id,
+            zapisnicar_id:args.zapisnicar_id,
+            mjvremena_id:args.mjvremena_id,
+            sudac1_id:args.sudac1_id,
+            sudac2_id:args.sudac2_id,
+            domaci_id:args.timdomaci_id,
+            gosti_id:args.timgosti_id
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod spremanja utakmice '+error);
+          throw(error);
+        }
+
       }
     },
     spremitimzautakmicu:{//Potrebno je da mutacija barem nešto vrati pa makar to bilo null,ako želimo da vrati null onda definiramo NOVI SCALAR TYPE VOID KOJI JE UVIJEK NULL I NJEGA STAVIMO ZA TYPE
@@ -811,7 +998,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
           });
           return true;
         } catch (error) {
-          console.log('Error in saving tim '+error);
+          console.log('Greška kod spremanja tima kluba za utakmicu '+error);
           throw(error);
         }
       }
@@ -828,15 +1015,20 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         gosti:{type:GraphQLInt},
       },
       resolve(parent,args){
-        return models.dogadajiutakmice.create({//AKO NE POŠALJEMO NEKI PARSMETAR U MUTACIJI ON ĆE PO DEFAULTU BITI NULL I SEQUELIZE GA NEĆE UOPĆE SPREMATI U QUERYU NEGO ĆE ON ZAUZET DEFAULT VRIJEDNOST
-          vrijeme:args.vrijeme,
-          tim:args.klubgrb,
-          rez_domaci:args.domaci,
-          rez_gosti:args.gosti,
-          broj_utakmice:args.broj_utakmice,
-          dogadaj_id:args.dogadaj_id,
-          maticni_broj:args.maticni_broj
-        });
+        try {
+          return models.dogadajiutakmice.create({//AKO NE POŠALJEMO NEKI PARSMETAR U MUTACIJI ON ĆE PO DEFAULTU BITI NULL I SEQUELIZE GA NEĆE UOPĆE SPREMATI U QUERYU NEGO ĆE ON ZAUZET DEFAULT VRIJEDNOST
+            vrijeme:args.vrijeme,
+            tim:args.klubgrb,
+            rez_domaci:args.domaci,
+            rez_gosti:args.gosti,
+            broj_utakmice:args.broj_utakmice,
+            dogadaj_id:args.dogadaj_id,
+            maticni_broj:args.maticni_broj
+          });
+        } catch (error) {
+          nodelogger.error('Greška kod spremanja događaja '+error);
+          throw(error);
+        }
       }
     },
     spremigolpoziciju:{
@@ -849,13 +1041,18 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         dogadaj_id:{type:GraphQLInt}
       },
       resolve(parent,args){
-        return models.pozicijegola.create({
-          pozicija:args.pozicija,
-          gol:args.gol,
-          broj_utakmice:args.broj_utakmice,
-          maticni_broj:args.maticni_broj,
-          dogadaj_id:args.dogadaj_id
-        })
+        try {
+          return models.pozicijegola.create({
+            pozicija:args.pozicija,
+            gol:args.gol,
+            broj_utakmice:args.broj_utakmice,
+            maticni_broj:args.maticni_broj,
+            dogadaj_id:args.dogadaj_id
+          })
+        } catch (error) {
+          nodelogger.error('Greška kod spremanja pozicije gola '+error);
+          throw(error);
+        }
       }
     },
     azurirajstatusutakmice:{
@@ -865,11 +1062,14 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         broj_utakmice:{type:GraphQLString},
       },
       resolve(parent,args){
-        return models.utakmica.update({status:args.status},{
-          where:{
-            broj_utakmice:args.broj_utakmice
-          }
-        }).then(()=>args.status);
+          return models.utakmica.update({status:args.status},{
+            where:{
+              broj_utakmice:args.broj_utakmice
+            }
+          }).then(()=>args.status).catch((error)=>{
+            nodelogger.error('Greška kod azuriranja statusa utakmice '+error);
+            throw(error);
+          })
       }
     },
     zavrsiutakmicu:{//kada ide zavrsiti utakmicu onda korisnik unosi ocjene sudaca i postavlja se i konacni rezultat utakmice i status na kraj
@@ -882,17 +1082,21 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         sudac2_ocjena:{type:GraphQLFloat}
       },
       resolve(parent,args){
-        return models.utakmica.update({
-          rezultat_domaci:args.rez_domaci,
-          rezultat_gosti:args.rez_gosti,
-          sudac1_ocjena:args.sudac1_ocjena,
-          sudac2_ocjena:args.sudac2_ocjena,
-          status:4
-        },{
-          where:{
-            broj_utakmice:args.broj_utakmice
-          }
-        }).then(()=>args.broj_utakmice);
+          return models.utakmica.update({
+            rezultat_domaci:args.rez_domaci,
+            rezultat_gosti:args.rez_gosti,
+            sudac1_ocjena:args.sudac1_ocjena,
+            sudac2_ocjena:args.sudac2_ocjena,
+            status:4
+          },{
+            where:{
+              broj_utakmice:args.broj_utakmice
+            }
+          }).then(()=>args.broj_utakmice).catch((error) => {
+            nodelogger.error('Greška kod zavrsavanja utakmice '+error);
+            throw(error);
+          })
+       
       }
     }
 

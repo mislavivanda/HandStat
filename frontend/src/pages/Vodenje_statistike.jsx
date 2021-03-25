@@ -4,6 +4,7 @@ import gameInfo from '../mockdata/gameInfo.js';
 import {Grid,Typography,Box, AppBar,Select,InputLabel,MenuItem,FormControl,Button,TextField} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles';
 import logo from '../images/handstat_logo.png';
+import SaveIcon from '@material-ui/icons/Save';
 import Timer from '../components/Timer';
 import TimVerticalBox from '../components/TimVerticalBox';
 import TijekUtakmiceBox from '../components/TijekUtakmiceBox';
@@ -64,6 +65,11 @@ const useStyles=makeStyles((theme)=>({
 export default function Vodenje_statistike() {
 const classes=useStyles();
 const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
+function zavrsiUtakmicu()
+{
+  //provjera jeli vrijeme na 60:00 došlo
+  //ako jest otvori popup inače error popup
+}
 //Svi potrebni podaci o utakmici
 
     return (
@@ -127,7 +133,7 @@ const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
                         <Klubovi timoviSvi={gameInfo.Timovi}/>
                 </Grid>
                 <Grid style={{marginTop:20}} item container direction='row' alignItems='center' justify='center' xs={12}> {/*SAVE button*/}
-                      <Spremi/>
+                      <Spremi/>{/*stavljen u posebnu komponenetu jer je taj state globalan i potreban ostalim komponentama*/}
                 </Grid>                {/*ako su spremljeni podaci o utakmici nema više klikanja*/}
             </Grid>
             {
@@ -163,6 +169,9 @@ const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
                       </Grid>
                </Grid>
             </Grid>
+            <Box style={{marginTop:50}}>
+              <Button onClick={()=>zavrsiUtakmicu()} disableRipple size='large' variant='contained' color='primary' endIcon={<SaveIcon/>} title='Završi utakmicu' > ZAVRŠI</Button>
+            </Box>
             </Fragment>
             )
             :

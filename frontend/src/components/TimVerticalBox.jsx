@@ -299,11 +299,13 @@ function RenderOdabraniFizio()
                           <Box style={{flexGrow:1,marginRight:'15%'}}><Typography align='center' variant='h6' style={{color:'#FFFFFF'}}>TEHNIKO</Typography></Box>
                         </Box>
                         {RenderOdabraniTehniko()}
-                        <Box className={classes.titulaBox}>
-                          <IconButton disabled={(timSpremljen)? true : false} onClick={()=>dodajClana(6)} title="Dodaj fiziotarapeuta" style={{color:'#FFFFFF'}}><PersonAddIcon/></IconButton>
-                          <Box style={{flexGrow:1,marginRight:'15%'}}><Typography align='center' variant='h6' style={{color:'#FFFFFF'}}>FIZIOTARAPEUT</Typography></Box> 
-                        </Box>
-                        {RenderOdabraniFizio()}       {/*Set the bottom edge of the <div> element to 10px above the bottom edge of its nearest parent element with some positioning( u našem slučaju kako je tim box position relative a button box abosulte pozicionirat će se 10 px iznad donjeg bordera od tim boxa):*/}
+                        <Box style={{marginBottom:70}}>{/*margina da se ne preklopi sa save buttonom kad se dodaju igraci i fiziotarapeut onda titula box i select fizio stavljamo u zajednički box i zjedno mičemo od dna*/}
+                          <Box className={classes.titulaBox}>
+                            <IconButton disabled={(timSpremljen)? true : false} onClick={()=>dodajClana(6)} title="Dodaj fiziotarapeuta" style={{color:'#FFFFFF'}}><PersonAddIcon/></IconButton>
+                            <Box style={{flexGrow:1,marginRight:'15%'}}><Typography align='center' variant='h6' style={{color:'#FFFFFF'}}>FIZIOTARAPEUT</Typography></Box> 
+                          </Box>
+                          {RenderOdabraniFizio()}
+                        </Box>       {/*Set the bottom edge of the <div> element to 10px above the bottom edge of its nearest parent element with some positioning( u našem slučaju kako je tim box position relative a button box abosulte pozicionirat će se 10 px iznad donjeg bordera od tim boxa):*/}
                         <Box style={{width:'100%',display:'flex',justifyContent:'center',bottom:10, alignItems:'center',marginLeft:'auto',marginRight:'auto',position:'absolute'}}>
                           <Button disabled={(timSpremljen)? true : false} onClick={()=>spremiTim()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Potvrdi momcad za utakmicu' > SAVE</Button>
                         </Box>

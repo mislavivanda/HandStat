@@ -14,6 +14,7 @@ function Gledatelji() {
                                 <InputLabel >GLEDATELJI</InputLabel>
                                 <TextField
                                 type="number"
+                                inputProps={{min:0}}
                                 label=" "
                                 value={gledatelji}
                                 onChange={(e)=>dispatch(gledateljiOdabrani(e.target.value))}

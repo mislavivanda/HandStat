@@ -1,10 +1,9 @@
-import {React,useState,Fragment,useEffect} from 'react'
+import {React,Fragment} from 'react'
 import tim from '../mockdata/tim.js';
 import gameInfo from '../mockdata/gameInfo.js';
-import {Grid,Typography,Box, AppBar,Select,InputLabel,MenuItem,FormControl,Button,TextField} from '@material-ui/core'
+import {Grid,Typography,Box, AppBar} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles';
 import logo from '../images/handstat_logo.png';
-import SaveIcon from '@material-ui/icons/Save';
 import Timer from '../components/Timer';
 import TimVerticalBox from '../components/TimVerticalBox';
 import TijekUtakmiceBox from '../components/TijekUtakmiceBox';
@@ -25,6 +24,8 @@ import Zapisnicar from '../components/SelectZapisnicar';
 import MjeracVremena from '../components/SelectMjeracVremena';
 import Sudci from '../components/SelectSudci';
 import Klubovi from '../components/SelectKlubovi';
+import ZavrsiUtakmicu from '../components/ZavrsiUtakmicuButton';
+import OcjenaSudaca from '../components/SudacOcjena';
 import {MuiPickersUtilsProvider} from '@material-ui/pickers';
 import {useSelector} from 'react-redux';
 import DateFnsUtils from '@date-io/date-fns'; /*funkcije za manipulaciju s dateovima*/
@@ -62,16 +63,10 @@ const useStyles=makeStyles((theme)=>({
       justifyContent:'space-between'
     },
 }));
-export default function Vodenje_statistike() {
+export default function Vodenje_statistike(props) {
 const classes=useStyles();
 const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
-function zavrsiUtakmicu()
-{
-  //provjera jeli vrijeme na 60:00 došlo
-  //ako jest otvori popup inače error popup
-}
-//Svi potrebni podaci o utakmici
-
+const utakmicaZavrsena=useSelector(state=>state.zavrsiUtakmicu);
     return (
         <div>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>{/*za date picker provider*/}
@@ -80,7 +75,9 @@ function zavrsiUtakmicu()
                     <Box style={{ flexGrow:1,display:'flex',alignItems:'center',justifyContent:'center'}}><Typography align='center' variant='h6' style={{color:'#FFFFFF'}}>STATISTIKA UTAKMICE</Typography></Box>
             </AppBar>
             <Grid container style={{ margin:'100 auto', marginTop:100}} direction='column' justify='space-evenly' alignItems='center'>{/*container svega ispod navbara*/}
-                  <Grid className={classes.gameInfoBox} item container xs={12} direction='column' justify='flex-start' alignItems='flex-start'>{/* glavni container= cili box*/ }
+                  {
+                    (!spremljenGameInfo)?
+                  (<Grid className={classes.gameInfoBox} item container xs={12} direction='column' justify='flex-start' alignItems='flex-start'>{/* glavni container= cili box*/ }
                         <Grid item container   direction='column' justify='flex-start' alignItems='flex-start' xs={12}>{/* container koji sadrži 2 retka */}
                             <Grid container item direction='row' >{/*Container koji sadrži 3 dropboxa u retku */}
                             <Grid item style={{textAlign: 'center',margin:'0.5rem 1.5rem 1.5rem 1.5rem'}} xs={12} sm={5} md >
@@ -132,10 +129,13 @@ function zavrsiUtakmicu()
                   <Grid item container direction='row'  alignItems='center' justify='space-around' xs={12}>  {/* container domaći vs gosti*/}
                         <Klubovi timoviSvi={gameInfo.Timovi}/>
                 </Grid>
-                <Grid style={{marginTop:20}} item container direction='row' alignItems='center' justify='center' xs={12}> {/*SAVE button*/}
+                <Grid style={{marginTop:20,marginBottom:5}} item container direction='row' alignItems='center' justify='center' xs={12}> {/*SAVE button*/}
                       <Spremi/>{/*stavljen u posebnu komponenetu jer je taj state globalan i potreban ostalim komponentama*/}
                 </Grid>                {/*ako su spremljeni podaci o utakmici nema više klikanja*/}
-            </Grid>
+            </Grid>)
+            : 
+            null
+            }
             {
             (spremljenGameInfo)?//ako je spremljen game info onda prikazujemo donji dio za vođenje utakmice
            (
@@ -169,13 +169,17 @@ function zavrsiUtakmicu()
                       </Grid>
                </Grid>
             </Grid>
-            <Box style={{marginTop:50}}>
-              <Button onClick={()=>zavrsiUtakmicu()} disableRipple size='large' variant='contained' color='primary' endIcon={<SaveIcon/>} title='Završi utakmicu' > ZAVRŠI</Button>
-            </Box>
+            <ZavrsiUtakmicu/>
             </Fragment>
             )
             :
             null
+            }
+            {
+              (utakmicaZavrsena)?
+              <OcjenaSudaca history={props.history}/>
+              :
+              null
             }
             </Grid>
             </MuiPickersUtilsProvider>

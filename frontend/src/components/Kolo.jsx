@@ -14,6 +14,7 @@ function Kolo() {
                                 <InputLabel>KOLO</InputLabel>
                                 <TextField
                                 type="number"
+                                inputProps={{min:1}}
                                 label=" "
                                 value={kolo}
                                 onChange={(e)=>dispatch(odabranoKolo(e.target.value))}

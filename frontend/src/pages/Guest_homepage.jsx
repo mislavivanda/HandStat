@@ -4,6 +4,7 @@ import {makeStyles} from '@material-ui/core/styles';
 import Navbar from '../components/Navbar';
 import Rezultat from '../components/Rezultat';
 import logo from '../images/handstat_logo.png';
+import rezultati from '../mockdata/rezultatiUzivo';
 const useStyles=makeStyles((theme)=>({
     logoBox:{
         display:'flex',
@@ -29,88 +30,6 @@ const useStyles=makeStyles((theme)=>({
         margin:'auto'
     }
 }))
-const mockData=[
-    {
-        broj_utakmice:12698426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:12603426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:127018426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:12408426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:12206898426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:126986,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:126426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:1270426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:12426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    },
-    {
-        broj_utakmice:16898426,
-        natjecanje:'Premijer Liga',
-        domaci:'RK Nexe',
-        gosti:'RK PPD Zagreb',
-        golovi_domaci:25,
-        golovi_gosti:18
-    }
-];
 export default function Guest_homepage(props) {//props su defaultni propsi koje dobija svakka komponenta u App.js a omgućavaju ih provideri,u našem slučaju nas zanima browserPrvodier u kojem se nalazi history objekt-> pristupamo mu preko props.history
     const classes=useStyles();
     return (
@@ -139,7 +58,7 @@ export default function Guest_homepage(props) {//props su defaultni propsi koje 
                 </Grid>
                 <Grid item xs={12}>
                     <GridList  className={classes.gridList} cols={1} cellHeight={50} spacing={20} >
-                        {mockData.map((rezultat)=>(
+                        {rezultati.map((rezultat)=>(
                             <Grid key={rezultat.broj_utakmice} item sm={8} xs={12} className={classes.gridItem}>
                                 <Rezultat history={props.history} broj_utakmice={rezultat.broj_utakmice}  natjecanje={rezultat.natjecanje} domaci={rezultat.domaci} gosti={rezultat.gosti} golovi_domaci={rezultat.golovi_domaci} golovi_gosti={rezultat.golovi_gosti}/>
                            </Grid>

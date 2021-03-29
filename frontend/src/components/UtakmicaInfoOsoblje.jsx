@@ -27,24 +27,18 @@ const useStyles=makeStyles((theme)=>({
         margin:'0.5rem 0 0.5rem 0'
     }
 }))
-function UtakmicaInfoOsoblje() {
+function UtakmicaInfoOsoblje(props) {
     const classes=useStyles();
-    const [utakmicaOsoblje,setUtakmicaOsoblje]=useState(null);
-    useEffect(()=>{
-        setUtakmicaOsoblje({
-            nadzornik:utakmica.nadzornik,
-            lijecnik:utakmica.lijecnik,
-            zapisnicar:utakmica.zapisnicar,
-            mjeracVremena:utakmica.mjerac_vremena,
-            sudac1:utakmica.sudac1,
-            sudac2:utakmica.sudac2
-        })
-    },[])
+    const [utakmicaOsoblje,setUtakmicaOsoblje]=useState({
+        nadzornik:props.nadzornik,
+        lijecnik:props.lijecnik,
+        zapisnicar:props.zapisnicar,
+        mjeracVremena:props.mjerac_vremena,
+        sudac1:props.sudac1,
+        sudac2:props.sudac2
+    });
     return (
        <Fragment>
-            {
-                (utakmicaOsoblje)?
-                (
                <Grid item container className={classes.desniInfoGlavniBox} direction='column' justify='space-evenly' alignItems='center' xs={12} sm={8} md={7}>{/*box sa podacima DESNO*/}
                             <Grid item container direction='row' justify='space-evenly' alignItems='center' xs>{/* redak sa 2 boxa*/}
                                 <Grid item xs={5}>
@@ -95,10 +89,6 @@ function UtakmicaInfoOsoblje() {
                                 </Grid>
                             </Grid> 
                         </Grid>
-                )
-                :
-                null
-                }
        </Fragment>
     )
 }

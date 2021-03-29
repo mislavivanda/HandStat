@@ -2,6 +2,9 @@ import React,{Fragment,useState} from 'react'
 import {Box} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import DogadajBox from '../components/Dogadaj.jsx';
+import { useQuery } from '@apollo/client';//hook za poziv querya
+import {dohvatiSveDogadajeUtakmice} from '../graphql/query';
+import Alert from '@material-ui/lab/Alert';
 const useStyles=makeStyles((theme)=>({
     tijekUtakmiceBox:{
         display:'inline-flex',
@@ -13,26 +16,37 @@ const useStyles=makeStyles((theme)=>({
         minHeight:500
       }
 }))
-function DogadajiStatistika({dogadajiUtakmice}) {//inace preko useEffecta dohvat
+function DogadajiStatistika({broj_utakmice}) {//inace preko useEffecta dohvat
     const classes=useStyles();
-    const [dogadaji,setDogadaji]=useState(dogadajiUtakmice);
+    const { loading, error, data } = useQuery(dohvatiSveDogadajeUtakmice,{
+        variables:{
+            broj_utakmice:broj_utakmice
+        }
+    });
+    if(loading) return null;
+    
+    if(error) return (<Alert severity="error">{error.message}</Alert>)
+
+    if(data)
+    {
     return (
      <Fragment>
           <Box className={classes.tijekUtakmiceBox}>
-                              {dogadaji&&dogadaji.map((dogadaj)=>{
-                                if(dogadaj.tip===1)
+                              {data.dogadajiutakmice&&data.dogadajiutakmice.map((dogadajutk)=>{
+                                if(dogadajutk.dogadaj.tip===1)
                                 {
-                                    return <DogadajBox key={dogadaj.id} aktivan={false} vrijeme={dogadaj.vrijeme} klubikona={dogadaj.klubgrb} domaci={dogadaj.domaci} gosti={dogadaj.gosti} ime={dogadaj.ime} prezime={dogadaj.prezime} dogadaj={dogadaj.naziv_dogadaja} tip={1} />
+                                    return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.tim} domaci={dogadajutk.rez_domaci} gosti={dogadajutk.rez_gosti} ime={dogadajutk.akter.ime} prezime={dogadajutk.akter.prezime} dogadaj={dogadajutk.dogadaj.naziv} tip={1} />
                                 }
-                                else if(dogadaj.tip===2)
+                                else if(dogadajutk.dogadaj.tip===2)
                                 {
-                                    return <DogadajBox key={dogadaj.id} aktivan={false} vrijeme={dogadaj.vrijeme} klubikona={dogadaj.klubgrb} dogadaj={dogadaj.naziv_dogadaja} tip={2}/>
+                                    return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.tim} dogadaj={dogadajutk.dogadaj.naziv} tip={2}/>
                                 }
-                                else return <DogadajBox key={dogadaj.id} aktivan={false} vrijeme={dogadaj.vrijeme} klubikona={dogadaj.klubgrb} ime={dogadaj.ime} prezime={dogadaj.prezime} dogadaj={dogadaj.naziv_dogadaja} tip={3}/>
+                                else return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.klubgrb} ime={dogadajutk.akter.ime} prezime={dogadajutk.akter.prezime} dogadaj={dogadajutk.dogadaj.naziv} tip={3}/>
                               })}
             </Box>
      </Fragment>
     )
+    }
 }
 
 export default DogadajiStatistika

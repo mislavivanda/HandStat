@@ -1,12 +1,14 @@
 import { gql } from '@apollo/client';
 //kod mutacija je obavezno staviti tip mutation za razliku od querya kojima možemo i izostavit tip ako hoćemo
 //zapisnicar i nadzornik obavezni,mogu samo 1 sudac(npr dica)
+//vrati niz od 2 kluba koja igraju s njihovim podacima + slikon
 const dodajUtakmicu=gql`
     mutation($broj_utakmice:String!,kolo:Int!,datum:String!,vrijeme:String!,gledatelji:Int!,natjecanje_id:Int!,dvorana_id:Int!,
     nadzornik_id:String!,lijecnik_id:String,zapisnicar_id:String!,mjvremena_id:String,sudac1_id:String!,sudac2_id:String,timdomaci_id:Int!,timgosti_id:Int!){
         dodajutakmicu(broj_utakmice:$broj_utakmice,kolo:$kolo,datum:$datum,vrijeme:$vrijeme,gledatelji:$gledatelji,natjecanje_id:$natjecanje_id,dvorana_id:$dvorana_id,
         nadzornik_id:$nadzornik_id,lijecnik_id:$lijecnik_id,zapisnicar_id:$zapisnicar_id,mjvremena_id:$mjvremena_id,sudac1_id:$sudac1_id,sudac2_id:$sudac2_id,timdomaci_id:$timdomaci_id,timgosti_id:$timgosti_id){
-            broj_utakmice
+            id
+            naziv
         }
     }
 `;

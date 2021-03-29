@@ -10,7 +10,11 @@ import GeneralInfo from '../components/UtakmicaGeneralInfo';
 import OsobljeInfo from '../components/UtakmicaInfoOsoblje';
 import utakmica from '../mockdata/utakmica.js';
 import {odabranTimDomaci,odabranTimGosti} from '../redux/slicers/timovi';
-import { useSelector,useDispatch } from 'react-redux';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Alert from '@material-ui/lab/Alert';
+import { useDispatch } from 'react-redux';
+import {prikazUtakmice} from '../graphql/query';
+import { useQuery } from '@apollo/client';//hook za poziv querya
 const useStyles = makeStyles((theme)=>({
     appBar:{
         color:'primary',
@@ -66,21 +70,23 @@ const useStyles = makeStyles((theme)=>({
 function Utakmica_statistika(props) {
     const classes=useStyles();
     const dispatch=useDispatch();
-    const [utakmicaUcitana,setUtakmicaUcitana]=useState(false);
-    const brojUtakmice=props.match.params.broj_utakmice;//match.params je objekt koji sadrzi djelove URL po key value dijelu-> kod definicije rute za ovaj path stvili smo da se taj dio naziv :broj_utakmice pa ga na taj nacin mozemo i izvadit
-    const [domaciGolovi,setDomaciGolovi]=useState(null);
-    const [gostiGolovi,setGostiGolovi]=useState(null);
-    const timDomaci=useSelector(state=>state.timovi.timDomaci);
-    const timGosti=useSelector(state=>state.timovi.timGosti);
-    const kolo=useSelector(state=>state.kolo);
-    const natjecanje=useSelector(state=>state.natjecanje.odabranoNatjecanje);
-    useEffect(()=>{
-        dispatch(odabranTimDomaci({id:12685,naziv:'RK PPD ZAGREB',klub_slika:klub}));
-        dispatch(odabranTimGosti({id:120185,naziv:'RK BARCELONA',klub_slika:klub2}));
-        setDomaciGolovi(utakmica.domaciRez);
-        setGostiGolovi(utakmica.gostiRez);
-        setUtakmicaUcitana(true);
-    },[]);//kada stavimo [] tio znaci da ce se useeeffect pozvati samo 1 put
+    const brojUtakmice=decodeURIComponent(props.match.params.broj_utakmice).toString();//match.params je objekt koji sadrzi djelove URL po key value dijelu-> kod definicije rute za ovaj path stvili smo da se taj dio naziv :broj_utakmice pa ga na taj nacin mozemo i izvadit
+    //appolo sam vodi racuna o promjenama stanja zahtjeva i ceka na zahtjev, oaj query se poziva odmah cim se komponent mounta
+    //KOMPONENTA ĆE SE RENDERAT 2 PUTA JER CE SE PROMIJENIT STANJE LOADINGA PA ĆE TO UZROKOVATI DRUGI RERENDER
+    const { loading, error, data } = useQuery(prikazUtakmice,{
+        variables:{
+            broj_utakmice:brojUtakmice
+        }
+    });
+    if(loading) return <CircularProgress color='primary'/>
+    
+    if(error) return (<Alert severity="error">{error.message}</Alert>)
+
+    if(data)//kada stignu podaci
+    {
+        //postavi timove da druge komponenete znaju koji su timovi odabrani
+        dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:klub}));
+        dispatch(odabranTimGosti({id:data.utakmica.gosti.id,naziv:data.utakmica.gosti.naziv,klub_slika:klub2}));
     return (
         <div>
              
@@ -91,30 +97,33 @@ function Utakmica_statistika(props) {
             <Grid  container direction='column' justify='space-evenly' alignItems='center' style={{marginTop:100}}>{/*glavni container*/}
                 <Grid item  container direction='column' justify='space-evenly' alignItems='center' xs={12}>{/*gornji box sa podacima*/}
                     <Grid item container direction='row' justify='center' xs={12}>                                                    {/*tek kada se postave najtecanje i kolo u gameInfo komponenti ih ispisujemo*/}
-                        <Box className={classes.ligaBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h5'>{((kolo!==0)&&natjecanje)? (kolo+'. KOLO '+natjecanje.naziv) : ''}</Typography></Box>
+                        <Box className={classes.ligaBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h5'>{(data.utakmica.kolo+'. KOLO '+data.utakmica.natjecanje.naziv)}</Typography></Box>
                     </Grid>
                     <Grid item className={classes.lijeviDesniBoxContainer} container direction='row' justify='space-between' alignItems='stretch' xs={12}>{/*container od retka koji sadrži 2 stupca podataka*/}
-                        <GeneralInfo/>
-                        <OsobljeInfo/>
+                        <GeneralInfo vrijeme={data.utakmica.vrijeme} gledatelji={data.utakmica.gledatelji} datum={data.utakmica.datum} lokacija={{id:data.utakmica.lokacija.id,dvorana:data.utakmica.lokacija.dvorana,mjesto:data.utakmica.lokacija.mjesto}}/>
+                        <OsobljeInfo nadzornik={{maticni_broj:data.utakmica.nadzornik.maticni_broj,ime:data.utakmica.nadzornik.ime,prezime:data.utakmica.nadzornik.prezime}}
+                                     lijecnik={{maticni_broj:data.utakmica.lijecnik.maticni_broj,ime:data.utakmica.lijecnik.ime,prezime:data.utakmica.lijecnik.prezime}} 
+                                     zapisnicar={{maticni_broj:data.utakmica.zapisnicar.maticni_broj,ime:data.utakmica.zapisnicar.ime,prezime:data.utakmica.zapisnicar.prezime}}
+                                     mjerac_vremena={{maticni_broj:data.utakmica.mjeracvremena.maticni_broj,ime:data.utakmica.mjeracvremena.ime,prezime:data.utakmica.mjeracvremena.prezime}}
+                                     sudac1={{maticni_broj:data.utakmica.sudac1.maticni_broj,ime:data.utakmica.sudac1.ime,prezime:data.utakmica.sudac1.prezime}}
+                                     sudac2={{maticni_broj:data.utakmica.sudac2.maticni_broj,ime:data.utakmica.sudac2.ime,prezime:data.utakmica.sudac2.prezime}}
+                        />
                     </Grid>
                 </Grid>
             </Grid>
-              {
-                (utakmicaUcitana)?
-                (
                 <Fragment>
                 <Grid item container direction='row' justify='space-evenly' alignItems='stretch' style={{marginTop:50}} xs={12}>{/*container od rezultata*/}
                    <Grid item container direction='row' justify='center' alignItems='center' xs={12} md={5}>
                         <Box  className={classes.ekipaBox}>
-                            <Typography variant='h5' style={{color:'#FFFFFF'}}>{timDomaci.naziv}</Typography>
+                            <Typography variant='h5' style={{color:'#FFFFFF'}}>{data.utakmica.domaci.naziv}</Typography>
                         </Box>
                    </Grid>
                     <Grid item container direction='row' justify='center' alignItems='center'  xs={12} md={2}>
-                        <Box className={classes.rezultatBox}> <Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>{domaciGolovi+':'+gostiGolovi}</Typography></Box>
+                        <Box className={classes.rezultatBox}> <Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>{data.utakmica.rezultat_domaci+':'+data.utakmica.rezultat_gosti}</Typography></Box>
                     </Grid>
                     <Grid item container direction='row' justify='space-around' alignItems='center' xs={12} md={5}>
                     <Box className={classes.ekipaBox}>
-                            <Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>{timGosti.naziv}</Typography>
+                            <Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>{data.utakmica.gosti.naziv}</Typography>
                         </Box>
                     </Grid>
                 </Grid>
@@ -124,16 +133,13 @@ function Utakmica_statistika(props) {
                     <TimStatistika tim_id={120185} timStatistika={utakmica.timGosti}/>
                 </Grid>
                 <Grid style={{width:'100%',marginTop:50}} item container direction='row' justify='center' xs={12} md={4}>
-                         <DogadajiUtakmice dogadajiUtakmice={utakmica.dogadaji}/>
+                         <DogadajiUtakmice broj_utakmice={brojUtakmice}/>
                       </Grid>
             </Grid>
             </Fragment>
-            )
-            :
-            null
-            }
         </div>
     )
+    }
 }
 
 export default Utakmica_statistika

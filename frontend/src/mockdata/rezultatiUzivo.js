@@ -1,6 +1,6 @@
 const rezultati=[
     {
-        broj_utakmice:12698426,
+        broj_utakmice:"12345/67664",
         natjecanje:'Premijer Liga',
         domaci:'RK Nexe',
         gosti:'RK PPD Zagreb',

@@ -2,7 +2,6 @@ var express=require('express');
 const loaders=require('./loaders');//ucitamo sve loadere-> trebamo im poslat app
 const {nodelogger}=require('./loaders/logger');
 const config=require('./config');
-
 var app=express();
 
 async function start()

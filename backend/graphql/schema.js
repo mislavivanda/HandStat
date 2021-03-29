@@ -12,6 +12,8 @@ const {GraphQLObjectType,
         GraphQLList,
         GraphQLBoolean,
         Kind}=graphql;//KIND SADRŽI SVE TIPOVE VARIJABLI AKO JE POTREBNO U RESOLVERIMA PROVJERAVAT JELI PRIMLJENA VARIJALBA ISPRAVNOG TIPA
+const { GraphQLUpload } = require('graphql-upload');//OVO JE TIP KOJI NAM OMOGUĆAVA RUKOVANJE S FILEOVIMA,SVUGDJE DI KORISTIMO FILEOVE KAO TIP STAVIMO OVAJ TIP
+
 //Definicija našeg vlastitog skalarnog tipa,datum nije defaultni skalarni tip
 const Datum = new GraphQLScalarType({
 name: 'Datum',
@@ -577,7 +579,8 @@ const Utakmica=new GraphQLObjectType({
           nodelogger.error('Greška kod dohvaćanja sudca1 unutar Utakmica objekta '+error);
           throw(error);
         }
-      },
+      }
+    },
       sudac2:{
         type:Sudac,
         resolve(parent,args){
@@ -623,7 +626,6 @@ const Utakmica=new GraphQLObjectType({
           }
         }
       }
-    }
   })
 })
 const DogadajiUtakmice=new GraphQLObjectType({
@@ -901,8 +903,9 @@ const RootQuery=new GraphQLObjectType({
 const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novih sadržaja u bazu
   name:'Mutacije',
   fields:{
+    //vrati niz od 2 kluba s njihovim id i nazivom + slikama ako je uspješno bilo
     dodajutakmicu:{
-      type:Utakmica,
+      type:new GraphQLList(Klub),
       args:{
         broj_utakmice:{type:GraphQLString},
         kolo:{type:GraphQLInt},
@@ -910,7 +913,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         vrijeme:{type:Vrijeme},
         gledatelji:{type:GraphQLInt},
         natjecanje_id:{type:GraphQLInt},
-        dvorana:{type:GraphQLInt},
+        dvorana_id:{type:GraphQLInt},
         nadzornik_id:{type:GraphQLString},
         lijecnik_id:{type:GraphQLString},
         zapisnicar_id:{type:GraphQLString},
@@ -929,7 +932,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
             vrijeme:args.vrijeme,
             gledatelji:args.gledatelji,
             natjecanje_id:args.natjecanje_id,
-            mjesto_id:args.dvorana,
+            mjesto_id:args.dvorana_id,
             nadzornik_id:args.nadzornik_id,
             lijecnik_id:args.lijecnik_id,
             zapisnicar_id:args.zapisnicar_id,
@@ -958,7 +961,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         tehniko_id:{type:GraphQLString},
         fizio_id:{type:GraphQLString}
       },
-      async resolve(parent,args){//ako nam treba async await sintaksa samo je dodamo na resolve funkciju
+      resolve:async (parent,args)=>{//ako nam treba async await sintaksa samo je dodamo na resolve funkciju
         try {
           for(let i=0;i<args.igraci_id.length;i++)
           {
@@ -1004,7 +1007,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
       }
     },
     spremidogadaj:{
-      type:DogadajiUtakmice,//vrati dogadaj ako je uspjesno spremljen
+      type:DogadajiUtakmice,//vrati dogadajID ako je uspjesno spremljen
       args:{
         broj_utakmice:{type:GraphQLString},
         vrijeme:{type:GraphQLString},
@@ -1032,7 +1035,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
       }
     },
     spremigolpoziciju:{
-      type:GolPozicija,//vrati true ako je dobro sve
+      type:GolPozicija,//vrati id novokreirani ako je dobro sve
       args:{
         pozicija:{type:GraphQLInt},
         gol:{type:GraphQLBoolean},

@@ -105,7 +105,8 @@ const ClanTima=new GraphQLObjectType({
       nacionalnost:{type:GraphQLString},
       datum_rodenja:{type:Datum},
       visina:{type:GraphQLInt},
-      tezina:{type:GraphQLInt}
+      tezina:{type:GraphQLInt},
+      rola:{type:GraphQLInt}
   })
 })
 const Klub=new GraphQLObjectType({
@@ -369,7 +370,6 @@ const GolmanStatistika=new GraphQLObjectType({
         try {
           return models.clanovitima.findOne({
             where:{
-              rola:2,
               maticni_broj:parent.maticni_broj//maticni broj ce doci iz resolvera od ispisa statistike cijelog tima iz niza objekata koji sadrze podatke o statistici golmana medu kojima se nalazi i maticni_broj
             }
           })
@@ -393,12 +393,7 @@ const StozerStatistika=new GraphQLObjectType({
         try {
           return models.clanovitima.findOne({
             where:{
-              [Op.and]: [{ maticni_broj: parent.maticni_broj },
-                          {  rola:{
-                              [Op.in]:[3,4,5,6]
-                            } 
-                          }
-                          ],      
+            maticni_broj: parent.maticni_broj
             }
           });
         } catch (error) {
@@ -617,7 +612,7 @@ const Utakmica=new GraphQLObjectType({
           try {
             return models.klub.findOne({
               where:{
-                id:parent.domaci_id
+                id:parent.gosti_id
               }
             })
           } catch (error) {

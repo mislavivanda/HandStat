@@ -8,7 +8,6 @@ import TimStatistika from '../components/TimStatistika';
 import DogadajiUtakmice from '../components/DogadajiStatistika';
 import GeneralInfo from '../components/UtakmicaGeneralInfo';
 import OsobljeInfo from '../components/UtakmicaInfoOsoblje';
-import utakmica from '../mockdata/utakmica.js';
 import {odabranTimDomaci,odabranTimGosti} from '../redux/slicers/timovi';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from '@material-ui/lab/Alert';
@@ -64,6 +63,11 @@ const useStyles = makeStyles((theme)=>({
         backgroundColor:theme.palette.primary.main,
         width:'100%',
         height:60
+    },
+    loadingItem:{
+        position:'fixed',
+        top:'50%',//centrira na način da stavi margin top 50% visine ekrana od vrha i 50% od sirin ekrana
+        left:'50%'
     }
 
 }))
@@ -78,7 +82,7 @@ function Utakmica_statistika(props) {
             broj_utakmice:brojUtakmice
         }
     });
-    if(loading) return <CircularProgress color='primary'/>
+    if(loading) return <CircularProgress className={classes.loadingItem} color='primary'/>
     
     if(error) return (<Alert severity="error">{error.message}</Alert>)
 
@@ -129,8 +133,8 @@ function Utakmica_statistika(props) {
                 </Grid>
             <Grid item  container direction='row' justify='space-evenly' alignItems='center' xs={12}>{/*container koji sadrzi tablice statistike i listu događaja*/}
                 <Grid item  container direction='column' justify='space-evenly' alignItems='center' xs={12} md={7}>{/*container koji sadrzi tablice statistike za oba tima*/}
-                    <TimStatistika tim_id={12685} timStatistika={utakmica.timDomaci}/>
-                    <TimStatistika tim_id={120185} timStatistika={utakmica.timGosti}/>
+                    <TimStatistika tim_id={data.utakmica.domaci.id} broj_utakmice={brojUtakmice}/>
+                    <TimStatistika tim_id={data.utakmica.gosti.id}  broj_utakmice={brojUtakmice}/>
                 </Grid>
                 <Grid style={{width:'100%',marginTop:50}} item container direction='row' justify='center' xs={12} md={4}>
                          <DogadajiUtakmice broj_utakmice={brojUtakmice}/>

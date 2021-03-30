@@ -238,6 +238,7 @@ const dohvatiStatistikuTima=gql`
                     maticni_broj
                     ime
                     prezime
+                    rola
                 }
             }
         }

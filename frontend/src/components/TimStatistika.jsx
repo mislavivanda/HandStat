@@ -3,6 +3,9 @@ import React,{Fragment,useState} from 'react'
 import {Box,Typography,Grid} from '@material-ui/core';
 import { useSelector} from 'react-redux';
 import StatistikaBox from '../components/Table_stats_box.jsx';
+import { useQuery } from '@apollo/client';//hook za poziv querya
+import {dohvatiStatistikuTima} from '../graphql/query';
+import Alert from '@material-ui/lab/Alert';
 const useStyles=makeStyles((theme)=>({
     statistikaGlavniBox:{
         borderColor:theme.palette.secondary.main,
@@ -50,10 +53,38 @@ const useStyles=makeStyles((theme)=>({
       height:60
     }
 }));
-function TimStatistika({tim_id,timStatistika,domaci}) {//da zna za koji tim mora dohvatit podatke kad spojimo s backendom,zasad mu saljemo gotove
+function TimStatistika({tim_id,broj_utakmice}) {//parametri potrebni za dohvat stati
     const classes=useStyles();
-    const [tim,setTim]=useState(timStatistika);
     const timovi=useSelector(state=>state.timovi);
+    function odrediTitulu(rola)
+    {
+        if(rola===3)
+        {
+            return "Trener";
+        }
+        else if(rola===4)
+        {
+            return "Službeni predstavnik";
+        }
+        else if(rola===5)
+        {
+            return "Tehniko"
+        }
+        else return "Fiziotarapeut";
+    }
+    const {data,loading,error}=useQuery(dohvatiStatistikuTima,{
+        variables:{
+            broj_utakmice:broj_utakmice,
+            klub_id:tim_id
+        }
+    });
+
+    if(loading) return null
+
+    if(error) return (<Alert severity="error">{error.message}</Alert>);
+
+    if(data)
+    {
     return (
       <Fragment>
                 <Grid item  className={classes.statistikaGlavniBox}  container direction='column' justify='space-evenly' alignItems='center' xs={12}>{/*container tablice statistike igraca*/}
@@ -62,7 +93,7 @@ function TimStatistika({tim_id,timStatistika,domaci}) {//da zna za koji tim mora
                             <Typography align='center' variant='h4' style={{color:'#FFFFFF'}}>{(tim_id===timovi.timDomaci.id)? timovi.timDomaci.naziv : timovi.timGosti.naziv}</Typography>
                         </Box>
                         <Box className={classes.statistikaBoxTitula}><Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>IGRAČI</Typography></Box>
-                        <Box className={classes.statistikaBoxStupciBox}>{/*mkanemo tekts za 5% sirine-> kakda ga maknemo za 5% udesno tada će se za centiranje elementa paddgin racunat od ostatka odnosno sve-5% a to će bit isto centriranje ko kod polja ispod-> pomak udesno koliko zauzima dres a to je 12.5% unutarnjeg containera */ }
+                        <Box className={classes.statistikaBoxStupciBox}>{/*maknemo tekst za 5% sirine-> kakda ga maknemo za 5% udesno tada će se za centiranje elementa paddgin racunat od ostatka odnosno sve-5% a to će bit isto centriranje ko kod polja ispod-> pomak udesno koliko zauzima dres a to je 12.5% unutarnjeg containera */ }
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'40%'}}><Typography align='center'  style={{color:'#FFFFFF',marginLeft:'12.5%'}}>IGRAČ</Typography></Box>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'12%'}}><Typography align='center'  style={{color:'#FFFFFF'}}>GOL</Typography></Box>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'12%'}}><Typography align='center' style={{color:'#FFFFFF'}}>2M</Typography></Box>
@@ -70,7 +101,7 @@ function TimStatistika({tim_id,timStatistika,domaci}) {//da zna za koji tim mora
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'12%'}}><Typography align='center' style={{color:'#FFFFFF'}}>C</Typography></Box>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'12%'}}><Typography align='center' style={{color:'#FFFFFF'}}>P</Typography></Box>
                         </Box>
-                        {tim&&tim.Igraci.map((igrac)=><StatistikaBox key={igrac.maticni_broj} dres={igrac.broj_dresa} ime={igrac.ime} prezime={igrac.prezime} golovi={igrac.golovi} iskljucenja={igrac.iskljucenja} zuti={igrac.zuti} crveni={igrac.crveni} plavi={igrac.plavi} tip={1} />)}
+                        {data.timstatistika.igraci&&data.timstatistika.igraci.map((igracstat)=><StatistikaBox key={igracstat.igrac.maticni_broj} dres={igracstat.igrac.broj_dresa} ime={igracstat.igrac.ime} prezime={igracstat.igrac.prezime} golovi={igracstat.golovi} pokusaji={igracstat.pokusaji} iskljucenja={igracstat.iskljucenja} zuti={igracstat.zuti} crveni={igracstat.crveni} plavi={igracstat.plavi} tip={1} />)}
                         <Box className={classes.statistikaBoxTitula}><Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>GOLMANI</Typography></Box>
                         <Box className={classes.statistikaBoxStupciBox}>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'40%'}}><Typography align='center'  style={{color:'#FFFFFF',marginLeft:'12.5%'}}>GOLMAN</Typography></Box>
@@ -81,7 +112,7 @@ function TimStatistika({tim_id,timStatistika,domaci}) {//da zna za koji tim mora
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'8%'}}><Typography align='center' style={{color:'#FFFFFF'}}>C</Typography></Box>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'8%'}}><Typography align='center'style={{color:'#FFFFFF'}}>P</Typography></Box>
                         </Box >
-                        {tim&&tim.Golmani.map((golman)=><StatistikaBox key={golman.maticni_broj} dres={golman.broj_dresa} ime={golman.ime} prezime={golman.prezime} golovi={golman.golovi} iskljucenja={golman.iskljucenja} zuti={golman.zuti} crveni={golman.crveni} plavi={golman.plavi} obrane={golman.obrane} tip={2}/>)}
+                        {data.timstatistika.golmani&&data.timstatistika.golmani.map((golmanstat)=><StatistikaBox key={golmanstat.golman.maticni_broj} dres={golmanstat.golman.broj_dresa} ime={golmanstat.golman.ime} prezime={golmanstat.golman.prezime} golovi={golmanstat.golovi} pokusaji={golmanstat.pokusaji} iskljucenja={golmanstat.iskljucenja} zuti={golmanstat.zuti} crveni={golmanstat.crveni} plavi={golmanstat.plavi} obrane={golmanstat.obrane_ukupno} primljeni={golmanstat.primljeni_ukupno} tip={2}/>)}
                         <Box className={classes.statistikaBoxTitula}><Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>STRUČNI STOŽER</Typography></Box>
                         <Box className={classes.statistikaBoxStupciBox}>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'40%'}}><Typography align='center' style={{color:'#FFFFFF'}}>IME I PREZIME</Typography></Box>
@@ -90,10 +121,11 @@ function TimStatistika({tim_id,timStatistika,domaci}) {//da zna za koji tim mora
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'8%'}}><Typography align='center' style={{color:'#FFFFFF'}}>C</Typography></Box>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'8%'}}><Typography align='center'  style={{color:'#FFFFFF'}}>P</Typography></Box>
                         </Box>
-                        {tim&&tim.Stozer.map((clan)=><StatistikaBox key={clan.maticni_broj} ime={clan.ime} prezime={clan.prezime} zuti={clan.zuti} crveni={clan.crveni} plavi={clan.plavi} titula={clan.titula} tip={3} />)}
+                        {data.timstatistika.stozer&&data.timstatistika.stozer.map((clanstat)=><StatistikaBox key={clanstat.clan.maticni_broj} ime={clanstat.clan.ime} prezime={clanstat.clan.prezime} zuti={clanstat.zuti} crveni={clanstat.crveni} plavi={clanstat.plavi} titula={odrediTitulu(clanstat.clan.rola)} tip={3} />)}
                     </Grid>
       </Fragment>
     )
+    }
 }
 
 export default TimStatistika

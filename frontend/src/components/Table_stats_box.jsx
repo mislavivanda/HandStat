@@ -45,7 +45,7 @@ function Table_stats_box(props) {
             <Box className={classes.glavniBox}>
                 <Box className={classes.dres}><Typography align='center' style={{color:'#FFFFFF'}}>{props.dres}</Typography></Box>
                 <Box className={classes.imePrezimeBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'12%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.golovi}</Typography></Box>
+                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'12%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
                 <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'12%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
                 <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'12%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.zuti}</Typography></Box>
                 <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'12%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.crveni}</Typography></Box>
@@ -58,8 +58,8 @@ function Table_stats_box(props) {
             <Box className={classes.glavniBox}>
                 <Box className={classes.dres}><Typography align='center' style={{color:'#FFFFFF'}}>{props.dres}</Typography></Box>
                 <Box className={classes.imePrezimeBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:'#FFFFFF'}}>{props.obrane}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:'#FFFFFF'}}>{props.golovi}</Typography></Box>
+                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:'#FFFFFF'}}>{(props.obrane>0||props.primljeni>0)? (props.obrane+'/'+(props.obrane+props.primljeni)) : ""}</Typography></Box>
+                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
                 <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
                 <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.zuti}</Typography></Box>
                 <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.crveni}</Typography></Box>

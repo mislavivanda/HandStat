@@ -1,6 +1,4 @@
 import {React,Fragment} from 'react'
-import tim from '../mockdata/tim.js';
-import gameInfo from '../mockdata/gameInfo.js';
 import {Grid,Typography,Box, AppBar} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles';
 import logo from '../images/handstat_logo.png';
@@ -81,13 +79,13 @@ const utakmicaZavrsena=useSelector(state=>state.zavrsiUtakmicu);
                         <Grid item container   direction='column' justify='flex-start' alignItems='flex-start' xs={12}>{/* container koji sadrži 2 retka */}
                             <Grid container item direction='row' >{/*Container koji sadrži 3 dropboxa u retku */}
                             <Grid item style={{textAlign: 'center',margin:'0.5rem 1.5rem 1.5rem 1.5rem'}} xs={12} sm={5} md >
-                                <Natjecanje natjecanja={gameInfo.Natjecanja}/>
+                                <Natjecanje />
                               </Grid>
                               <Grid item style={{textAlign: 'center',margin:'0.5rem 1.5rem 1.5rem 1.5rem'}} xs={12} sm={5} md>
                                 <BrojUtakmice/>
                               </Grid>
                               <Grid item style={{textAlign: 'center',margin:'0.5rem 1.5rem 1.5rem 1.5rem'}} xs={12} sm={12} md>
-                                <Lokacija dvorane={gameInfo.Dvorane}/>
+                                <Lokacija />
                               </Grid>
                             </Grid>
                             <Grid  container item direction='row'  >{/*Container koji sadrži 4 dropboxa u retku */}
@@ -108,26 +106,26 @@ const utakmicaZavrsena=useSelector(state=>state.zavrsiUtakmicu);
                         <Grid item container direction='column' justify='flex-start' alignItems='flex-start' xs={12}>{/* container koji sadrži 4 dropboxa */}
                             <Grid container item direction='row'  >{/*Container koji sadrži 2 dropboxa u retku */}
                               <Grid item style={{textAlign: 'center',margin:'0.5rem 1.5rem 1.5rem 1.5rem'}} xs={12} sm>{/*ako ocemo da automatski dijele raspolozvii prostor samo stavimo xs */}
-                              <Nadzornik nadzornici={gameInfo.Nadzornici}/>
+                              <Nadzornik />
                               </Grid>
                               <Grid item style={{textAlign: 'center',margin:'0.5rem 1.5rem 1.5rem 1.5rem'}} xs={12} sm>
-                              <Lijecnik lijecnici={gameInfo.Lijecnici}/>
+                              <Lijecnik />
                               </Grid>
                             </Grid>
                             <Grid container item direction='row'  >{/*Container koji sadrži 2 dropboxa u retku */}
                               <Grid item style={{textAlign: 'center',margin:'0.5rem 1.5rem 1.5rem 1.5rem'}} xs={12} sm>{/*ako ocemo da automatski dijele raspolozvii prostor samo stavimo xs */}
-                              <Zapisnicar zapisnicari={gameInfo.Zapisnicari}/>
+                              <Zapisnicar />
                               </Grid>
                               <Grid item style={{textAlign: 'center',margin:'0.5rem 1.5rem 1.5rem 1.5rem'}} xs={12} sm>
-                                <MjeracVremena mjeraciVremena={gameInfo.MjeraciVremena}/>
+                                <MjeracVremena />
                               </Grid>
                             </Grid>
                         </Grid>
                         <Grid item container direction='column' justify='center' alignItems='center' xs={12}>{/*Container sudaca*/}
-                        <Sudci sudacSvi={gameInfo.Suci}/>
+                        <Sudci />
                       </Grid>
                   <Grid item container direction='row'  alignItems='center' justify='space-around' xs={12}>  {/* container domaći vs gosti*/}
-                        <Klubovi timoviSvi={gameInfo.Timovi}/>
+                        <Klubovi />
                 </Grid>
                 <Grid style={{marginTop:20,marginBottom:5}} item container direction='row' alignItems='center' justify='center' xs={12}> {/*SAVE button*/}
                       <Spremi/>{/*stavljen u posebnu komponenetu jer je taj state globalan i potreban ostalim komponentama*/}
@@ -151,10 +149,10 @@ const utakmicaZavrsena=useSelector(state=>state.zavrsiUtakmicu);
             </Grid>
             <Grid style={{marginTop:50}} item container direction='row' alignItems='flex-start' justify='space-evenly'>{/*container od 4 stupca-> stupac domaće ekipe,gostujuće događaji i gol+dogadaji utakmice*/}
               <Grid  style={{borderColor:'#000000',borderStyle:'solid'}}item container direction='column' alignItems='center' justify='space-evenly' xs={12} sm={6} md={3}>{/* vertikalni box od domaćeg tima*/ }
-                <TimVerticalBox tim={tim[0]} tim_id={1}/>
+                <TimVerticalBox tim_id={1}/>
                </Grid>
                <Grid  style={{borderColor:'#000000',borderStyle:'solid'}}item container direction='column' alignItems='center' justify='space-evenly' xs={12} sm={6} md={3}>{/* vertikalni box od gostujućeg tima*/ }
-                   <TimVerticalBox tim={tim[1]} tim_id={2}/>
+                   <TimVerticalBox tim_id={2}/>
                </Grid>
                <Grid  style={{borderColor:'#000000',borderStyle:'solid'}}item container direction='column' alignItems='center' justify='space-evenly' xs={12} sm={6} md={2}>{/* vertikalni box od događaja*/ }
                    <MoguciDogadaji/>

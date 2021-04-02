@@ -4,26 +4,29 @@ import {useDispatch,useSelector } from 'react-redux';
 import {sudac1Odabran,sudac2Odabran} from '../redux/slicers/sudci';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import SportsIcon from '@material-ui/icons/Sports';
-export default function Sudci({sudacSvi}) {
+import { useQuery } from '@apollo/client';
+import {dohvatiSveSuce} from '../graphql/query';
+import Alert from '@material-ui/lab/Alert';
+export default function Sudci() {
   const dispatch=useDispatch();
   const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
   const {sudac1,sudac2}=useSelector(state=>state.sudci);
-  const [sudacPreostali,setSudacPreostali]=useState(sudacSvi);
+  const [sudacPreostali,setSudacPreostali]=useState(null);//prazno dok ne dohvatimo suce, možd POVEZAT SUDCE SA NATJECANJIMA U BAZI DA MANJE PODATAKA DOHVAĆAMO
   function odabranSudac(odabranSudac,broj)//broj oznacava je li sudac1 ili sudac2
-{
-  let new_array=sudacPreostali.filter((sudac)=>sudac.maticni_broj!==odabranSudac.maticni_broj);//izbacit odabranog suca iz niza preostlaih
-  if(broj===1)//sudac1
   {
-    //ako je odabran neki od 2 suca prethodno onda nakon odabira drugoga moramo vratiti prethodno odabranog(koji postoji ako je sudac1 ili 2 razlicit od null) u niz preostalih
-    if(sudac1)//ako je prethodno sudac1= null onda nije bio nijedan odabran-> ne trebamo vraćat ništa u preostale
+    let new_array=sudacPreostali.filter((sudac)=>sudac.maticni_broj!==odabranSudac.maticni_broj);//izbacit odabranog suca iz niza preostlaih
+    if(broj===1)//sudac1
     {
-      setSudacPreostali([...new_array,{maticni_broj:sudac1.maticni_broj,ime:sudac1.ime,prezime:sudac1.prezime,mjesto:sudac1.mjesto}]);
-    }
-    else
-    {
-      setSudacPreostali(new_array);
-    }
-    dispatch(sudac1Odabran(odabranSudac));
+      //ako je odabran neki od 2 suca prethodno onda nakon odabira drugoga moramo vratiti prethodno odabranog(koji postoji ako je sudac1 ili 2 razlicit od null) u niz preostalih
+      if(sudac1)//ako je prethodno sudac1= null onda nije bio nijedan odabran-> ne trebamo vraćat ništa u preostale
+      {
+        setSudacPreostali([...new_array,{maticni_broj:sudac1.maticni_broj,ime:sudac1.ime,prezime:sudac1.prezime,mjesto:sudac1.mjesto}]);
+      }
+      else
+      {
+        setSudacPreostali(new_array);
+      }
+      dispatch(sudac1Odabran(odabranSudac));
   }
   else
   {
@@ -38,6 +41,19 @@ export default function Sudci({sudacSvi}) {
     dispatch(sudac2Odabran(odabranSudac));
   }
 }
+const {loading,error,data}=useQuery(dohvatiSveSuce);
+
+if(loading) return null;
+
+if(error) return (<Alert severity="error">{error.message}</Alert>);
+
+if(data)
+{
+  if(!sudacPreostali)//KADA POSTAVIMO DONJI STATE KOMPONENTA ĆE SE RERENDERAT-> NEĆE PONOVNO POZVATI USEQUERY ALI ĆE PONOVNO POSTAVIT STATE I TSE PONOVO REREDNERAT ITD-> ERROR:TO MANY REREDNERS
+  //POSTAVLJAMO STATE SAMO PRVI PUT ODNOSNO KADA JE ON NULL-> TAKO SE ZASITIMO OD BESKONACNOG RERENDERANJA
+  {
+  setSudacPreostali(data.suci);//postavi ih u state nakon dohvata
+  }
     return (
       <Fragment>
                      <Grid item container  direction='row' justify='space-around' alignItems='center' xs={12} > {/* redak sudca*/}
@@ -86,4 +102,5 @@ export default function Sudci({sudacSvi}) {
                         </Grid>
       </Fragment>
     )
+}
 }

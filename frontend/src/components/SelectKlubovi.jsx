@@ -1,41 +1,72 @@
-import React,{Fragment,useState} from 'react'
+import React,{Fragment,useState,useEffect} from 'react'
 import klub from '../images/zagreb.jpg';
 import {Typography,Box,Select,MenuItem,FormControl,InputLabel,Grid} from '@material-ui/core'
 import {odabranTimDomaci,odabranTimGosti} from '../redux/slicers/timovi';
 import { useSelector,useDispatch } from 'react-redux';
-function SelectKlubovi({timoviSvi}) {
+import { useLazyQuery } from '@apollo/client';
+import {dohvatiSveKluboveOdNatjecanja} from '../graphql/query';
+import Alert from '@material-ui/lab/Alert';
+import { ContactsTwoTone } from '@material-ui/icons';
+function SelectKlubovi() {
     const dispatch=useDispatch();
     const {timDomaci,timGosti}=useSelector(state=>state.timovi);
     const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
-    const [timPreostali,setTimPreostali]=useState(timoviSvi);
+    const natjecanje=useSelector(state=>state.natjecanje.odabranoNatjecanje);//DOHVAĆAMO SAMO KLUBOVE IZ ODABRANOG NATJECANJA
+    const [timPreostali,setTimPreostali]=useState(null);
     function odabranTim(odabranTim,broj)//broj označava je li riječ o domaćem ili gostujućem timu
-{
-  let new_array=timPreostali.filter((tim)=>tim.id!==odabranTim.id);
-  if(broj===1)
-  {//id=null znaci da nije jos odabran taj tim
-    if(timDomaci)//isti princip kao za suce
     {
-      setTimPreostali([...new_array,{id:timDomaci.id,naziv:timDomaci.naziv}]);
-    }
-    else
-    {
-      setTimPreostali(new_array);
-    }
-    dispatch(odabranTimDomaci({id:odabranTim.id,naziv:odabranTim.naziv,klub_slika:klub}));
+      let new_array=timPreostali.filter((tim)=>tim.id!==odabranTim.id);
+      if(broj===1)
+      {//id=null znaci da nije jos odabran taj tim
+        if(timDomaci)//isti princip kao za suce
+        {
+          setTimPreostali([...new_array,{id:timDomaci.id,naziv:timDomaci.naziv}]);
+        }
+        else
+        {
+          setTimPreostali(new_array);
+        }
+        dispatch(odabranTimDomaci({id:odabranTim.id,naziv:odabranTim.naziv,klub_slika:klub}));
+      }
+      else
+      {
+        if(timGosti)
+        {
+          setTimPreostali([...new_array,{id:timGosti.id,naziv:timGosti.naziv}]);
+        }
+        else
+        {
+          setTimPreostali(new_array);
+        }
+      dispatch(odabranTimGosti({id:odabranTim.id,naziv:odabranTim.naziv,klub_slika:klub}));
+      }
   }
-  else
+   const [dohvatiKlubove,{loading,error,data}]=useLazyQuery(dohvatiSveKluboveOdNatjecanja,{
+    onCompleted(data){//POZIVA SE ako se USPJEŠNO IZVRŠI QUERY
+      setTimPreostali(data.klubovi);//postavi dohvaćene klubove
+    }
+   })//ne poziva se odmah nego kad pozovoemo dohvatiKlubove funkciju koju je vratila
+
+   useEffect(()=>{
+    if(natjecanje)//osigurat se da je razlicito od null-> ODABRANO
+    {
+      dohvatiKlubove({//poziva query i onda se izvodi donji dio s loading,error i data
+        variables:{natjecanje_id:natjecanje.id}
+    });
+    console.log('Pozvan query');
+    //OČISTI TRENUTNO ODABRANA NATJECANJA AKO IH IMA-> POSTAVIT ODABRANE TIMOVE NA NULL
+    dispatch(odabranTimDomaci(null));
+    dispatch(odabranTimGosti(null));
+    }
+   },[natjecanje]);//poziva se kod svake promjene odabira natjecanja-> dohvat novihh klubova
+
+  if(loading) return null;
+
+  if(error) return (<Alert severity="error">{error.message}</Alert>);
+
+  if(data)
   {
-    if(timGosti)
-    {
-      setTimPreostali([...new_array,{id:timGosti.id,naziv:timGosti.naziv}]);
-    }
-    else
-    {
-      setTimPreostali(new_array);
-    }
-   dispatch(odabranTimGosti({id:odabranTim.id,naziv:odabranTim.naziv,klub_slika:klub}));
-  }
-}
+    console.log('DATA: '+JSON.stringify(data)+' state: '+JSON.stringify(timPreostali));
     return (
        <Fragment>
              <Grid  item style={{textAlign: 'center'}}  xs={12} md={5}>
@@ -59,6 +90,9 @@ function SelectKlubovi({timoviSvi}) {
             </Grid>
        </Fragment>
     )
+  }
+  return null;//ZA SLUČAJ DOK JOŠ NIJE POZVAN QUERY-> VRATIMO NULL TAKO DA SE NE PRIKAŽE MOGUĆNOST ODABIRA KLUBOVA DOK SE NE ODABERE NATJECANJE
+
 }
 
 export default SelectKlubovi

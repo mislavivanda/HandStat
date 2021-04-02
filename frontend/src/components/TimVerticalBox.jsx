@@ -8,6 +8,9 @@ import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import SaveIcon from '@material-ui/icons/Save';
 import { useSelector, useDispatch } from 'react-redux';
 import {spremljenDomaci,spremljenGosti} from '../redux/slicers/timovi';
+import { useQuery } from '@apollo/client';
+import {dohvatiSveClanoveTima} from '../graphql/query';
+import Alert from '@material-ui/lab/Alert';
 const useStyles=makeStyles((theme)=>({
     klubBox:{
         display:'flex',
@@ -36,29 +39,28 @@ const useStyles=makeStyles((theme)=>({
       },
 
 }))
-function TimVerticalBox({tim,tim_id})//inace cemo slat tim_id pa će po njemu dohvaćat sve clanove tima,zasad saljemo niz
+function TimVerticalBox({tim_id})//inace cemo slat tim_id pa će po njemu dohvaćat sve clanove tima,zasad saljemo niz
 {
 const classes=useStyles();
 const timovi=useSelector(state=>state.timovi);
 const dispatch=useDispatch();
-const [timSviIgraci,setTimSviIgraci]=useState(tim.Igraci);//svi igraci koje primimo s backenda
+const [timSviIgraci,setTimSviIgraci]=useState(null);//svi igraci koje primimo s backenda
 const [timIgraci,setTimIgraci]=useState([]);//igraci koje smo ODABRALI
-const [timPreostaliIgraci,setTimPreostaliIgraci]=useState(tim.Igraci);//preostali igraci koje nismo jos odabrali a nalaze se u selectu
-const [timSviGolmani,setTimSviGolmani]=useState(tim.Golmani);
+const [timPreostaliIgraci,setTimPreostaliIgraci]=useState(null);//preostali igraci koje nismo jos odabrali a nalaze se u selectu
+const [timSviGolmani,setTimSviGolmani]=useState(null);
 const [timGolmani,setTimGolmani]=useState([]);
-const [timPreostaliGolmani,setTimPreostaliGolmani]=useState(tim.Golmani);
-const [timSviTreneri,setTimSviTreneri]=useState(tim.Treneri);//može biti više trenera u klubu i može se dogoditi da svakio od njih može vodit utakmica
+const [timPreostaliGolmani,setTimPreostaliGolmani]=useState(null);
+const [timSviTreneri,setTimSviTreneri]=useState(null);//može biti više trenera u klubu i može se dogoditi da svakio od njih može vodit utakmica
 const [timTrener,setTimTrener]=useState({});//samo 1 može biti,nije niz nego varijabla,točnije objekt
 //NE MOŽE DODAVAT VIŠE OD 1 TRENERA TO MU NE DOPUŠTAMO PA AKO OĆE DODAT NEKOG DRUGOG TENEERA MORA IZBRISAT PRETHODNO DODANOG TRENERA, KLIKNUT NA IKONU DODAJ CLANA I IZABRAT TOG TRENERA OD SVIH MOGUCIH
 //NEMA POTREBE ZA NIZOM PREOSTALI TRENERI, ISTO VRIJEDI I ZA OSTALE TITULE GDJE MOŽE BITI SAMO 1 ČLAN
-const [timSviSluzbeni,setTimSviSluzbeni]=useState(tim.Sluzbeni);//sluzbeni predstavnik
+const [timSviSluzbeni,setTimSviSluzbeni]=useState(null);//sluzbeni predstavnik
 const [timSluzbeni,setTimSluzbeni]=useState({});
-const [timSviTehniko,setTimSviTehniko]=useState(tim.Tehniko);
+const [timSviTehniko,setTimSviTehniko]=useState(null);
 const [timTehniko,setTimTehniko]=useState({});
-const [timSviFizio,setTimSviFizio]=useState(tim.Fiziotarapeut);
+const [timSviFizio,setTimSviFizio]=useState(null);
 const [timFizio,setTimFizio]=useState({});
 const [timSpremljen,setTimSpremljen]=useState(false);
-const [odabraniClan,setOdabraniClan]=useState(null);//kod klika na clana-> on postaje odabran, kada nitko nije selektiran-> NULL
 function isEmpty(obj) {//custom utility funkcija koja gleda jeli objekt prazan-> ako jest onda ne iscrtavamo ništa odnosno return null
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
@@ -265,6 +267,29 @@ function RenderOdabraniFizio()
     </Fragment>
   )
 }
+//ovisno o tome jeli prosljeden 1 ili 2 kao tim_id saljemo query za clanove tima domaceg ili gostujućeg tima
+  const {loading,error,data}=useQuery(dohvatiSveClanoveTima,{
+    variables:{
+      klub_id:(tim_id===1)? timovi.timDomaci.id : timovi.timGosti.id
+    },
+    onCompleted(data){//IZVRŠAVA SE NAKON USPJEŠNOG DOHVATA PODATAKA-> U NJOJ POSTAVIMO SVE POTREBEN STATEOVE KAD STIGNU PODACI
+      setTimSviIgraci(data.timclanovi.igraci);
+      setTimPreostaliIgraci(data.timclanovi.igraci);//NAKON DOHVATA U POČEKTU ISTI KAO I SVI IGRAČI JER NIJE JOŠ NITKO ODABRAN
+      setTimSviGolmani(data.timclanovi.golmani);
+      setTimPreostaliGolmani(data.timclanovi.golmani);
+      setTimSviTreneri(data.timclanovi.treneri);
+      setTimSviSluzbeni(data.timclanovi.sluzbenipredstavnici);
+      setTimSviTehniko(data.timclanovi.tehniko);
+      setTimSviFizio(data.timclanovi.fizio);
+    }
+  });
+
+  if(loading) return null;
+
+  if(error) return (<Alert severity="error">{error.message}</Alert>);
+
+  if(data)
+  {
     return (
        <Fragment>
                   <Box className={classes.klubBox}>
@@ -312,6 +337,7 @@ function RenderOdabraniFizio()
                     </Box>
             </Fragment>
     )
+  }
 }
 
 export default TimVerticalBox

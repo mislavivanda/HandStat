@@ -9,18 +9,10 @@ const timSlicer=createSlice({
     },
     reducers:{
         odabranTimDomaci:(state,action)=>{
-             state.timDomaci={
-                id:action.payload.id,
-                naziv:action.payload.naziv,
-                grb:action.payload.klub_slika
-            }
+             state.timDomaci=action.payload;
         },
         odabranTimGosti:(state,action)=>{
-            state.timGosti={
-                id:action.payload.id,
-                naziv:action.payload.naziv,
-                grb:action.payload.klub_slika
-            }
+            state.timGosti=action.payload;
         },
         spremljenDomaci:(state)=>{
             state.timDomaciSpremljen=true;

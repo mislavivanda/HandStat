@@ -1,13 +1,15 @@
 import React,{Fragment,useState,useEffect} from 'react'
 import {Box,Typography,Button} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
-import dogadaji from '../mockdata/dogadaji.js';
 import Dogadaj from './MoguciDogadaj.jsx';
 import { useSelector, useDispatch } from 'react-redux';
 import {otkljucajGol} from '../redux/slicers/otkljucajGol';
 import {dodajDogadaj} from '../redux/slicers/dogadajiUtakmice';
 import {odabranDogadaj} from '../redux/slicers/odabraniDogadaj';
 import {odabranClan} from '../redux/slicers/odabraniClan';
+import { useQuery } from '@apollo/client';
+import {dohvatiSveMoguceDogadaje} from '../graphql/query';
+import Alert from '@material-ui/lab/Alert';
 const useStyles=makeStyles((theme)=>({
 dogadajiBox:{
     display:'inline-flex',
@@ -19,7 +21,6 @@ dogadajiBox:{
 function MoguciDogadaji() {
     const classes=useStyles();
     const dispatch=useDispatch();
-    const [moguciDogadaji,setMoguciDogadaji]=useState(dogadaji);
     const odabraniDogadaj=useSelector(state=>state.odabraniDogadaj.dogadaj);
     const odabraniClan=useSelector(state=>state.odabraniClan.clan);
     const timDomaciId=useSelector(state=>state.timovi.timDomaci.id);
@@ -84,16 +85,26 @@ function MoguciDogadaji() {
         }
       }//AKO JE NULL-> ILI JE POČETNO STANJE ILI JE VRAĆEN NA NULL NAKON ODRAĐENOG DOGAĐAJA->NE RADI NIŠTA,NEMA DOGAĐAJA ZA SPREMANJE
       },[odabraniDogadaj])//POZIVA SE KOD SVAKOG ODABIRA DOGAĐAJA
-    return (
-       <Fragment>
-            <Typography align='center' variant='h4'>DOGAĐAJ</Typography>
-            <Box className={classes.dogadajiBox}>
-            {moguciDogadaji.map((dogadaj)=>{
-                return  <Dogadaj key={dogadaj.id} id={dogadaj.id} naziv={dogadaj.naziv} tip={dogadaj.tip} id={dogadaj.id}/>
-            })}                                   
-            </Box>
-       </Fragment>
-    )
+
+    const{loading,error,data}=useQuery(dohvatiSveMoguceDogadaje);
+
+    if(loading) return null;
+
+    if(error) return (<Alert severity="error">{error.message}</Alert>);
+
+    if(data)
+    {
+      return (
+        <Fragment>
+              <Typography align='center' variant='h4'>DOGAĐAJ</Typography>
+              <Box className={classes.dogadajiBox}>
+              {data.dogadaji.map((dogadaj)=>{
+                  return  <Dogadaj key={dogadaj.id} id={dogadaj.id} naziv={dogadaj.naziv} tip={dogadaj.tip} id={dogadaj.id}/>
+              })}                                   
+              </Box>
+        </Fragment>
+      )
+    }
 }
 
 export default MoguciDogadaji

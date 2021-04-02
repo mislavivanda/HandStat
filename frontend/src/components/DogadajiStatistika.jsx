@@ -29,23 +29,23 @@ function DogadajiStatistika({broj_utakmice}) {//inace preko useEffecta dohvat
 
     if(data)
     {
-    return (
-     <Fragment>
-          <Box className={classes.tijekUtakmiceBox}>
-                              {data.dogadajiutakmice&&data.dogadajiutakmice.map((dogadajutk)=>{
-                                if(dogadajutk.dogadaj.tip===1)
-                                {
-                                    return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.tim} domaci={dogadajutk.rez_domaci} gosti={dogadajutk.rez_gosti} ime={dogadajutk.akter.ime} prezime={dogadajutk.akter.prezime} dogadaj={dogadajutk.dogadaj.naziv} tip={1} />
-                                }
-                                else if(dogadajutk.dogadaj.tip===2)
-                                {
-                                    return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.tim} dogadaj={dogadajutk.dogadaj.naziv} tip={2}/>
-                                }
-                                else return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.klubgrb} ime={dogadajutk.akter.ime} prezime={dogadajutk.akter.prezime} dogadaj={dogadajutk.dogadaj.naziv} tip={3}/>
-                              })}
-            </Box>
-     </Fragment>
-    )
+        return (
+        <Fragment>
+            <Box className={classes.tijekUtakmiceBox}>
+                                {data.dogadajiutakmice&&data.dogadajiutakmice.map((dogadajutk)=>{
+                                    if(dogadajutk.dogadaj.tip===1)
+                                    {
+                                        return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.tim} domaci={dogadajutk.rez_domaci} gosti={dogadajutk.rez_gosti} ime={dogadajutk.akter.ime} prezime={dogadajutk.akter.prezime} dogadaj={dogadajutk.dogadaj.naziv} tip={1} />
+                                    }
+                                    else if(dogadajutk.dogadaj.tip===2)
+                                    {
+                                        return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.tim} dogadaj={dogadajutk.dogadaj.naziv} tip={2}/>
+                                    }
+                                    else return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.klubgrb} ime={dogadajutk.akter.ime} prezime={dogadajutk.akter.prezime} dogadaj={dogadajutk.dogadaj.naziv} tip={3}/>
+                                })}
+                </Box>
+        </Fragment>
+        )
     }
 }
 

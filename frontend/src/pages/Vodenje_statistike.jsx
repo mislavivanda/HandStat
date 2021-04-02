@@ -140,7 +140,7 @@ const utakmicaZavrsena=useSelector(state=>state.zavrsiUtakmicu);
             (spremljenGameInfo)?//ako je spremljen game info onda prikazujemo donji dio za vođenje utakmice
            (
             <Fragment>
-           <Grid style={{marginTop:100}} item container direction='row' alignItems='center' justify='space-around'>{/*redak od rezultata i vremena*/}
+           <Grid style={{marginTop:10}} item container direction='row' alignItems='center' justify='space-around'>{/*redak od rezultata i vremena*/}
               <Grid item xs={12} md={5}>
                   <Rezultat/>
                 </Grid>

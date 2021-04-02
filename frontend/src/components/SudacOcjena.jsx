@@ -63,9 +63,9 @@ function SudacOcjena({history}) {
                                 />
                 </FormControl>
                 </Grid>
-            </Grid>
+            </Grid>   {/*obavezno je da bude 1 sudac,drugi sudac moze biti opcionalan npr utakmice djece */}
             {
-            (sudac2)?{/*obavezno je da bude 1 sudac,drugi sudac moze biti opcionalan npr utakmice djece */}
+            (sudac2)?
 
             (<Grid item container direction='row' justify='space-around' alignItems='center' xs={12} style={{marginTop:20}}>{/*redak drugog suca*/}
                 <Grid item container xs={12} sm={6} direction='row' justify='center' >

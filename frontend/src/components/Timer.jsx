@@ -4,7 +4,7 @@ import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import {makeStyles} from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import {incrementTimer} from '../redux/slicers/timer';//import THUNK FUKCIJE KOJA DISPATCHA INRKEMENT AKCIJU SVAKO 1 SEKUNDU
+import {incrementTimer,disableDispatch} from '../redux/slicers/timer';//import REDUX THUNK FUNCTION
 const useStyles=makeStyles((theme)=>({
     timeBox:{
         display:'flex',
@@ -24,27 +24,33 @@ const useStyles=makeStyles((theme)=>({
 export default function Timer() {
     const classes=useStyles();
     const [paused,setPaused]=useState(true);
-    const time=useSelector(state=>state.timer);//redux hook za dohvat dijela globalnog statea koji nam treba
-    const dispatch = useDispatch();//za dispatchanje akcija u redux reducere
-  
+    //UVODIMO OVU VARIJABLU ZBOG BUGA U KOJEM SE VIŠE PUTA UNUTAR INTERVALA MANJEG OD 1s stisne pause stop-> problem je što bi se nakon svakog stiskanja continue uvecao timer-> to ne zelimo
+    const dispatchEnable=useSelector(state=>state.timer.dispatch);//odreduje jeli omogceno dispatchanje odnosno uvecavanje timera
+    const time=useSelector(state=>state.timer);
+    const dispatch = useDispatch();
+  {/*ako stisne pause i contineu vise puta unutar intervlala manjeg od 1 sekunde onda će npr ako je stiska continue 3 puta dispatchat se 3 puta timer odnosno proc ce 3 sekunde->
+  zato uvodimo dispatch varijablu koja će omogućavati disptachanje tek nakon što prođe 1 selunda odnosno nkon što se promijeni vrime*/}
     useEffect(()=>{
-        if(!paused)
+        if(!paused)//ako je paused=false-> continue odnosno dozvoljeno odbrojavanje-> uvecaj timer
         {
-            dispatch(incrementTimer());
+                dispatch(incrementTimer());//uvijek uvecaj timer ako je paused=false odnosno continue je omogucen jer ce nakon uvecavanje timera bit omogucen dispatch jer ce se postavit u true
         }
-    },[time.ticks]);/*iako ovisi o paused ne stavljamo ga u dependencies jer se dogodi da se useEffect pozove 2 puta kada se istovremeno promijene i paused i time.ticks pa onda imamo 2 poziv useEffecta i 2 poziva timera pa odborojavamo duplo brže odnosno 2 sekunde za 1 sekundu zbog 2 poziva unutra
-        a i kasnije kad idemo zaustaviti i stavimp paused=false ako se nakon toga desi promjena time.ticks to ce ponistit tu promjenu i timer ce nastavit odbrojavati*/
- /*ako je stavljen play onda promijeni stanje vremena-> ta promjena će izazvati poziv gornjeg useEffecta koji će nastaviti odbrojavati sve do sljedeće promjene pause=true koje će sprječiti update vremena u ifu pa se neće 
-        mijenjati stanje sve dok se opet ne stisne botun i ovi useEffect promijeni vrijeme koje će opet trigerat gornji useEffect*/
-    /*ovaj useEffect se poziva samo kod promjene pause stanja koje će se dgodoiti kod klika na pause ikonu nakon kojeg će se prominit stanje*/
+    },[time.ticks]);
     useEffect(()=>{
-        if(!paused)
+        if(!paused)//ako je pauziran=false odnosno ako ga nakon klika idemo pokrenuti(jer se poziva nakon promjene stanja paused)-> zabrani dispatchanje dok ne prode 1 sekunda jer bi inace pokrenulo dispatch pokrenuo uvecavanje countera više puta kad bi mijenjali vise puta u pause=false i dispatchaloi za svaku promjenu dobili vise poziva dispatcha i vise uvecavanja timera, inace ce se dispatchanje dopsutit nakon sto se promini timer
         {
-           dispatch(incrementTimer());
+            if(dispatchEnable)//ako je true( BIT CE TRUE SAMO NAKON STA PRODE SEKUNDA jer ga jedino ona postavlja na true) onda mozemo disptachati odnosno uvecavati timer-> prosla 1 sekunda ILI je prvi put stisnut play
+            {
+                dispatch(incrementTimer());//uvecaj timer
+            }
         }
     },[paused]);
-    const handlePauseChange=(event)=>{     /*promijeni stanje pause buttona na klik suprotno od onog koje je bilo*/
-        setPaused(!paused)
+    const handlePauseChange=(event)=>{
+        if(!paused)//ako je paused prije klika=false-> zelimo ga zaustavit KLIKANJEM-> dispatch=false-> nema uvecavanja timera-> ZABRANIMO DISPATCHANJE
+        {
+            dispatch(disableDispatch());//jedino ga ovjde postavljamo na false
+        }
+        setPaused(!paused);//uvijek to napravi nakon klika
     }   
     return (
         <Box>
@@ -54,10 +60,10 @@ export default function Timer() {
                 <Box style={{width:'40%',display:'flex',flexDirection:'row', justifyContent:'center'}}><Typography color='primary' variant='h3'>{time.seconds}</Typography></Box>
             </Box>
           <Box className={classes.iconBox}> { (paused) ?
-        <IconButton title='Pokreni' onClick={handlePauseChange} disableRipple style={{height:'100%'}} color='secondary'><PlayArrowIcon style={{width:50,height:'auto'}}/></IconButton>
+        <IconButton title='Start' onClick={handlePauseChange} disableRipple style={{height:'100%'}} color='secondary'><PlayArrowIcon style={{width:50,height:'auto'}}/></IconButton>
         : 
-        <IconButton title='Zaustavi' onClick={handlePauseChange} disableRipple style={{height:'100%'}} color='secondary'><PauseIcon style={{width:50,height:'auto'}}/></IconButton>
-        } </Box>  {/*conditional rendering*/}
+        <IconButton title='Stop' onClick={handlePauseChange} disableRipple style={{height:'100%'}} color='secondary'><PauseIcon style={{width:50,height:'auto'}}/></IconButton>
+        } </Box> 
       </Box>
     )
 }

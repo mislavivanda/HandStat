@@ -51,7 +51,7 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                     <Box className={classes.dogadajGlavniBox} >
                         <Box style={{width:'12%',display:'flex',alignItems:'center'}}><Typography color='secondary' align='center'>{props.vrijeme}</Typography></Box>
                         <Box style={{width:'15%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-                            <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.grb : timGosti.grb} alt='klub grb'/>
+                            <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.klub_slika : timGosti.klub_slika} alt='klub grb'/>
                         </Box>
                         <Box className={classes.dogadajRezultatBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.domaci+':'+props.gosti}</Typography></Box>
                         <Box style={{width:'53%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
@@ -67,7 +67,7 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                     <Box className={classes.dogadajGlavniBox} >
                     <Box style={{width:'12%',display:'flex',alignItems:'center'}}><Typography color='secondary' align='center'>{props.vrijeme}</Typography></Box>
                     <Box style={{width:'15%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.grb : timGosti.grb} alt='klub grb'/>
+                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.klub_slika : timGosti.klub_slika} alt='klub grb'/>
                     </Box>
                     <Box className={classes.dogadajRezultatBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.domaci+':'+props.gosti}</Typography></Box>
                     <Box style={{width:'58%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
@@ -85,7 +85,7 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                 <Box className={classes.dogadajGlavniBox}>
                     <Box style={{width:'12%',display:'flex',alignItems:'center'}}><Typography color='secondary' align='center'>{props.vrijeme}</Typography></Box>
                     <Box style={{width:'15%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.grb : timGosti.grb} alt='klub grb'/>
+                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.klub_slika : timGosti.klub_slika} alt='klub grb'/>
                     </Box>
                     <Box style={{width:'15%',height:'95%',backgroundColor:'#FFFFFF'}}></Box>
                     <Box style={{width:'53%',display:'flex',alignItems:'center',justifyContent:'space-around'}}><Typography align='center' color='secondary'>{props.dogadaj}</Typography></Box>
@@ -97,7 +97,7 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                     <Box className={classes.dogadajGlavniBox}>
                     <Box style={{width:'12%',display:'flex',alignItems:'center'}}><Typography color='secondary' align='center'>{props.vrijeme}</Typography></Box>
                     <Box style={{width:'15%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.grb : timGosti.grb} alt='klub grb'/>
+                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.klub_slika : timGosti.klub_slika} alt='klub grb'/>
                     </Box>
                     <Box style={{width:'15%',height:'95%',backgroundColor:'#FFFFFF'}}></Box>
                     <Box style={{width:'58%',display:'flex',alignItems:'center',justifyContent:'space-around'}}><Typography align='center' color='secondary'>{props.dogadaj}</Typography></Box>
@@ -111,7 +111,7 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                 <Box className={classes.dogadajGlavniBox}>
                     <Box style={{width:'12%',display:'flex',alignItems:'center'}}><Typography color='secondary' align='center'>{props.vrijeme}</Typography></Box>
                     <Box style={{width:'15%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.grb : timGosti.grb} alt='klub grb'/>
+                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.klub_slika : timGosti.klub_slika} alt='klub grb'/>
                     </Box>
                     <Box style={{width:'15%',height:'95%',backgroundColor:'#FFFFFF'}}></Box>
                     <Box style={{width:'53%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
@@ -125,7 +125,7 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                     <Box className={classes.dogadajGlavniBox}>
                     <Box style={{width:'12%',display:'flex',alignItems:'center'}}><Typography color='secondary' align='center'>{props.vrijeme}</Typography></Box>
                     <Box style={{width:'15%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.grb : timGosti.grb} alt='klub grb'/>
+                        <img className={classes.dogadajKlubSlika} src={(props.klubikona==1)? timDomaci.klub_slika : timGosti.klub_slika} alt='klub grb'/>
                     </Box>
                     <Box style={{width:'15%',height:'95%',backgroundColor:'#FFFFFF'}}></Box>
                     <Box style={{width:'58%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>

@@ -293,7 +293,7 @@ function RenderOdabraniFizio()
     return (
        <Fragment>
                   <Box className={classes.klubBox}>
-                      <img src={(tim_id===timovi.timDomaci.id)? timovi.timDomaci.grb : timovi.timGosti.grb} alt='ikona_kluba' className={classes.klubSlika}/>
+                      <img src={(tim_id===timovi.timDomaci.id)? timovi.timDomaci.klub_slika : timovi.timGosti.klub_slika} alt='ikona_kluba' className={classes.klubSlika}/>
                       <Typography color='secondary' align='center' variant='h4'>{(tim_id===timovi.timDomaci.id)? timovi.timDomaci.naziv : timovi.timGosti.naziv}</Typography>
                     </Box>
                     <Box className={classes.timBox}>

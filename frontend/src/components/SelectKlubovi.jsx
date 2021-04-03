@@ -6,7 +6,6 @@ import { useSelector,useDispatch } from 'react-redux';
 import { useLazyQuery } from '@apollo/client';
 import {dohvatiSveKluboveOdNatjecanja} from '../graphql/query';
 import Alert from '@material-ui/lab/Alert';
-import { ContactsTwoTone } from '@material-ui/icons';
 function SelectKlubovi() {
     const dispatch=useDispatch();
     const {timDomaci,timGosti}=useSelector(state=>state.timovi);

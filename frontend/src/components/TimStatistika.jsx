@@ -89,7 +89,7 @@ function TimStatistika({tim_id,broj_utakmice}) {//parametri potrebni za dohvat s
       <Fragment>
                 <Grid item  className={classes.statistikaGlavniBox}  container direction='column' justify='space-evenly' alignItems='center' xs={12}>{/*container tablice statistike igraca*/}
                         <Box className={classes.statistikaBoxKlub}>
-                            <img src={(tim_id===timovi.timDomaci.id)? timovi.timDomaci.grb : timovi.timGosti.grb} alt='ikona_kluba' className={classes.klubSlika}/>
+                            <img src={(tim_id===timovi.timDomaci.id)? timovi.timDomaci.klub_slika : timovi.timGosti.klub_slika} alt='ikona_kluba' className={classes.klubSlika}/>
                             <Typography align='center' variant='h4' style={{color:'#FFFFFF'}}>{(tim_id===timovi.timDomaci.id)? timovi.timDomaci.naziv : timovi.timGosti.naziv}</Typography>
                         </Box>
                         <Box className={classes.statistikaBoxTitula}><Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>IGRAČI</Typography></Box>

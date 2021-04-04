@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
    
     static associate(models) {
     this.hasMany(models.utakmica,{foreignKey:'sudac1_id'});
-    this.hasMany(models.utakmica,{foreignKey:'sudac2_id'});
+    this.hasMany(models.utakmica,{foreignKey:{name:'sudac2_id',allowNull:true}});
     }
   };
   suci.init({

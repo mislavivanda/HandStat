@@ -25,7 +25,7 @@ module.exports = {
       },
       {
         "klub_id":1,
-        "maticni_broj":"159/5238",
+        "maticni_broj":"1989/523",
       },
       {
         "klub_id":1,

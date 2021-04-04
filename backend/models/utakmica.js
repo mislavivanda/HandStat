@@ -8,11 +8,11 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.natjecanje,{foreignKey:'natjecanje_id'});
       this.belongsTo(models.mjestodvorana,{foreignKey:'mjesto_id'});
       this.belongsTo(models.sluzbenoosoblje,{foreignKey:'nadzornik_id'});
-      this.belongsTo(models.sluzbenoosoblje,{foreignKey:'lijecnik_id'});
+      this.belongsTo(models.sluzbenoosoblje,{foreignKey:{name:'lijecnik_id',allowNull:true}});
       this.belongsTo(models.sluzbenoosoblje,{foreignKey:'zapisnicar_id'});
-      this.belongsTo(models.sluzbenoosoblje,{foreignKey:'mjvremena_id'});
+      this.belongsTo(models.sluzbenoosoblje,{foreignKey:{name:'mjvremena_id',allowNull:true}});
       this.belongsTo(models.suci,{foreignKey:'sudac1_id'});
-      this.belongsTo(models.suci,{foreignKey:'sudac2_id'});
+      this.belongsTo(models.suci,{foreignKey:{name:'sudac2_id',allowNull:true}});
       this.belongsTo(models.klub,{foreignKey:'domaci_id'});
       this.belongsTo(models.klub,{foreignKey:'gosti_id'});
       this.hasMany(models.igracutakmica,{foreignKey:'broj_utakmice'});

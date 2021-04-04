@@ -919,7 +919,6 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         timgosti_id:{type:GraphQLInt}
       },
       resolve(parent,args){
-        try {
           return models.utakmica.create({
             broj_utakmice:args.broj_utakmice,
             kolo:args.kolo,
@@ -936,13 +935,23 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
             sudac2_id:args.sudac2_id,
             domaci_id:args.timdomaci_id,
             gosti_id:args.timgosti_id
+          }).then((data)=>{
+              const klub_ids=[data.domaci_id,data.gosti_id];//niz 2 ida od klubova
+              return models.klub.findAll({//vracamo promise
+                attributes:['id','naziv'],
+                where:{
+                  id:{
+                    [Op.in]:klub_ids
+                  }
+                }
+              })
+          }).then((data)=>{
+            return data;
+          }).catch((error)=>{
+            nodelogger.error('Greška kod spremanja utakmice '+error);
+            throw(error);
           })
-        } catch (error) {
-          nodelogger.error('Greška kod spremanja utakmice '+error);
-          throw(error);
         }
-
-      }
     },
     spremitimzautakmicu:{//Potrebno je da mutacija barem nešto vrati pa makar to bilo null,ako želimo da vrati null onda definiramo NOVI SCALAR TYPE VOID KOJI JE UVIJEK NULL I NJEGA STAVIMO ZA TYPE
       type:GraphQLBoolean,//VRATIMO TRUE AKO JE USPJEŠNO

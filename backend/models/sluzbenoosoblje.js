@@ -7,9 +7,9 @@ module.exports = (sequelize, DataTypes) => {
    
     static associate(models) {
      this.hasMany(models.utakmica,{foreignKey:'nadzornik_id'});
-     this.hasMany(models.utakmica,{foreignKey:'lijecnik_id'});
+     this.hasMany(models.utakmica,{foreignKey:{name:'lijecnik_id',allowNull:true}});
      this.hasMany(models.utakmica,{foreignKey:'zapisnicar_id'});
-     this.hasMany(models.utakmica,{foreignKey:'mjvremena_id'});
+     this.hasMany(models.utakmica,{foreignKey:{name:'mjvremena_id',allowNull:true}});
     }
   };
   sluzbenoosoblje.init({

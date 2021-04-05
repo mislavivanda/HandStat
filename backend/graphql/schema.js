@@ -23,10 +23,18 @@ serialize(value){//format datuma koji će ići u response,priprema format za sla
   let date_format=date.getDate().toString()+'.'+(date.getMonth()+1).toString()+'.'+date.getFullYear().toString();
   return date_format;
 },
-parseValue(value)//i parse value i parseLiteral parsiraju DOLAZNE/INPUT PODATKE NPR U MUTACIJAMA,RAZLIKA: parseValue: parsira podatke dobivene u JSON formatu
+parseValue(value)//i parse value i parseLiteral parsiraju DOLAZNE/INPUT PODATKE NPR U MUTACIJAMA,RAZLIKA: parseValue: parsira argumente mutacije koji su hard kodirano poslani, parseLiteral-> parsira argumente koji su poslani preko query/mutation varijabli
 {
-  return new Date(Date.parse(ast.value))
-},   //  parseLiteral: parsira vriiednosti dobivene u AST(stablo,ugnijezdeni) formatu od graphqla-> TAKO IH PRIMAMO U MUTACIJAMA
+  return new Date(Date.parse(value))
+}, 
+//parseValue->Apollo Server calls this method when the scalar is provided by a client as a GraphQL variable for an argument
+//parseLiteral->(When a scalar is provided as a hard-coded argument in the operation string, parseLiteral is called instead.)
+//pimjer:
+// mutation{
+//spremiutakmicu(broj_utakmice:"13268955")}-> poziva se parseLiteral
+//mutation($broj_utakmice:String!){
+//spremiutakmicu(broj_utakmice:$broj_utakmice)-> poziva se parseValue
+
 parseLiteral(ast){
   return new Date(Date.parse(ast.value))//potrbno parsirati string u date objekt jer će inače javit grešku
 }
@@ -39,10 +47,10 @@ const Vrijeme=new GraphQLScalarType({
     let date_format=date.getHours().toString()+':'+date.getMinutes().toString();
     return date_format;
   },
-  parseValue(value)//i parse value i parseLiteral parsiraju DOLAZNE/INPUT PODATKE NPR U MUTACIJAMA,RAZLIKA: parseValue: parsira podatke dobivene u JSON formatu
+  parseValue(value)
   {
-    return new Date(Date.parse(ast.value))
-  },   //  parseLiteral: parsira vriiednosti dobivene u AST(stablo,ugnijezdeni) formatu od graphqla
+    return new Date(Date.parse(value))
+  }, 
   parseLiteral(ast){
     return new Date(Date.parse(ast.value))
   }

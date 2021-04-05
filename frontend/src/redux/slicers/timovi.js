@@ -19,8 +19,20 @@ const timSlicer=createSlice({
         },
         spremljenGosti:(state)=>{
             state.timGostiSpremljen=true
+        },
+        slikaTimDomaci:(state,action)=>{
+            state.timDomaci.klub_slika=action.payload;
+        },
+        slikaTimGosti:(state,action)=>{
+            state.timGosti.klub_slika=action.payload;
+        },
+        resetirajTimove:(state)=>{
+            state.timDomaci=null;
+            state.timGosti=null;
+            state.timDomaciSpremljen=false;
+            state.timGostiSpremljen=false;
         }
     }
 })
-export const {odabranTimDomaci,odabranTimGosti,spremljenDomaci,spremljenGosti}=timSlicer.actions;
+export const {resetirajTimove,odabranTimDomaci,odabranTimGosti,spremljenDomaci,spremljenGosti,slikaTimDomaci,slikaTimGosti}=timSlicer.actions;
 export default timSlicer.reducer;

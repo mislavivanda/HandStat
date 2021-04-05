@@ -3,8 +3,8 @@ const spremiUtakmicuSlicer=createSlice({
     name:'spremiUtakmicu',
     initialState:false,
     reducers:{
-        spremiUtakmicu:(state)=>{
-           return state=true;
+        spremiUtakmicu:(state,action)=>{
+           return state=action.payload;
         }
     }
 });

@@ -3,18 +3,9 @@ const vrijemeSlicer=createSlice({
     name:'vrijeme',
     initialState:'',
     reducers:{
-        postaviVrijeme:{
-            reducer:(state,action)=>{
-            return state=action.payload.datum;
-        },
-        prepare(datum){
-            return{
-                payload:{
-                    datum:datum.getHours().toString()+':'+datum.getMinutes().toString()
-                }
-            }
+        postaviVrijeme:(state,action)=>{
+            return state=action.payload;
         }
-    }
     }
 })
 export const {postaviVrijeme}=vrijemeSlicer.actions;

@@ -8,8 +8,10 @@ import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import SaveIcon from '@material-ui/icons/Save';
 import { useSelector, useDispatch } from 'react-redux';
 import {spremljenDomaci,spremljenGosti} from '../redux/slicers/timovi';
-import { useQuery } from '@apollo/client';
+import { useQuery,useMutation } from '@apollo/client';
 import {dohvatiSveClanoveTima} from '../graphql/query';
+import { spremiRosterUtakmice} from '../graphql/mutation';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from '@material-ui/lab/Alert';
 const useStyles=makeStyles((theme)=>({
     klubBox:{
@@ -44,6 +46,7 @@ function TimVerticalBox({tim_id})//inace cemo slat tim_id pa će po njemu dohva�
 const classes=useStyles();
 const timovi=useSelector(state=>state.timovi);
 const dispatch=useDispatch();
+const brojUtakmice=useSelector(state=>state.brojUtakmice);
 const [timSviIgraci,setTimSviIgraci]=useState(null);//svi igraci koje primimo s backenda
 const [timIgraci,setTimIgraci]=useState([]);//igraci koje smo ODABRALI
 const [timPreostaliIgraci,setTimPreostaliIgraci]=useState(null);//preostali igraci koje nismo jos odabrali a nalaze se u selectu
@@ -130,14 +133,46 @@ function dodajSveIgraceGolmane(tip){//jedino njih možemo sve unijeti,ostale tit
               setTimGolmani(timSviGolmani);
             }
 }
-function spremiTim()//poziva se kada spremimo odabrane clanove tima za tu utakmicu-> postavimo globalni state da je zadani tim spremljen
-{
-    if(tim_id===timovi.timDomaci.id)
+const [spremiRoster,{loading:mutationLoading,error:mutationError}]=useMutation(spremiRosterUtakmice,{
+  onCompleted(data){//vrati true ako je sve dobro, mora nešto vratitit, ne treba nam to jer u slučaju errora ćeo ga ishandleat dolje
+    if(tim_id===1)//spremljen domaći tim
     {
       dispatch(spremljenDomaci());
     }
     else dispatch(spremljenGosti());
     setTimSpremljen(true);//u oba slucaja postavi da je tim spremljen
+  }
+})
+function spremiTim()//poziva se kada spremimo odabrane clanove tima za tu utakmicu-> postavimo globalni state da je zadani tim spremljen
+{
+  //provjeri polja-> barem 1 golman i 6 igrača + trener prije spremanja
+    if(timIgraci&&timIgraci.length<6)
+    {
+      console.log('Odaberite minimalno 6 igrača');
+    }
+    else if(timGolmani&&!(timGolmani.length>0))
+    {
+      console.log('Odabertie barem 1 golmana');
+    }
+    else if(isEmpty(timTrener))//ako je prazan objekt
+    {
+      console.log('Odaberite trenera za utakmicu');
+    }
+    else{
+      spremiRoster({
+        variables:{
+          broj_utakmice:brojUtakmice,
+          klub_id:(tim_id===1)? timovi.timDomaci.id : timovi.timGosti.id,
+          igraci_id:timIgraci.map((igrac)=>igrac.maticni_broj),//uzmi samo nizove idova odnosno maticnih brojeva
+          golmani_id:timGolmani.map((golman)=>golman.maticni_broj),
+          trener_id:timTrener.maticni_broj,
+          sluzpredstavnik_id:(isEmpty(timSluzbeni))? null : timSluzbeni.maticni_broj,//ako nije odabran pošalji null
+          tehniko_id:(isEmpty(timTehniko))? null : timTehniko.maticni_broj,
+          fizio_id:(isEmpty(timFizio))? null : timFizio.maticni_broj
+        }
+      });
+     
+    }
 }
 //komponenta za rednerianje svih odabranih igraca-> RENDEIRAJU SE VEĆ ODABRANI IGRAČI I SELECT MENIJI GDJE JOŠ NISU ODABRANI IGRAČI
 function RenderOdabraniIgraci(){
@@ -268,7 +303,7 @@ function RenderOdabraniFizio()
   )
 }
 //ovisno o tome jeli prosljeden 1 ili 2 kao tim_id saljemo query za clanove tima domaceg ili gostujućeg tima
-  const {loading,error,data}=useQuery(dohvatiSveClanoveTima,{
+  const {loading:queryLoading,error:queryError,data}=useQuery(dohvatiSveClanoveTima,{//RENAMEAMO KOD DESTRUCTIRINGA PROOPERTY JER IMAMO LOADING,ERROR OD QUERYA I MUTACIJA PA IH JE POTREBNO RAZLIKOVAT
     variables:{
       klub_id:(tim_id===1)? timovi.timDomaci.id : timovi.timGosti.id
     },
@@ -284,9 +319,9 @@ function RenderOdabraniFizio()
     }
   });
 
-  if(loading) return null;
+  if(queryLoading) return null;
 
-  if(error) return (<Alert severity="error">{error.message}</Alert>);
+  if(queryError) return (<Alert severity="error">{queryError.message}</Alert>);
 
   if(data)
   {
@@ -331,9 +366,15 @@ function RenderOdabraniFizio()
                           </Box>
                           {RenderOdabraniFizio()}
                         </Box>       {/*Set the bottom edge of the <div> element to 10px above the bottom edge of its nearest parent element with some positioning( u našem slučaju kako je tim box position relative a button box abosulte pozicionirat će se 10 px iznad donjeg bordera od tim boxa):*/}
-                        <Box style={{width:'100%',display:'flex',justifyContent:'center',bottom:10, alignItems:'center',marginLeft:'auto',marginRight:'auto',position:'absolute'}}>
-                          <Button disabled={(timSpremljen)? true : false} onClick={()=>spremiTim()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Potvrdi momcad za utakmicu' > SAVE</Button>
-                        </Box>
+                       {(()=>{
+                          if(mutationLoading) return <CircularProgress color='primary'/>
+
+                          if(mutationError) return (<Alert severity="error">{mutationError.message}</Alert>)
+                          //inace vrati save button
+                          return (<Box style={{width:'100%',display:'flex',justifyContent:'center',bottom:10, alignItems:'center',marginLeft:'auto',marginRight:'auto',position:'absolute'}}>
+                            <Button disabled={(timSpremljen)? true : false} onClick={()=>spremiTim()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Potvrdi momcad za utakmicu' > SAVE</Button>
+                          </Box>)
+                       })()}
                     </Box>
             </Fragment>
     )

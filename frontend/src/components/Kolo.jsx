@@ -17,7 +17,7 @@ function Kolo() {
                                 inputProps={{min:1}}
                                 label=" "
                                 value={kolo}
-                                onChange={(e)=>dispatch(odabranoKolo(e.target.value))}
+                                onChange={(e)=>dispatch(odabranoKolo(parseInt(e.target.value)))}//JER INAČE ŠALJE INPUT U OBLIKU STRINGA A NE INTEGERA
                                 disabled={(spremljenGameInfo)? true : false}
                                 />
             </FormControl>

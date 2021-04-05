@@ -19,9 +19,12 @@ const dogadajiUtakmiceSlicer=createSlice({
     },
     izbrisiDogadaj:(state,action)=>{
         state=state.filter((dogadaj)=>dogadaj.id!==action.payload.dogadaj_id);
+    },
+    resetirajDogadaje:(state)=>{
+        return state=[];
     }
 
     }
 })
-export const {dodajDogadaj,izbrisiDogadaj}=dogadajiUtakmiceSlicer.actions;
+export const {resetirajDogadaje,dodajDogadaj,izbrisiDogadaj}=dogadajiUtakmiceSlicer.actions;
 export default dogadajiUtakmiceSlicer.reducer;

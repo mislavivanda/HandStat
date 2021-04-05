@@ -1,23 +1,72 @@
 import React,{useState} from 'react'
 import {Box,Typography,Button,Grid,TextField,FormControl,InputLabel} from '@material-ui/core';
-import {makeStyles} from '@material-ui/core/styles';
 import SaveIcon from '@material-ui/icons/Save';
 import SportsIcon from '@material-ui/icons/Sports';
 import CancelIcon from '@material-ui/icons/Cancel';
 import GradeIcon from '@material-ui/icons/Grade';
 import {ponistiZavrsetakUtakmice} from '../redux/slicers/zavrsiUtakmicu';
 import { useSelector,useDispatch} from 'react-redux';
-const useStyles=makeStyles((theme)=>({
-    sudacImeBox:{
-        display:'inline'
-    }
-}))
+import { useMutation } from '@apollo/client';
+import { zavrsiUtakmicu} from '../graphql/mutation';
+import {brojUtakmiceUnesen} from '../redux/slicers/brojUtakmice';
+import {postaviDatum} from '../redux/slicers/datum';
+import {gledateljiOdabrani} from '../redux/slicers/gledatelji';
+import {odabranoKolo} from '../redux/slicers/kolo';
+import {lijecnikOdabran} from '../redux/slicers/lijecnik';
+import {mjeracOdabran} from '../redux/slicers/mjeracVremena';
+import {nadzornikOdabran} from '../redux/slicers/nadzornik';
+import {zapisnicarOdabran} from '../redux/slicers/zapisnicar';
+import {lokacijaOdabrana} from '../redux/slicers/lokacija';
+import {natjecanjeOdabir} from '../redux/slicers/natjecanje';
+import {resetirajDogadaje} from '../redux/slicers/dogadajiUtakmice';
+import {odabranClan} from '../redux/slicers/odabraniClan';
+import {odabranDogadaj} from '../redux/slicers/odabraniDogadaj';
+import  {otkljucajGol} from '../redux/slicers/otkljucajGol';
+import {resetirajRezultat} from '../redux/slicers/rezultat';
+import {spremiUtakmicu} from '../redux/slicers/spremiUtakmicu';
+import {sudac1Odabran,sudac2Odabran} from '../redux/slicers/sudci';
+import {resetirajTimer} from '../redux/slicers/timer';
+import {resetirajTimove} from '../redux/slicers/timovi';
+import {postaviVrijeme} from '../redux/slicers/vrijeme';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Alert from '@material-ui/lab/Alert';
 function SudacOcjena({history}) {
     //primamo history objekt kako bi nakon zavesetka i spremanja utakmice preusmjerili na home page sa history.replace
     const dispatch=useDispatch();
     const {sudac1,sudac2}=useSelector(state=>state.sudci);
     const [ocjena1,setOcjena1]=useState(1);
     const [ocjena2,setOcjena2]=useState(1);
+    const brojUtakmice=useSelector(state=>state.brojUtakmice);
+    const {timDomaci,timGosti}=useSelector(state=>state.rezultat);
+    const [spremiZavrsiUtakmicu,{loading,error}]=useMutation(zavrsiUtakmicu,{
+        onCompleted:(data)=>{
+             //preusmjeri na homepage nakon uspješnog spremanja
+            history.replace('/');
+            //OČISTI SVE GLOBAL STATEOVE OD STRANICE VOĐENJA STATISTIKE ODNOSNO POSTAVIT IH NAZAD NA DEFAULTNE VRIJEDNOSTI
+            dispatch(brojUtakmiceUnesen(''));
+            dispatch(postaviDatum(''));
+            dispatch(gledateljiOdabrani(0));
+            dispatch(odabranoKolo(0));
+            dispatch(lijecnikOdabran(null));
+            dispatch(mjeracOdabran(null));
+            dispatch(nadzornikOdabran(null));
+            dispatch(zapisnicarOdabran(null));
+            dispatch(lokacijaOdabrana(null));
+            dispatch(natjecanjeOdabir(null));
+            dispatch(resetirajDogadaje());
+            dispatch(odabranClan(null));
+            dispatch(odabranDogadaj(null));
+            dispatch(otkljucajGol(false));
+            dispatch(resetirajRezultat());
+            dispatch(spremiUtakmicu(false));
+            dispatch(sudac1Odabran(null));
+            dispatch(sudac2Odabran(null));
+            dispatch(resetirajTimer());
+            dispatch(resetirajTimove());
+            dispatch(postaviVrijeme(''));
+            dispatch(ponistiZavrsetakUtakmice());
+        }
+    })
     function handleChangeOcjena1(value)
     {
         setOcjena1(value);
@@ -28,10 +77,15 @@ function SudacOcjena({history}) {
     }
     function spremiZavrsi()
     {
-        //poziv useffecta i querya na bazu
-        //OČISTI SVE GLOBAL STATEOVE OD STRANICE VOĐENJA STATISTIKE ODNOSNO POSTAVIT NA NULL
-        //preusmjeri na homepage nakon uspješnog spremanja
-        history.replace('/');
+        spremiZavrsiUtakmicu({
+            variables:{
+                broj_utakmice:brojUtakmice,
+                rez_domaci:timDomaci,
+                rez_gosti:timGosti,
+                sudac1_ocjena:ocjena1,
+                sudac2_ocjena:ocjena2
+            }
+        })
     }
     function ponistiZavrsi()//kada ne zelimo zavrsit utakmicu i unit ocjene sudaca
     {
@@ -92,9 +146,17 @@ function SudacOcjena({history}) {
             :
             null
             }
-            <Grid item container spacing={3}  direction='row' justify='center' alginItems='center' xs={12}>
+            <Grid item container style={{marginTop:10}} spacing={3}  direction='row' justify='center' alginItems='center' xs={12}>
                 <Grid container item direction='row' justify='flex-end' alginItems='center' xs={6}>
-                    <Button  onClick={()=>spremiZavrsi()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Spremi i završi' >SPREMI</Button>
+                    {
+                        (()=>{
+                            if(loading) return <CircularProgress color='primary'/>
+
+                            if(error) return (<Alert severity="error">{error.message}</Alert>)
+
+                            return ( <Button  onClick={()=>spremiZavrsi()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Spremi i završi' >SPREMI</Button>)
+                        })()
+                    }
                 </Grid>
                 <Grid container item direction='row' justify='flex-start' alginItems='center' xs={6}>
                     <Button  onClick={()=>ponistiZavrsi()} disableRipple size='large' variant='contained' color='primary' endIcon={<CancelIcon/>} title='Otkaži spremanje' >OTKAŽI</Button>

@@ -17,7 +17,7 @@ function Gledatelji() {
                                 inputProps={{min:0}}
                                 label=" "
                                 value={gledatelji}
-                                onChange={(e)=>dispatch(gledateljiOdabrani(e.target.value))}
+                                onChange={(e)=>dispatch(gledateljiOdabrani(parseInt(e.target.value)))}//JER INAČE ŠALJE INPUT U OBLIKU STRINGA A NE INTEGERA
                                 disabled={(spremljenGameInfo)? true : false}
                                 />
                 </FormControl>

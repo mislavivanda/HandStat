@@ -1,5 +1,4 @@
 import React,{Fragment,useState,useEffect} from 'react'
-import klub from '../images/zagreb.jpg';
 import {Typography,Box,Select,MenuItem,FormControl,InputLabel,Grid} from '@material-ui/core'
 import {odabranTimDomaci,odabranTimGosti} from '../redux/slicers/timovi';
 import { useSelector,useDispatch } from 'react-redux';
@@ -25,7 +24,7 @@ function SelectKlubovi() {
         {
           setTimPreostali(new_array);
         }
-        dispatch(odabranTimDomaci({id:odabranTim.id,naziv:odabranTim.naziv,klub_slika:klub}));
+        dispatch(odabranTimDomaci({id:odabranTim.id,naziv:odabranTim.naziv}));
       }
       else
       {
@@ -37,7 +36,7 @@ function SelectKlubovi() {
         {
           setTimPreostali(new_array);
         }
-      dispatch(odabranTimGosti({id:odabranTim.id,naziv:odabranTim.naziv,klub_slika:klub}));
+      dispatch(odabranTimGosti({id:odabranTim.id,naziv:odabranTim.naziv}));
       }
   }
    const [dohvatiKlubove,{loading,error,data}]=useLazyQuery(dohvatiSveKluboveOdNatjecanja,{

@@ -23,10 +23,16 @@ const timerSlicer=createSlice({// us lsiceu za svaku komponentu definiramo reduc
         },
         disableDispatch:(state)=>{
             state.dispatch=false;
+        },
+        resetirajTimer:(state)=>{
+            state.ticks=0;
+            state.minutes=0;
+            state.seconds=0;
+            state.dispatch=true;
         }
     }
 })
-export const {incrementTime,disableDispatch}=timerSlicer.actions;
+export const {resetirajTimer,incrementTime,disableDispatch}=timerSlicer.actions;
 export default timerSlicer.reducer//OVO ĆE KORISTIT ZA INCIJALIZACIJU REDUX STOREA
 //prima dispatch i getstate argumente,nama treba samo dispatch
 export const incrementTimer = ()=> (dispatch) => {//thunk za uvećavanje timera,bez parametara

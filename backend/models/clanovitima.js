@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      this.hasMany(models.igracutakmica,{foreignKey:'maticni_broj'});
      this.hasMany(models.golmanutakmica,{foreignKey:'maticni_broj'});
      this.hasMany(models.stozerutakmica,{foreignKey:'maticni_broj'});
-     this.hasMany(models.dogadajiutakmice,{foreignKey:'maticni_broj'});
+     this.hasMany(models.dogadajiutakmice,{foreignKey:{name:'maticni_broj',allowNull: true}});
      this.hasMany(models.pozicijegola,{foreignKey:'maticni_broj'});
     }
   };

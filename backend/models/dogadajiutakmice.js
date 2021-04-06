@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.utakmica,{foreignKey:'broj_utakmice'});
       this.belongsTo(models.dogadaj,{foreignKey:'dogadaj_id'});
-      this.belongsTo(models.clanovitima,{foreignKey:'maticni_broj'});
+      this.belongsTo(models.clanovitima,{foreignKey:{name:'maticni_broj',allowNull: true}});
     }
   };
   dogadajiutakmice.init({

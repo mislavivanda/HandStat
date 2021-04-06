@@ -964,9 +964,9 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
     spremitimzautakmicu:{//Potrebno je da mutacija barem nešto vrati pa makar to bilo null,ako želimo da vrati null onda definiramo NOVI SCALAR TYPE VOID KOJI JE UVIJEK NULL I NJEGA STAVIMO ZA TYPE
       type:GraphQLBoolean,//VRATIMO TRUE AKO JE USPJEŠNO
       args:{
-        broj_utakmice:{type:GraphQLString},//niz maticnih brojava koji su stringovi
+        broj_utakmice:{type:GraphQLString},
         klub_id:{type:GraphQLInt},
-        igraci_id:{type:new GraphQLList(GraphQLString)},
+        igraci_id:{type:new GraphQLList(GraphQLString)},//niz maticnih brojava koji su stringovi
         golmani_id:{type:new GraphQLList(GraphQLString)},
         trener_id:{type:GraphQLString},
         sluzpredstavnik_id:{type:GraphQLString},
@@ -991,26 +991,35 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
               maticni_broj:args.golmani_id[i]
             })
           }
-          await models.stozerutakmica.create({
+          await models.stozerutakmica.create({//trener mora bit odabran nije null sig
             broj_utakmice:args.broj_utakmice,
             klub_id:args.klub_id,
             maticni_broj:args.trener_id
           });
-          await models.stozerutakmica.create({
-            broj_utakmice:args.broj_utakmice,
-            klub_id:args.klub_id,
-            maticni_broj:args.sluzpredstavnik_id
-          });
-          await models.stozerutakmica.create({
-            broj_utakmice:args.broj_utakmice,
-            klub_id:args.klub_id,
-            maticni_broj:args.tehniko_id
-          });
-          await models.stozerutakmica.create({
-            broj_utakmice:args.broj_utakmice,
-            klub_id:args.klub_id,
-            maticni_broj:args.fizio_id
-          });
+          if(args.sluzpredstavnik_id)//mogu biti null svi osim trenera
+          {
+            await models.stozerutakmica.create({
+              broj_utakmice:args.broj_utakmice,
+              klub_id:args.klub_id,
+              maticni_broj:args.sluzpredstavnik_id
+            });
+          }
+          if(args.tehniko_id)
+          {
+            await models.stozerutakmica.create({
+              broj_utakmice:args.broj_utakmice,
+              klub_id:args.klub_id,
+              maticni_broj:args.tehniko_id
+            });
+          }
+          if(args.fizio_id)
+          {
+            await models.stozerutakmica.create({
+              broj_utakmice:args.broj_utakmice,
+              klub_id:args.klub_id,
+              maticni_broj:args.fizio_id
+            });
+          }
           return true;
         } catch (error) {
           console.log('Greška kod spremanja tima kluba za utakmicu '+error);
@@ -1121,3 +1130,31 @@ module.exports=new GraphQLSchema({//definicija sheme koju stavljamo u express gr
   query:RootQuery,
   mutation:Mutation
 })
+
+//PITANJE???-> OVDE LOADAMO SAMO QUERYE I MUTACIJE A NIGDI NE LOADAMO GORNJE NAVEDENE OBJEKTNE TIPOVE SHEME I SKALARANE TIPOVE, KAKO GRAPHQL ZNA ZA NJIH??
+/*GRAPHQL SHEMA SE MOŽE PREZNWTIRAT NA 3 NAČINA:
+1)The GraphQL Schema Definition Language, or SDL,NPR;
+type Author {
+  id: Int!
+  firstName: String
+  lastName: String
+  posts: [Post]
+}type Post {
+  id: Int!
+  title: String
+  author: Author
+  votes: Int
+}type Query {
+  posts: [Post]
+  author(id: Int!): Author
+}-> OVO LOADAMO U GRAHPQL SERVER I TAKO ON ZNA ZA TIPOVE
+
+2)The GraphQL introspection query result-> POMOĆU NJEGA SAZNAJEMO KAKO NAM IZGLEDA SHEMA I TIPOVI NA SRVERU TAKO 
+ŠTO ŠALJEMO POSEBNE INTROSPECTION QUERYE S FILEDSIMA KOJI NAS ZNAIMAJU
+
+3)GraphQL.js GraphQLSchema object-> ovde KORIPTENI
+Last but not least, we have the objects that the JavaScript reference implementation of GraphQL uses to store information about the schema
+. It’s a great intermediate representation, so it’s often the medium used to communicate between different JavaScript tools.
+-> VEZAN UZ JAVASCRIPT JEZIK, PREDSTAVLJA TIPOVE SHEME KAO OBJEKTE I PREKO NJIH KOMUNICIRA I TRAŽI RESOLVERE I ZADANE TIPOVE U QUERYIMA I MUTACIJAMA
+This representation of the schema makes it the easiest to manipulate the objects directly, and write functions that generate types for you,
+ but it’s not as convenient as the SDL for writing schemas by hand.*/

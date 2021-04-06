@@ -113,7 +113,7 @@ function SudacOcjena({history}) {
                                 inputProps={{min:1,max:5, step:0.1}}
                                 label=" "
                                 value={ocjena1}
-                                onChange={(e)=>handleChangeOcjena1(e.target.value)}
+                                onChange={(e)=>handleChangeOcjena1(parseFloat(e.target.value))}
                                 />
                 </FormControl>
                 </Grid>
@@ -138,7 +138,7 @@ function SudacOcjena({history}) {
                                 inputProps={{min:1,max:5, step:0.1}}
                                 label=" "
                                 value={ocjena2}
-                                onChange={(e)=>handleChangeOcjena2(e.target.value)}
+                                onChange={(e)=>handleChangeOcjena2(parseFloat(e.target.value))}
                                 />
                 </FormControl>
                 </Grid>
@@ -146,8 +146,8 @@ function SudacOcjena({history}) {
             :
             null
             }
-            <Grid item container style={{marginTop:10}} spacing={3}  direction='row' justify='center' alginItems='center' xs={12}>
-                <Grid container item direction='row' justify='flex-end' alginItems='center' xs={6}>
+            <Grid item container style={{marginTop:10}} spacing={3}  direction='row' justify='center' alignItems='center' xs={12}>
+                <Grid container item direction='row' justify='flex-end' alignItems='center' xs={6}>
                     {
                         (()=>{
                             if(loading) return <CircularProgress color='primary'/>
@@ -158,7 +158,7 @@ function SudacOcjena({history}) {
                         })()
                     }
                 </Grid>
-                <Grid container item direction='row' justify='flex-start' alginItems='center' xs={6}>
+                <Grid container item direction='row' justify='flex-start' alignItems='center' xs={6}>
                     <Button  onClick={()=>ponistiZavrsi()} disableRipple size='large' variant='contained' color='primary' endIcon={<CancelIcon/>} title='Otkaži spremanje' >OTKAŽI</Button>
                 </Grid>
             </Grid>

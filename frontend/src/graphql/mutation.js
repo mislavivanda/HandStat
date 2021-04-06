@@ -27,6 +27,20 @@ const spremiDogadaj=gql`
     mutation($broj_utakmice:String!,$vrijeme:String!,$klubgrb:Int!,$maticni_broj:String,$dogadaj_id:Int!,$domaci:Int,$gosti:Int){
         spremidogadaj(broj_utakmice:$broj_utakmice,vrijeme:$vrijeme,klubgrb:$klubgrb,maticni_broj:$maticni_broj,dogadaj_id:$dogadaj_id,domaci:$domaci,gosti:$gosti){
             id
+            vrijeme
+            tim
+            rez_domaci
+            rez_gosti
+            dogadaj{
+                id
+                naziv
+                tip
+            }
+            akter{
+                maticni_broj
+                ime
+                prezime
+            }
         }
     }
 `;

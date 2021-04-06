@@ -8,6 +8,8 @@ import {dodajDogadaj} from '../redux/slicers/dogadajiUtakmice';
 import {odabranDogadaj} from '../redux/slicers/odabraniDogadaj';
 import {odabranClan} from '../redux/slicers/odabraniClan';
 import {incrementDomaci,incrementGosti} from '../redux/slicers/rezultat';
+import { useMutation } from '@apollo/client';
+import {spremiDogadaj,spremiGolPozicija} from '../graphql/mutation';
 const useStyles=makeStyles((theme)=>({
     gol:{               /*image je sa auto uvik na oko 95% pa stavimo visinu girda 90% + gornja margina 5% i pratit će se responzivno*/ 
         marginTop:'4%',
@@ -42,11 +44,17 @@ const useStyles=makeStyles((theme)=>({
           backgroundColor:theme.palette.primary.main
         }
       },
+      mutationErrorItem:{
+        position:'fixed',
+        top:'50%',//centrira na način da stavi margin top 50% visine ekrana od vrha i 50% od sirin ekrana
+        left:'50%'
+    }
 }))
 function Gol() {
     const [odabraniDioGola,setOdabraniDioGola]=useState(null);
     const classes=useStyles();
     const dispatch=useDispatch();
+    const brojUtakmice=useSelector(state=>state.brojUtakmice);
     const otkljucanGol=useSelector(state=>state.otkljucajGol);
     const odabraniDogadaj=useSelector(state=>state.odabraniDogadaj.dogadaj);
     const odabraniClan=useSelector(state=>state.odabraniClan.clan);
@@ -55,11 +63,29 @@ function Gol() {
     const time=useSelector(state=>state.timer);
     let domaciRez=useSelector(state=>state.rezultat.timDomaci);
     let gostiRez=useSelector(state=> state.rezultat.timGosti);
-function odabraniGol(gol_pozicija)//poziva se nakon klika odnosno odabira pozicije gola
-{
-  setOdabraniDioGola(gol_pozicija);
-}
-useEffect(()=>{
+    const [spremiOdabraniDogadaj,{error:dogadajError}]=useMutation(spremiDogadaj,{
+      onCompleted:(data)=>{
+        dispatch(dodajDogadaj({
+          id:data.spremidogadaj.dogadaj.id,
+          vrijeme:data.spremidogadaj.vrijeme,
+          klubikona:data.spremidogadaj.tim,//ako je domaći->1-> prikazi sliku od odmaćeg tima,inače od gostujućeg NE PSREMAMO SLIKU NEGO SAMO OVI FLAG
+          tip:data.spremidogadaj.dogadaj.tip,
+          naziv_dogadaja:data.spremidogadaj.dogadaj.naziv,
+          ime:(data.spremidogadaj.akter)? data.spremidogadaj.akter.ime : null,
+          prezime:(data.spremidogadaj.akter)? data.spremidogadaj.akter.prezime : null,
+          domaci:data.spremidogadaj.rez_domaci,
+          gosti:data.spremidogadaj.rez_gosti
+      }))
+      }
+    });
+    //spremanje odabranog dijela branke
+  const [spremiPozicijuGola,{error:golpozicijaError}]=useMutation(spremiGolPozicija);
+
+  function odabraniGol(gol_pozicija)//poziva se nakon klika odnosno odabira pozicije gola
+  {
+    setOdabraniDioGola(gol_pozicija);
+  }
+  useEffect(()=>{
   //ODABIR GOLA JE ZADNJA FAZA U TOM DOGAĐAJU-> NAKON ODABIRA SPREMI GA U NIZ DOGAĐAJA I U BAZU
     if(odabraniDioGola)//ako je različit od null onda je odabran neki dio
     {
@@ -76,30 +102,42 @@ useEffect(()=>{
       //SPREMI DOGAĐAJ I SPREMI U BAZU DIO KOJI SE ODNOSI NA POZICIJU GOLA
       if(timDomaciId=== odabraniClan.klub_id)
       {
-        dispatch(dodajDogadaj({
-          vrijeme:(time.minutes.toString()+':'+time.seconds.toString()),
-          klubikona:1,//ako je domaći->1-> prikazi sliku od odmaćeg tima,inače od gostujućeg NE PSREMAMO SLIKU NEGO SAMO OVI FLAG
-          tip:odabraniDogadaj.tip,
-          naziv_dogadaja:odabraniDogadaj.naziv,
-          ime:odabraniClan.ime,
-          prezime:odabraniClan.prezime,
-          domaci:domaciRez,
-          gosti:gostiRez
-        }))
+        spremiOdabraniDogadaj({
+          variables:{
+            broj_utakmice:brojUtakmice,
+            vrijeme:(time.minutes.toString()+':'+time.seconds.toString()),
+            klubgrb:1,
+            dogadaj_id:odabraniDogadaj.id,
+            maticni_broj:odabraniClan.maticni_broj,
+            domaci:domaciRez,
+            gosti:gostiRez
+          }
+        })
     }
       else {
-        dispatch(dodajDogadaj({
-          vrijeme:(time.minutes.toString()+':'+time.seconds.toString()),
-          klubikona:2,//ako je domaći->1-> prikazi sliku od odmaćeg tima,inače od gostujućeg NE PSREMAMO SLIKU NEGO SAMO OVI FLAG
-          tip:odabraniDogadaj.tip,
-          naziv_dogadaja:odabraniDogadaj.naziv,
-          ime:odabraniClan.ime,
-          prezime:odabraniClan.prezime,
-          domaci:domaciRez,
-          gosti:gostiRez
-        }))
+        spremiOdabraniDogadaj({
+          variables:{
+            broj_utakmice:brojUtakmice,
+            vrijeme:(time.minutes.toString()+':'+time.seconds.toString()),
+            klubgrb:2,
+            dogadaj_id:odabraniDogadaj.id,
+            maticni_broj:odabraniClan.maticni_broj,
+            domaci:domaciRez,
+            gosti:gostiRez
+          }
+        })
       }
-        //vrati sve vriiednosti na početak nakon uspješnog unosa
+      //u oba slučaja-> mora bit odabran gol-> spremamo ovo neovisno jeli gostujući li domaći tim
+      spremiPozicijuGola({
+        variables:{
+          broj_utakmice:brojUtakmice,
+          pozicija:odabraniDioGola,
+          gol:(odabraniDogadaj.tip===1)? true : false,//ako je gol-> saljemo true
+          maticni_broj:odabraniClan.maticni_broj,
+          dogadaj_id:odabraniDogadaj.id
+        }
+      })
+    //vrati sve vriiednosti na početak nakon uspješnog ili neuspješnog unosa-> ako je neuspješan isto mora krenuti ispočetka sve
     dispatch(odabranDogadaj(null));
     dispatch(odabranClan(null));
     dispatch(otkljucajGol(false));
@@ -107,6 +145,12 @@ useEffect(()=>{
     }
   
   },[odabraniDioGola]);//POZIVA SE KADA KORISNIK ODABERE DIO GOLA KADA ODABEREMO NEKI OD DOGAĐAJA KOJI OMOGUĆUJE ODABIR GOLA
+
+   /* if(dogadajError) //pozovi error window
+
+    if(golpozicijaError) //pozovi error window
+    */
+
     return (
       <Fragment>
            <img src={gol} alt='handball goal' className={classes.gol}/>

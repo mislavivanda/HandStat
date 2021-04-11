@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      this.hasMany(models.utakmica,{foreignKey:{name:'lijecnik_id',allowNull:true}});
      this.hasMany(models.utakmica,{foreignKey:'zapisnicar_id'});
      this.hasMany(models.utakmica,{foreignKey:{name:'mjvremena_id',allowNull:true}});
+     this.hasMany(models.korisnici,{foreignKey:'maticni_broj'});
     }
   };
   sluzbenoosoblje.init({

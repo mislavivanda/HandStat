@@ -1,5 +1,8 @@
 var {graphqlHTTP}=require('express-graphql');//npm paket koji omogućava implmeentaciju graphql arhitekure API-a u zadani express server
 // graphqlnpm paket koji omogućava korištenje graphql funkcija i tipova(sheme,mutacije,query,...)
+const config=require('../config');
+const session=require('express-session');
+const session_store=require('./session_store');
 const schema=require('../graphql/schema');
 var cors = require('cors');
 var corsOptions = {
@@ -18,10 +21,26 @@ module.exports=(app,httplogger)=>{//U OVOJ FUNKCIJI LOADAMO SVE ŠTO JE POTREBNO
     //ZA REQUESTOVE: {"query":{"hello"},"variables":}
     //ZA RESPONSE: {"data":{"hello":"Hello world!"}}}-> NA OVAJ NAČIN ĆE NPR APPOLO LIBRARY LAKO MOĆ ODRŽAVATI CACHE I GLEDAT KOJI SU SE DJELOVI PROMIJENILI A KOJI NE
     //stavimo maksimalnu velicinu slike=1MB
-    app.use('/graphql',graphqlHTTP({
+    app.use(session({
+      saveUninitialized:false,
+      resave:false,
+      key:'user_sid',
+      secret:config.express_session.secret,
+      store: session_store,
+      cookie:{
+       path: '/',httpOnly: true,domain:'localhost',sameSite:'lax', secure:false, maxAge: 1000*60*60 //1 sat trajanje
+       //secure za produkciju samo
+      }
+    }))
+//graphql http je obicni middleware za postavljanje postavki graphql sheme na serveru i vraća taj objekt-> im pristup req i res objektima
+    app.use('/graphql',graphqlHTTP((req,res)=>({
        schema,
        graphiql:true,
-       customFormatErrorFn:(err) => ({ message: err.message, status: (err.status || 500) })//error handleanje kada throwamo error unutar resolvera
-    }));
+       customFormatErrorFn:(err) => ({ message: err.message, status: (err.status || 500) }),//error handleanje kada throwamo error unutar resolvera
+       context:{req,res}/*A value to pass as the context to the graphql() function 
+       from GraphQL.js/src/execute.js. If context is not provided, the request object is passed as the context.
+       > ONO ŠTO OVJDE STAVIMO CE PREDSTAVLJATI KONTEKST ODNOSNO TO ĆE BITI 3. PARAEMTAR U SVIM GRAPHQL RESOOLVERIMA I NA TAJ NAČIN ĆEMO MOĆ PRISTUPAT CONTEXT VARIJABAMA U SVIM RESOLVERIMA,
+       -> NPR TREBA NAM PRISTUP REQ.SESSION OBJEKTU ZA SESSION COOKIESE*/
+    })));
     
 }

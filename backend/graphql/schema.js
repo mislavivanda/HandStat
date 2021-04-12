@@ -1,4 +1,5 @@
 const { Op } = require("sequelize");
+const bcrypt=require('bcrypt');
 const {nodelogger}=require('../loaders/logger.js');
 const graphql=require('graphql');
 const models=require('../models');//u njemu se nalaze svi loadani modeli bitni za resolvere
@@ -897,6 +898,16 @@ const RootQuery=new GraphQLObjectType({
           throw(error);
         }
       }
+    },
+    checklogin:{
+      type:GraphQLBoolean,
+      resolve(parent,args,context){
+        if(context.req.session)//ako je logiran-> ima session cookie-> propusti ga
+        {
+          return true;
+        }
+        else return false;//nije logiran
+      }
     }
   }
 })
@@ -1121,6 +1132,40 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
             throw(error);
           })
        
+      }
+    },
+    login:{//kod logiranja provjera unesenih usernamea i passworda
+      type:SluzbenaOsoba,//vrati true ako je prosa login/false ako nije
+      args:{
+        username:{type:GraphQLString},
+        password:{type:GraphQLString}
+      },
+      resolve: async(parent,args,context)=>{//u contextu nam se nalazi req objekt kojem pristupamo
+       const user= await models.korisnici.findOne({
+          include:{
+            model:models.sluzbenoosoblje
+          },
+          where:{
+            username:args.username
+          }
+        });
+        if(!user)//ako nema korisnika s tim usernameom
+        {
+          throw(new Error('Nije pronađen korisnik sa zadanim usernameom'));//ovo će napravit graphql error s ovim messageom
+        }
+        else
+        {//postoji korisnik s tim username-> provjerit password
+          if(await bcrypt.compare(args.password,user.password))
+          {//dobar username i password-> propustimo ga dalje
+            context.req.session.user_id=user.maticni_broj;//radimo sesiju
+            return {//ovo će vratiti podatke o korisniku koji se logirao
+              maticni_broj:user.sluzbenoosoblje.maticni_broj,
+              ime:user.sluzbenoosoblje.ime,
+              prezime:user.sluzbenoosoblje.prezime
+            };
+          }
+          else throw(new Error('Netočan password'));//ovo će napravit graphql error s ovim messageom
+        }
       }
     }
 

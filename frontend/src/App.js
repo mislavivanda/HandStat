@@ -4,6 +4,7 @@ import { Route ,Switch} from "react-router-dom";
 import GuestHomePage from './pages/Guest_homepage';
 import VodenjeStatistike from './pages/Vodenje_statistike';
 import UtakmicaStatistika from './pages/Utakmica_statistika';
+import Login from './pages/Login';
 import { ApolloClient, InMemoryCache } from '@apollo/client';//konfiguriramo klijenta da zna di će slat requestove,koji cache koristit ....
 import { ApolloProvider } from '@apollo/client';//provider-> omogućava svim komponentama unutar app.js da koriste grahpql objekte npr data,error,loading...
 const client = new ApolloClient({
@@ -31,6 +32,7 @@ export default function App() {
         <Switch>
           <Route exact path='/' component={GuestHomePage}/>{/*exact path da nebi bilo parcijalnog matchanja*/}
           <Route exact path='/statistika' component={VodenjeStatistike}/>
+          <Route exact path='/login' component={Login}/>
           <Route exact path='/utakmica/:broj_utakmice' component={UtakmicaStatistika}/>
         </Switch>
       </div>

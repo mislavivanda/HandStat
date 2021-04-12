@@ -267,5 +267,11 @@ const dohvatiSveDogadajeUtakmice=gql`
     }
 `;
 
+//provjera je li korisnik logiran
+const checkLogin=gql`
+    query{
+        checklogin
+    }`
+
 export {prikazUtakmice,dohvatiSvaNatjecanja,dohvatiSveDvorane,dohvatiSveNadzornike,dohvatiSveLijecnike,dohvatiSveZapisnicare,
-dohvatiSveMjerace,dohvatiSveSuce,dohvatiSveKluboveOdNatjecanja,dohvatiSveMoguceDogadaje,dohvatiSveClanoveTima,dohvatiStatistikuTima,dohvatiSveDogadajeUtakmice};
+dohvatiSveMjerace,dohvatiSveSuce,dohvatiSveKluboveOdNatjecanja,dohvatiSveMoguceDogadaje,dohvatiSveClanoveTima,dohvatiStatistikuTima,dohvatiSveDogadajeUtakmice,checkLogin};

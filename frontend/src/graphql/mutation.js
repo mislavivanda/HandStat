@@ -65,4 +65,15 @@ const zavrsiUtakmicu=gql`
         zavrsiutakmicu(broj_utakmice:$broj_utakmice,rez_domaci:$rez_domaci,rez_gosti:$rez_gosti,sudac1_ocjena:$sudac1_ocjena,sudac2_ocjena:$sudac2_ocjena)
     }
 `;
-export {dodajUtakmicu,spremiRosterUtakmice,spremiDogadaj,spremiGolPozicija,azurirajStatus,zavrsiUtakmicu};
+
+//login-> dajemo username i password
+const login=gql`
+    mutation($username:String!,$password:String!){
+        login(username:$username,password:$password){
+            maticni_broj
+            ime
+            prezime
+        }
+    }
+`
+export {login,dodajUtakmicu,spremiRosterUtakmice,spremiDogadaj,spremiGolPozicija,azurirajStatus,zavrsiUtakmicu};

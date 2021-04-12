@@ -60,7 +60,7 @@ export default function Navbar({history}) {//propsi od razlicitih providera pros
                     </Grid>
                     <Grid  item container direction='row' justify='center' alignItems='center' xs={12} md={1}>{/*grid od admin botuna*/}
                         <Box style={{ display:'flex', marginRight:0,  flexDirection:'row',justifyContent:'center',alignContent:'center' }}>
-                            <Button onClick={()=>history.push('/statistika')}  className={classes.adminButton}><Typography  style={{fontWeight:'bold'}} color='secondary'>Admin</Typography></Button>
+                            <Button onClick={()=>history.push('/login')}  className={classes.adminButton}><Typography  style={{fontWeight:'bold'}} color='secondary'>Admin</Typography></Button>
                             </Box>
                     </Grid>
                </Grid>

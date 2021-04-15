@@ -6,8 +6,8 @@ const session_store=require('./session_store');
 const schema=require('../graphql/schema');
 var cors = require('cors');
 var corsOptions = {
-    origin: 'http://localhost:3000'
-}
+    origin: 'http://localhost:3000',
+    credentials: true };//Always send user credentials (cookies, basic http auth, etc..), even for cross-origin calls.
 module.exports=(app,httplogger)=>{//U OVOJ FUNKCIJI LOADAMO SVE ŠTO JE POTREBNO ZA NAŠ EXPRESS SERVER
     app.use(httplogger);
     app.use(cors(corsOptions));

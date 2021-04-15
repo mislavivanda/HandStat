@@ -345,17 +345,15 @@ const IgracStatistika=new GraphQLObjectType({
     igrac:{//igrac cija je to statistika
       type:ClanTima,
       resolve(parent,args){
-        try {
           return models.clanovitima.findOne({
             where:{
               rola:1,//dodatnui osigurac iako je maticni broj sam dovoljan
               maticni_broj:parent.maticni_broj//maticni broj koji je sadrzan u retku tablice za statistiku igraca i koji će se vratiti iz resolvera za ispis statistike svih igraca
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju clana tima unutar IgracStatistika objekta '+error);
           throw(error);
-        }
+        })
       }
     }
   })
@@ -376,16 +374,14 @@ const GolmanStatistika=new GraphQLObjectType({
     golman:{
       type:ClanTima,
       resolve(parent,args){
-        try {
           return models.clanovitima.findOne({
             where:{
               maticni_broj:parent.maticni_broj//maticni broj ce doci iz resolvera od ispisa statistike cijelog tima iz niza objekata koji sadrze podatke o statistici golmana medu kojima se nalazi i maticni_broj
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju clana tima unutar GolmanStatistika objekta '+error);
           throw(error);
-        }
+        })
     }
   }
   })
@@ -399,16 +395,14 @@ const StozerStatistika=new GraphQLObjectType({
     clan:{
       type:ClanTima,
       resolve(parent,args){
-        try {
           return models.clanovitima.findOne({
             where:{
             maticni_broj: parent.maticni_broj
             }
-          });
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju clana tima unutar StozerStatistika objekta '+error);
           throw(error);
-        }
+        })
       }
     }
   })
@@ -419,49 +413,43 @@ const TimStatistika=new GraphQLObjectType({
     igraci:{
       type:new GraphQLList(IgracStatistika),
       resolve(parent,args){
-        try {
           return models.igracutakmica.findAll({
             where:{
               broj_utakmice:parent.broj_utakmice,//iz parent objekti koji smo dobili iz resolvera u queryu koji samo prosljeduje primljene parametre
               klub_id:parent.klub_id//bitna i utakmica i klub za koji igra(jer su 2 kluba na toj utakmici)
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju statistike igrača unutar TimStaitstika objekta '+error);
           throw(error);
-        }
+        })
       }
     },
     golmani:{
       type:new GraphQLList(GolmanStatistika),
       resolve(parent,args){
-        try {
           return models.golmanutakmica.findAll({
             where:{
               broj_utakmice:parent.broj_utakmice,
               klub_id:parent.klub_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju staitstike golmana unutar TimStatistika objekta '+error);
           throw(error);
-        }
+        })
       }
     },
     stozer:{
       type:new GraphQLList(StozerStatistika),
       resolve(parent,args){
-        try {
           return models.stozerutakmica.findAll({
             where:{
               broj_utakmice:parent.broj_utakmice,
               klub_id:parent.klub_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju statistike stožera unutar TimStatistika objekta '+error);
           throw(error);
-        }
+        })
       }
     }
   })
@@ -483,151 +471,131 @@ const Utakmica=new GraphQLObjectType({
       type:Natjecanje,//parent dolazi u igru kod nestanja više tipova-> npr ako je resolver unutar domaci_id od utakmice onda će resolver koji ide otrkiti
       //koji je to klub moći pristupiti idu od tog tima u utakmici preko parent.tim_id jer je utakmica parent objekt od ugnijezden tim objekta
       resolve(parent,args){
-        try {
           return models.natjecanje.findOne({
             where:{
               id:parent.natjecanje_id
             }
-          });
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja natjecanja unutar Utakmica objekta '+error);
           throw(error);
-        }
+        });
       }
     },
     lokacija:{//DA BI OVI DIO BIO USPJEŠAN ONO ŠTO SE VRATI IZ RESOLVER MORA ZADOVOLJVATI SHEMU OD TIPA DVORNANA INAČE ĆE BITI GREŠKA
       type:Dvorana,
       resolve(parent,args){
-        try {
           return models.mjestodvorana.findOne({
             where:{
               id:parent.mjesto_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja dvorane unutar Utakmica objekta '+error);
           throw(error);
-        }
+        })
       }
     },
     nadzornik:{
       type:SluzbenaOsoba,
       resolve(parent,args){//POVEZANOSTI 1:N I VEZE MEĐU ELEMENTIMA DEFINIRAMO NA OVAJ NAČIN, NIKAD U SEQUELIZE NE ODREĐUJEMO ATRIBUTE KOJE DOHVAĆAMO NEGO DOHVAĆAMO SVE DA SU U SKLADU SA SHEMOM A ONDA U QUERY SPECIFICARMO KOJA POLJA ŽELIMO UKLJUČITI
-        try {
           return models.sluzbenoosoblje.findOne({
             where:{
               maticni_broj:parent.nadzornik_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja ndozrnika unutar Utakmica objekta '+error);
           throw(error);
-        }
+        })
       }
     },
     lijecnik:{
       type:SluzbenaOsoba,
       resolve(parent,args){
-        try {
           return models.sluzbenoosoblje.findOne({
             where:{
               maticni_broj:parent.lijecnik_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja liječnika unutar Utakmica objekta '+error);
           throw(error);
-        }
+        })
       }
     },
     zapisnicar:{
       type:SluzbenaOsoba,
       resolve(parent,args){
-        try {
           return models.sluzbenoosoblje.findOne({
             where:{
               maticni_broj:parent.zapisnicar_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja zapisničara unutar Utakmica objekta '+error);
           throw(error);
-        }
+        });
       }
     },
     mjeracvremena:{
       type:SluzbenaOsoba,
       resolve(parent,args){
-        try {
           return models.sluzbenoosoblje.findOne({
             where:{
               maticni_broj:parent.mjvremena_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja mjeraca vremena unutar Utakmica objekta '+error);
           throw(error);
-        }
+        })
       }
     },
     sudac1:{
       type:Sudac,
       resolve(parent,args){
-        try {
           return models.suci.findOne({
             where:{
               maticni_broj:parent.sudac1_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja sudca1 unutar Utakmica objekta '+error);
           throw(error);
-        }
+        })
       }
     },
       sudac2:{
         type:Sudac,
         resolve(parent,args){
-          try {
             return models.suci.findOne({
               where:{
                 maticni_broj:parent.sudac2_id
               }
-            })
-          } catch (error) {
+            }).then((data)=>data).catch((error)=>{
             nodelogger.error('Greska kod dohvaćanja sudca2 unutar Utakmica objekta '+error);
             throw(error);
-          }
+          })
         }
       },
       domaci:{
         type:Klub,
         resolve(parent,args){
-          try {
             return models.klub.findOne({
               where:{
                 id:parent.domaci_id
               }
-            })
-          } catch (error) {
+            }).then((data)=>data).catch((error)=>{
             nodelogger.error('Greška kod dohvaćanja domaćeg kluba unutar Utakmica objekta '+error);
             throw(error);
-          }
+          })
         }
       },
       gosti:{
         type:Klub,
         resolve(parent,args){
-          try {
             return models.klub.findOne({
               where:{
                 id:parent.gosti_id
               }
-            })
-          } catch (error) {
+            }).then((data)=>data).catch((error)=>{
             nodelogger.error('Greska kod dohvaćanja gostujućeg kluba unutar Utakmica objekta '+error);
             throw(error);
-          }
+          })
         }
       }
   })
@@ -643,31 +611,27 @@ const DogadajiUtakmice=new GraphQLObjectType({
     dogadaj:{
       type:MoguciDogadaji,
       resolve(parent,args){
-        try {
           return models.dogadaj.findOne({
             where:{
               id:parent.dogadaj_id
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvata događaja unutar DogadajiUtakmice objekta '+error);
           throw(error);
-        }
+        })
       }
     },
     akter:{
       type:ClanTima,
       resolve(parent,args){
-        try {
           return models.clanovitima.findOne({
             where:{
               maticni_broj:parent.maticni_broj
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvata clana tima unutar DogadajiUtakmice objekta '+error);
           throw(error);
-        }
+        })
       }
     }
   })
@@ -681,31 +645,27 @@ const GolPozicija=new GraphQLObjectType({
     akter:{
       type:ClanTima,
       resolve(parent,args){
-        try {
           return models.clanovitima.findOne({
             where:{
               maticni_broj:parent.maticni_broj
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvata clana tima unutar GolPozicija objekta '+error);
           throw(error);
-        }
+        })
       }
     },
     dogadaj:{
       type:MoguciDogadaji,
       resolve(parent,args){
-        try {
           return models.dogadaj.findOne({
             where:{
               id:parent.dogadaj_id
             }
-          })
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata događaja unutar GolPOzicija objekta '+error);
+          }).then((data)=>data).catch((error)=>{
+          nodelogger.error('Greška kod dohvata događaja unutar GolPozicija objekta '+error);
           throw(error);
-        }
+        })
       }
     }
   })
@@ -717,17 +677,15 @@ const RootQuery=new GraphQLObjectType({
     utakmica:{//DOHVAT PODATAKA VEZANIH ZA UTAKMICU-> za dohvat generalInfo i osoba utakmice isti ovi query samo specificiramo atribute koji nam trebaju
       type:Utakmica,
       args:{broj_utakmice:{type:GraphQLString}},//specificiramo sve argumente querya
-      resolve(parent,args){
-        try {
+      resolve(parent,args){//NIJE POTREBNA AUTORIZACIJA JER JE TO ZA GENERALNOG KORISNIKA
           return models.utakmica.findOne({
             where:{
               broj_utakmice:args.broj_utakmice
             }
-          }); 
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greška kod dohvata podataka utakmice '+error);
           throw(error);
-        }
+        })
       }
       //Nije potrebno da resolver bude async i radimo await u njemu jer će graphql sam čekati da dobije neki odgovor uvreturnu koji može usporediti s danom shemom i tipom tog querya
       //Ako oćemo nešto ispisivat unutar resolvera onda su nam bitni promisesi i onda koristimo ili .then ili async await
@@ -736,138 +694,190 @@ const RootQuery=new GraphQLObjectType({
        During execution, GraphQL will wait for Promises, Futures, and Tasks to complete before continuing
         and will do so with optimal concurrency*/
     },
-    natjecanja:{//dohvat svih najtecanja kod odabira
+    natjecanja:{//dohvat svih najtecanja kod vođenja utakmice-> SAMO ADMIN AUTORIZIRAN
       type:new GraphQLList(Natjecanje),
-      resolve(parent,args){
-        try {
-          return models.natjecanje.findAll({});
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata svih najtecanja '+error);
-          throw(error);
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.natjecanje.findAll({}).then((data)=>data).catch((error)=> {
+            nodelogger.error('Greška kod dohvata svih najtecanja '+error);
+            throw(error);
+          })
+        }
+        else {
+          nodelogger.error('Greska u autorizaciji kod dohvata svih natjecanja');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
     dvorane:{
       type:new GraphQLList(Dvorana),
-      resolve(parent,args){
-        try {
-          return models.mjestodvorana.findAll({});
-        } catch (error) {
-          nodelogger.error('Greška kod dohvaćanja svih dvorana '+error);
-          throw(error);
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.mjestodvorana.findAll({}).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod dohvaćanja svih dvorana '+error);
+            throw(error);
+          })
+        }
+        else {
+          nodelogger.error('Greska u autorizaciji kod dohvata svih dvorana');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
     nadzornici:{//dohvat svih nadzornika
       type:new GraphQLList(SluzbenaOsoba),
-      resolve(parent,args){
-        try {
-          return models.sluzbenoosoblje.findAll({
-            where:{
-              rola:1
-            }
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.sluzbenoosoblje.findAll({
+              where:{
+                rola:1
+              }
+            }).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod dohvata svih nadzornika '+error);
+            throw(error);
           })
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata svih nadzornika '+error);
-          throw(error);
+        }
+        else {
+          nodelogger.error('Greska u autorizaciji kod dohvata svih nadzornika');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
     lijecnici:{
       type:new GraphQLList(SluzbenaOsoba),
-      resolve(parent,args){
-        try {
-          return  models.sluzbenoosoblje.findAll({
-            where:{
-              rola:4
-            }
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return  models.sluzbenoosoblje.findAll({
+              where:{
+                rola:4
+              }
+            }).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod dohvata svih liječnika '+error);
+            throw(error);
           })
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata svih liječnika '+error);
-          throw(error);
+        }
+        else {
+          nodelogger.error('Greska u autorizaciji kod dohvata svih lijecnika');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
     zapisnicari:{
       type:new GraphQLList(SluzbenaOsoba),
-      resolve(parent,args){
-        try {
-          return  models.sluzbenoosoblje.findAll({
-            where:{
-              rola:2
-            }
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return  models.sluzbenoosoblje.findAll({
+              where:{
+                rola:2
+              }
+            }).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod dohvata svih zapisničara '+error);
+            throw(error);
           })
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata svih zapisničara '+error);
-          throw(error);
+        }
+        else {
+          nodelogger.error('Greska u autorizaciji kod dohvata svih zapisnicara');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
     mjeracivremena:{
       type:new GraphQLList(SluzbenaOsoba),
-      resolve(parent,args){
-        try {
-          return  models.sluzbenoosoblje.findAll({
-            where:{
-              rola:3
-            }
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return  models.sluzbenoosoblje.findAll({
+              where:{
+                rola:3
+              }
+            }).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod dohvata svih mjerača vremena '+error);
+            throw(error);
           })
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata svih mjerača vremena '+error);
-          throw(error);
-        }
+      }
+      else {
+        nodelogger.error('Greska u autorizaciji kod dohvata svih mjerača vremena');
+        throw(new Error('Niste autorizirani za zadanu operaciju'));
+      }
       }
     },
     suci:{
       type:new GraphQLList(Sudac),
-      resolve(parent,args){
-        try {
-          return models.suci.findAll({})
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata svih sudaca '+error);
-          throw(error);
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.suci.findAll({}).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod dohvata svih sudaca '+error);
+            throw(error);
+          })
+        }
+        else {
+          nodelogger.error('Greska u autorizaciji kod dohvata svih sudaca');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
     klubovi:{
       type:new GraphQLList(Klub),
-      args:{natjecanje_id:{type:GraphQLInt}},//dohvat SAMO ONIH KLUBOVA IZ ODABRANOG NATJECANJA
-      resolve(parent,args){
-        try {
-          return models.klub.findAll({
-            include:{
-              model:models.natjecanje,
-              as:'kluboviodnatjecanja',
-              through: { attributes: [] },
-              where:{
-                id:args.natjecanje_id
+      args:{natjecanje_id:{type:GraphQLInt}},//dohvat SAMO ONIH KLUBOVA IZ ODABRANOG NATJECANJA-> KOD VOĐENJA UTAKMICE-> OMOGUĆENO SAMO ADMINU
+      resolve:async(parent,args,context)=>{
+        if(context.req.session.user_id)
+        {
+            return models.klub.findAll({
+              include:{
+                model:models.natjecanje,
+                as:'kluboviodnatjecanja',
+                through: { attributes: [] },
+                where:{
+                  id:args.natjecanje_id
+                }
               }
-            }
+            }).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod dohvata svih klubova odabranog natjecanja '+error);
+            throw(error);
           })
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata svih klubova odabranog natjecanja '+error);
-          throw(error);
+        }
+        else {
+          nodelogger.error('Greska u autorizaciji kod dohvata klubova iz natjecanja');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
     dogadaji:{//dohvat svih mogućih događaja koji se mogu dogoditi
       type:new GraphQLList(MoguciDogadaji),
-      resolve(parent,args){
-        try {
-          return models.dogadaj.findAll({});
-        } catch (error) {
-          nodelogger.error('Greška kod dohvata svih mogućih događaja '+error);
-          throw(error);
-        }
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.dogadaj.findAll({}).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod dohvata svih mogućih događaja '+error);
+            throw(error);
+          })
+      }
+      else {
+        nodelogger.error('Greska u autorizaciji kod dohvata svih mogućih događaja');
+        throw(new Error('Niste autorizirani za zadanu operaciju'));
+      }
       }
     },
-    timclanovi:{//vraća sve moguće članove tima od igrača i golmana do stožera
+    timclanovi:{//vraća sve moguće članove tima od igrača i golmana do stožera kod vođenja utakmice-> AUTORIZIRANO SAMO ZA ADMINE
       type:Tim,
       args:{klub_id:{type:GraphQLInt}},
-      resolve(parent,args){//OVAJ RESOLVER ĆE VRATITI ID OD KLUBA U OBJECT TYPE TIM U KOJEM MU MOŽEMO PRISTUPATI I KOJI ĆE POMOĆU NJEGA DOBITI SVE POTREBNE CLANOVE TIMA
-        return {//NIJE POTREBNO TRY CATCH ERROR HANDLEANJE JER NEMA SINKRONIH OPERAIJA+ KAD SE THROWA ERROR UNUTAR TIM OBJEKTA ON SE NEĆE PROPAGIRATI NAZAD U OVAJ RESOLVER NEGO ĆE IĆI ODMAH NA ERROR HANDLEANJE
-          //ODNOSNO PRVI RESOLVERI KAD SE IZVRSE ONI SU GOTOVI I NEMA VIŠE POVRATKA U NJIH, ERROR HANDLEANJE ĆE SE ODRADIT UNUTAR TIM OBJEKTA
-          id:args.klub_id
+      resolve(parent,args,context){//OVAJ RESOLVER ĆE VRATITI ID OD KLUBA U OBJECT TYPE TIM U KOJEM MU MOŽEMO PRISTUPATI I KOJI ĆE POMOĆU NJEGA DOBITI SVE POTREBNE CLANOVE TIMA
+        if(context.req.session.user_id)
+        {
+          return {//NIJE POTREBNO TRY CATCH ERROR HANDLEANJE JER NEMA SINKRONIH OPERAIJA+ KAD SE THROWA ERROR UNUTAR TIM OBJEKTA ON SE NEĆE PROPAGIRATI NAZAD U OVAJ RESOLVER NEGO ĆE IĆI ODMAH NA ERROR HANDLEANJE
+            //ODNOSNO PRVI RESOLVERI KAD SE IZVRSE ONI SU GOTOVI I NEMA VIŠE POVRATKA U NJIH, ERROR HANDLEANJE ĆE SE ODRADIT UNUTAR TIM OBJEKTA
+            id:args.klub_id
+          }
+        }
+        else {
+          nodelogger.error('Greška u autorizaciji kod dohvata clanova tima');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
@@ -887,22 +897,20 @@ const RootQuery=new GraphQLObjectType({
       type:new GraphQLList(DogadajiUtakmice),
       args:{broj_utakmice:{type:GraphQLString}},
       resolve(parent,args){
-        try {
           return models.dogadajiutakmice.findAll({
             where:{
               broj_utakmice:args.broj_utakmice
             }
-          })
-        } catch (error) {
+          }).then((data)=>data).catch((error)=>{
           nodelogger.error('Greska kod dohvata događaja utakmice '+error);
           throw(error);
-        }
+        })
       }
     },
     checklogin:{
       type:GraphQLBoolean,
       resolve(parent,args,context){
-        if(context.req.session)//ako je logiran-> ima session cookie-> propusti ga
+        if(context.req.session.user_id)//ako je logiran-> ima session cookie jer mu jw postavljen user_id pa je i spremljen u bazu-> propusti ga
         {
           return true;
         }
@@ -937,39 +945,46 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         timdomaci_id:{type:GraphQLInt},
         timgosti_id:{type:GraphQLInt}
       },
-      resolve(parent,args){
-          return models.utakmica.create({
-            broj_utakmice:args.broj_utakmice,
-            kolo:args.kolo,
-            datum:args.datum,
-            vrijeme:args.vrijeme,
-            gledatelji:args.gledatelji,
-            natjecanje_id:args.natjecanje_id,
-            mjesto_id:args.dvorana_id,
-            nadzornik_id:args.nadzornik_id,
-            lijecnik_id:args.lijecnik_id,
-            zapisnicar_id:args.zapisnicar_id,
-            mjvremena_id:args.mjvremena_id,
-            sudac1_id:args.sudac1_id,
-            sudac2_id:args.sudac2_id,
-            domaci_id:args.timdomaci_id,
-            gosti_id:args.timgosti_id
-          }).then((data)=>{
-              const klub_ids=[data.domaci_id,data.gosti_id];//niz 2 ida od klubova
-              return models.klub.findAll({//vracamo promise
-                attributes:['id','naziv'],
-                where:{
-                  id:{
-                    [Op.in]:klub_ids
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.utakmica.create({
+              broj_utakmice:args.broj_utakmice,
+              kolo:args.kolo,
+              datum:args.datum,
+              vrijeme:args.vrijeme,
+              gledatelji:args.gledatelji,
+              natjecanje_id:args.natjecanje_id,
+              mjesto_id:args.dvorana_id,
+              nadzornik_id:args.nadzornik_id,
+              lijecnik_id:args.lijecnik_id,
+              zapisnicar_id:args.zapisnicar_id,
+              mjvremena_id:args.mjvremena_id,
+              sudac1_id:args.sudac1_id,
+              sudac2_id:args.sudac2_id,
+              domaci_id:args.timdomaci_id,
+              gosti_id:args.timgosti_id
+            }).then((data)=>{
+                const klub_ids=[data.domaci_id,data.gosti_id];//niz 2 ida od klubova
+                return models.klub.findAll({//vracamo promise
+                  attributes:['id','naziv'],
+                  where:{
+                    id:{
+                      [Op.in]:klub_ids
+                    }
                   }
-                }
-              })
-          }).then((data)=>{
-            return data;
-          }).catch((error)=>{
-            nodelogger.error('Greška kod spremanja utakmice '+error);
-            throw(error);
-          })
+                })
+            }).then((data)=>{
+              return data;
+            }).catch((error)=>{
+              nodelogger.error('Greška kod spremanja utakmice '+error);
+              throw(error);
+            })
+        }
+        else {
+          nodelogger.error('Greška u autorizaciji kod spremanja utakmice');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
+        }
         }
     },
     spremitimzautakmicu:{//Potrebno je da mutacija barem nešto vrati pa makar to bilo null,ako želimo da vrati null onda definiramo NOVI SCALAR TYPE VOID KOJI JE UVIJEK NULL I NJEGA STAVIMO ZA TYPE
@@ -984,56 +999,60 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         tehniko_id:{type:GraphQLString},
         fizio_id:{type:GraphQLString}
       },
-      resolve:async (parent,args)=>{//ako nam treba async await sintaksa samo je dodamo na resolve funkciju
+      resolve:async (parent,args,context)=>{//ako nam treba async await sintaksa samo je dodamo na resolve funkciju
         try {
-          for(let i=0;i<args.igraci_id.length;i++)
+          if(context.req.session.user_id)
           {
-            await models.igracutakmica.create({//CREATE PO DEFAULTU SAM VRAĆA OBJEKT U KOJEM SE NALAZI NOVO KREIRANI/UNESENI REDAK TABLICE
+            for(let i=0;i<args.igraci_id.length;i++)
+            {
+              await models.igracutakmica.create({//CREATE PO DEFAULTU SAM VRAĆA OBJEKT U KOJEM SE NALAZI NOVO KREIRANI/UNESENI REDAK TABLICE
+                broj_utakmice:args.broj_utakmice,
+                klub_id:args.klub_id,
+                maticni_broj:args.igraci_id[i]
+              });
+            }
+            for(let i=0;i<args.golmani_id.length;i++)
+            {
+              await models.golmanutakmica.create({
+                broj_utakmice:args.broj_utakmice,
+                klub_id:args.klub_id,
+                maticni_broj:args.golmani_id[i]
+              })
+            }
+            await models.stozerutakmica.create({//trener mora bit odabran nije null sig
               broj_utakmice:args.broj_utakmice,
               klub_id:args.klub_id,
-              maticni_broj:args.igraci_id[i]
+              maticni_broj:args.trener_id
             });
+            if(args.sluzpredstavnik_id)//mogu biti null svi osim trenera
+            {
+              await models.stozerutakmica.create({
+                broj_utakmice:args.broj_utakmice,
+                klub_id:args.klub_id,
+                maticni_broj:args.sluzpredstavnik_id
+              });
+            }
+            if(args.tehniko_id)
+            {
+              await models.stozerutakmica.create({
+                broj_utakmice:args.broj_utakmice,
+                klub_id:args.klub_id,
+                maticni_broj:args.tehniko_id
+              });
+            }
+            if(args.fizio_id)
+            {
+              await models.stozerutakmica.create({
+                broj_utakmice:args.broj_utakmice,
+                klub_id:args.klub_id,
+                maticni_broj:args.fizio_id
+              });
+            }
+            return true;
           }
-          for(let i=0;i<args.golmani_id.length;i++)
-          {
-            await models.golmanutakmica.create({
-              broj_utakmice:args.broj_utakmice,
-              klub_id:args.klub_id,
-              maticni_broj:args.golmani_id[i]
-            })
-          }
-          await models.stozerutakmica.create({//trener mora bit odabran nije null sig
-            broj_utakmice:args.broj_utakmice,
-            klub_id:args.klub_id,
-            maticni_broj:args.trener_id
-          });
-          if(args.sluzpredstavnik_id)//mogu biti null svi osim trenera
-          {
-            await models.stozerutakmica.create({
-              broj_utakmice:args.broj_utakmice,
-              klub_id:args.klub_id,
-              maticni_broj:args.sluzpredstavnik_id
-            });
-          }
-          if(args.tehniko_id)
-          {
-            await models.stozerutakmica.create({
-              broj_utakmice:args.broj_utakmice,
-              klub_id:args.klub_id,
-              maticni_broj:args.tehniko_id
-            });
-          }
-          if(args.fizio_id)
-          {
-            await models.stozerutakmica.create({
-              broj_utakmice:args.broj_utakmice,
-              klub_id:args.klub_id,
-              maticni_broj:args.fizio_id
-            });
-          }
-          return true;
+          else throw(new Error('Niste autorizirani za zadanu operaciju'));
         } catch (error) {
-          console.log('Greška kod spremanja tima kluba za utakmicu '+error);
+          nodelogger.error('Greška kod spremanja tima kluba za utakmicu '+error);
           throw(error);
         }
       }
@@ -1049,20 +1068,25 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         domaci:{type:GraphQLInt},
         gosti:{type:GraphQLInt},
       },
-      resolve(parent,args){
-        try {
-          return models.dogadajiutakmice.create({//AKO NE POŠALJEMO NEKI PARSMETAR U MUTACIJI ON ĆE PO DEFAULTU BITI NULL I SEQUELIZE GA NEĆE UOPĆE SPREMATI U QUERYU NEGO ĆE ON ZAUZET DEFAULT VRIJEDNOST
-            vrijeme:args.vrijeme,
-            tim:args.klubgrb,
-            rez_domaci:args.domaci,
-            rez_gosti:args.gosti,
-            broj_utakmice:args.broj_utakmice,
-            dogadaj_id:args.dogadaj_id,
-            maticni_broj:args.maticni_broj
-          });
-        } catch (error) {
-          nodelogger.error('Greška kod spremanja događaja '+error);
-          throw(error);
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.dogadajiutakmice.create({//AKO NE POŠALJEMO NEKI PARSMETAR U MUTACIJI ON ĆE PO DEFAULTU BITI NULL I SEQUELIZE GA NEĆE UOPĆE SPREMATI U QUERYU NEGO ĆE ON ZAUZET DEFAULT VRIJEDNOST
+              vrijeme:args.vrijeme,
+              tim:args.klubgrb,
+              rez_domaci:args.domaci,
+              rez_gosti:args.gosti,
+              broj_utakmice:args.broj_utakmice,
+              dogadaj_id:args.dogadaj_id,
+              maticni_broj:args.maticni_broj
+            }).then((data)=>data).catch((error)=>{
+            nodelogger.error('Greška kod spremanja događaja '+error);
+            throw(error);
+          })
+        }
+        else {
+          nodelogger.error('Greška u autorizaciji prilikom spremanja događaja');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
@@ -1075,18 +1099,23 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         maticni_broj:{type:GraphQLString},
         dogadaj_id:{type:GraphQLInt}
       },
-      resolve(parent,args){
-        try {
-          return models.pozicijegola.create({
-            pozicija:args.pozicija,
-            gol:args.gol,
-            broj_utakmice:args.broj_utakmice,
-            maticni_broj:args.maticni_broj,
-            dogadaj_id:args.dogadaj_id
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.pozicijegola.create({
+              pozicija:args.pozicija,
+              gol:args.gol,
+              broj_utakmice:args.broj_utakmice,
+              maticni_broj:args.maticni_broj,
+              dogadaj_id:args.dogadaj_id
+            }).then((data)=>data).catch((error)=> {
+            nodelogger.error('Greška kod spremanja pozicije gola '+error);
+            throw(error);
           })
-        } catch (error) {
-          nodelogger.error('Greška kod spremanja pozicije gola '+error);
-          throw(error);
+        }
+        else {
+          nodelogger.error('Greška u autorizaciji kod spremanja pozicije gola');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       }
     },
@@ -1096,15 +1125,22 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         status:{type:GraphQLInt},
         broj_utakmice:{type:GraphQLString},
       },
-      resolve(parent,args){
-          return models.utakmica.update({status:args.status},{
-            where:{
-              broj_utakmice:args.broj_utakmice
-            }
-          }).then(()=>args.status).catch((error)=>{
-            nodelogger.error('Greška kod azuriranja statusa utakmice '+error);
-            throw(error);
-          })
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.utakmica.update({status:args.status},{
+              where:{
+                broj_utakmice:args.broj_utakmice
+              }
+            }).then(()=>args.status).catch((error)=>{
+              nodelogger.error('Greška kod azuriranja statusa utakmice '+error);
+              throw(error);
+            })
+          }
+        else {
+            nodelogger.error('Greška u autorizaciji kod ažuriranja statusa utakmice');
+            throw(new Error('Niste autorizirani za zadanu operaciju'));
+          }
       }
     },
     zavrsiutakmicu:{//kada ide zavrsiti utakmicu onda korisnik unosi ocjene sudaca i postavlja se i konacni rezultat utakmice i status na kraj
@@ -1116,21 +1152,38 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         sudac1_ocjena:{type:GraphQLFloat},
         sudac2_ocjena:{type:GraphQLFloat}
       },
-      resolve(parent,args){
-          return models.utakmica.update({
-            rezultat_domaci:args.rez_domaci,
-            rezultat_gosti:args.rez_gosti,
-            sudac1_ocjena:args.sudac1_ocjena,
-            sudac2_ocjena:args.sudac2_ocjena,
-            status:4
-          },{
-            where:{
-              broj_utakmice:args.broj_utakmice
-            }
-          }).then(()=>args.broj_utakmice).catch((error) => {
-            nodelogger.error('Greška kod zavrsavanja utakmice '+error);
-            throw(error);
-          })
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+            return models.utakmica.update({
+              rezultat_domaci:args.rez_domaci,
+              rezultat_gosti:args.rez_gosti,
+              sudac1_ocjena:args.sudac1_ocjena,
+              sudac2_ocjena:args.sudac2_ocjena,
+              status:4
+            },{
+              where:{
+                broj_utakmice:args.broj_utakmice
+              }
+            }).then((data)=>{
+              context.res.clearCookie('user_sid',{//BRISANJE COOKIEJA U BROWSERU
+                path: '/',
+                httpOnly: true,
+                domain:'localhost',
+                sameSite:'lax',
+                secure:false
+            });
+            context.req.session.destroy();//IZBRISE SESIJU IZ MEMORY STOREA
+            return args.broj_utakmice;
+            }).catch((error) => {
+              nodelogger.error('Greška kod zavrsavanja utakmice '+error);
+              throw(error);
+            })
+        }
+        else {
+          nodelogger.error('Greška u autorizaciji kod zavrsavanja utakmice');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
+        }
        
       }
     },
@@ -1141,6 +1194,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         password:{type:GraphQLString}
       },
       resolve: async(parent,args,context)=>{//u contextu nam se nalazi req objekt kojem pristupamo
+        try {
        const user= await models.korisnici.findOne({
           include:{
             model:models.sluzbenoosoblje
@@ -1151,7 +1205,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         });
         if(!user)//ako nema korisnika s tim usernameom
         {
-          throw(new Error('Nije pronađen korisnik sa zadanim usernameom'));//ovo će napravit graphql error s ovim messageom
+          throw(new Error('Nije pronađen korisnik sa zadanim korisničkim imenom'));//ovo će napravit graphql error s ovim messageom
         }
         else
         {//postoji korisnik s tim username-> provjerit password
@@ -1164,8 +1218,12 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
               prezime:user.sluzbenoosoblje.prezime
             };
           }
-          else throw(new Error('Netočan password'));//ovo će napravit graphql error s ovim messageom
-        }
+          else throw(new Error('Netočna lozinka'));//ovo će napravit graphql error s ovim messageom
+        }   
+      } catch (error) {
+          nodelogger.error('Greska prilikom logiranja'+error);
+          throw(error);
+      }
       }
     }
 

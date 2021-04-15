@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState,Fragment} from 'react'
 import {Box,Typography,Button,Grid,TextField,FormControl,InputLabel} from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import SportsIcon from '@material-ui/icons/Sports';
@@ -29,7 +29,9 @@ import {resetirajTimer} from '../redux/slicers/timer';
 import {resetirajTimove} from '../redux/slicers/timovi';
 import {postaviVrijeme} from '../redux/slicers/vrijeme';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Alert from '@material-ui/lab/Alert';
+import ErrorDialog from './ErrorDialog';
+import {postaviError} from '../redux/slicers/error';
+import {adminLoginStatus} from '../redux/slicers/adminLogged';
 function SudacOcjena({history}) {
     //primamo history objekt kako bi nakon zavesetka i spremanja utakmice preusmjerili na home page sa history.replace
     const dispatch=useDispatch();
@@ -39,9 +41,12 @@ function SudacOcjena({history}) {
     const brojUtakmice=useSelector(state=>state.brojUtakmice);
     const {timDomaci,timGosti}=useSelector(state=>state.rezultat);
     const [spremiZavrsiUtakmicu,{loading,error}]=useMutation(zavrsiUtakmicu,{
+        //nakon spremanja podataka će biti automatski premjesten na home page i ODLOGIRAN-> MAKNUT ĆE MU SE SESSION COOKIE
         onCompleted:(data)=>{
              //preusmjeri na homepage nakon uspješnog spremanja
             history.replace('/');
+            //ODLOGIRAJ KORISNIKA-> AKO JE QUER USPJEŠNO COMPLETAN ONDA JE CLEARAN SESSION COOKIE U BROWSERU I IZBRISAN IZ MEMORY STOREA NA SERVERU
+            dispatch(adminLoginStatus(false));
             //OČISTI SVE GLOBAL STATEOVE OD STRANICE VOĐENJA STATISTIKE ODNOSNO POSTAVIT IH NAZAD NA DEFAULTNE VRIJEDNOSTI
             dispatch(brojUtakmiceUnesen(''));
             dispatch(postaviDatum(''));
@@ -65,6 +70,9 @@ function SudacOcjena({history}) {
             dispatch(resetirajTimove());
             dispatch(postaviVrijeme(''));
             dispatch(ponistiZavrsetakUtakmice());
+        },
+        onError:(error)=>{
+            dispatch(postaviError(true));
         }
     })
     function handleChangeOcjena1(value)
@@ -92,6 +100,7 @@ function SudacOcjena({history}) {
         dispatch(ponistiZavrsetakUtakmice());
     }
     return (
+    <Fragment>
        <Grid container direction='column' justify='space-evenly' alignItems='center' style={{marginTop:50}}>{/*glavni container od sudaca koji sadrzi 2 retka za unos ocjene*/}
             <Grid item container xs={12} direction='row' justify='space-around' alignItems='center'>
                 <Typography color='secondary' align='center'variant='h6'>UNESITE OCJENE SUDACA</Typography>
@@ -152,8 +161,6 @@ function SudacOcjena({history}) {
                         (()=>{
                             if(loading) return <CircularProgress color='primary'/>
 
-                            if(error) return (<Alert severity="error">{error.message}</Alert>)
-
                             return ( <Button  onClick={()=>spremiZavrsi()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Spremi i završi' >SPREMI</Button>)
                         })()
                     }
@@ -163,6 +170,13 @@ function SudacOcjena({history}) {
                 </Grid>
             </Grid>
        </Grid>
+       {
+           (error&&error.message)?
+           <ErrorDialog errorText={error.message}/>
+           :
+           null
+       }
+    </Fragment>
     )
 }
 

@@ -10,6 +10,8 @@ import {odabranClan} from '../redux/slicers/odabraniClan';
 import { useQuery,useMutation } from '@apollo/client';
 import {dohvatiSveMoguceDogadaje} from '../graphql/query';
 import {spremiDogadaj} from '../graphql/mutation';
+import ErrorDialog from './ErrorDialog';
+import {postaviError} from '../redux/slicers/error';
 import Alert from '@material-ui/lab/Alert';
 const useStyles=makeStyles((theme)=>({
 dogadajiBox:{
@@ -45,6 +47,9 @@ function MoguciDogadaji() {
           domaci:data.spremidogadaj.rez_domaci,
           gosti:data.spremidogadaj.rez_gosti
       }))
+      },
+      onError:(error)=>{
+        dispatch(postaviError(true));//ovo će otvorit error popup
       }
     });
     useEffect(()=>{//poziva se kod odabira dogadaja da vidi jel se može branka otključati
@@ -120,7 +125,6 @@ function MoguciDogadaji() {
 
     if(queryError) return (<Alert severity="error">{queryError.message}</Alert>);
     
-   /* if(mutationError) //pozovi error window*/
 
     if(data)
     {
@@ -132,6 +136,12 @@ function MoguciDogadaji() {
                   return  <Dogadaj key={dogadaj.id} id={dogadaj.id} naziv={dogadaj.naziv} tip={dogadaj.tip} id={dogadaj.id}/>
               })}                                   
               </Box>
+              {
+                (mutationError&&mutationError.message)?
+                <ErrorDialog errorText={mutationError.message}/>
+                :
+                null
+              }
         </Fragment>
       )
     }

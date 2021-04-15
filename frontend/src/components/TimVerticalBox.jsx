@@ -13,6 +13,8 @@ import {dohvatiSveClanoveTima} from '../graphql/query';
 import { spremiRosterUtakmice} from '../graphql/mutation';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from '@material-ui/lab/Alert';
+import ErrorDialog from './ErrorDialog';
+import {postaviError} from '../redux/slicers/error';
 const useStyles=makeStyles((theme)=>({
     klubBox:{
         display:'flex',
@@ -141,6 +143,9 @@ const [spremiRoster,{loading:mutationLoading,error:mutationError}]=useMutation(s
     }
     else dispatch(spremljenGosti());
     setTimSpremljen(true);//u oba slucaja postavi da je tim spremljen
+  },
+  onError:(error)=>{
+    dispatch(postaviError(true));
   }
 })
 function spremiTim()//poziva se kada spremimo odabrane clanove tima za tu utakmicu-> postavimo globalni state da je zadani tim spremljen
@@ -369,13 +374,18 @@ function RenderOdabraniFizio()
                        {(()=>{
                           if(mutationLoading) return <CircularProgress color='primary'/>
 
-                          if(mutationError) return (<Alert severity="error">{mutationError.message}</Alert>)
                           //inace vrati save button
                           return (<Box style={{width:'100%',display:'flex',justifyContent:'center',bottom:10, alignItems:'center',marginLeft:'auto',marginRight:'auto',position:'absolute'}}>
                             <Button disabled={(timSpremljen)? true : false} onClick={()=>spremiTim()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Potvrdi momcad za utakmicu' > SAVE</Button>
                           </Box>)
                        })()}
                     </Box>
+                    {
+                      (mutationError&&mutationError.message)?
+                      <ErrorDialog errorText={mutationError.message}/>
+                      :
+                      null
+                    }
             </Fragment>
     )
   }

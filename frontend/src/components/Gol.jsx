@@ -10,6 +10,8 @@ import {odabranClan} from '../redux/slicers/odabraniClan';
 import {incrementDomaci,incrementGosti} from '../redux/slicers/rezultat';
 import { useMutation } from '@apollo/client';
 import {spremiDogadaj,spremiGolPozicija} from '../graphql/mutation';
+import ErrorDialog from './ErrorDialog';
+import {postaviError} from '../redux/slicers/error';
 const useStyles=makeStyles((theme)=>({
     gol:{               /*image je sa auto uvik na oko 95% pa stavimo visinu girda 90% + gornja margina 5% i pratit će se responzivno*/ 
         marginTop:'4%',
@@ -76,10 +78,17 @@ function Gol() {
           domaci:data.spremidogadaj.rez_domaci,
           gosti:data.spremidogadaj.rez_gosti
       }))
+      },
+      onError:(error)=>{
+        dispatch(postaviError(true));//ovo će otvorit error popup
       }
     });
     //spremanje odabranog dijela branke
-  const [spremiPozicijuGola,{error:golpozicijaError}]=useMutation(spremiGolPozicija);
+  const [spremiPozicijuGola,{error:golpozicijaError}]=useMutation(spremiGolPozicija,{
+    onError:(error)=>{
+      dispatch(postaviError(true));//ovo će otvorit error popup
+    }
+  });
 
   function odabraniGol(gol_pozicija)//poziva se nakon klika odnosno odabira pozicije gola
   {
@@ -189,6 +198,12 @@ function Gol() {
                                                       </Grid>
                                                 </Grid>
                                   </Grid>
+           {                   
+                ((dogadajError&&dogadajError.message)||(golpozicijaError&&golpozicijaError.message))?//kada se dogodi 1 od errora radimo alert dialog
+                <ErrorDialog errorText={(dogadajError)? dogadajError.message : golpozicijaError.message} /> //kada se dogodi error onda vraćamo dialog komponentu i otvaramo je u onError funkciji
+                :
+                null
+            }
       </Fragment>
     )
 }

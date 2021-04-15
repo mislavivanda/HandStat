@@ -1,4 +1,4 @@
-import React,{Fragment} from 'react'
+import React,{Fragment,useState} from 'react'
 import {spremiUtakmicu} from '../redux/slicers/spremiUtakmicu';
 import {useDispatch,useSelector } from 'react-redux';
 import klub1 from '../images/zagreb.jpg';
@@ -9,7 +9,8 @@ import SaveIcon from '@material-ui/icons/Save';
 import { useMutation } from '@apollo/client';
 import {dodajUtakmicu} from '../graphql/mutation';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Alert from '@material-ui/lab/Alert';
+import ErrorDialog from './ErrorDialog';
+import {postaviError} from '../redux/slicers/error';
 function SpremiUtakmicuButton() {
     const dispatch=useDispatch();
     const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
@@ -26,7 +27,8 @@ function SpremiUtakmicuButton() {
     const lijecnik=useSelector(state=>state.lijecnik.odabraniLijecnik);//nije obavezan
     const {sudac1,sudac2}=useSelector(state=>state.sudci);//1 sudac obavezan, drugi opcionalan
     const {timDomaci,timGosti}=useSelector(state=>state.timovi);
-
+    const isError=useSelector((state)=>state.error);
+    const [errorMessage,setErrorMessage]=useState('');//da znamo koji tekst poslati error dialogu
     const [spremiUtakmicaInfo,{loading,error}]=useMutation(dodajUtakmicu,{
         onCompleted:(data)=>{
             if(data.dodajutakmicu[0].id===timDomaci.id)
@@ -39,6 +41,10 @@ function SpremiUtakmicuButton() {
                 dispatch(slikaTimGosti(klub1));
             }
             dispatch(spremiUtakmicu(true));
+        },
+        onError:(error)=>{
+            setErrorMessage(error.message);
+            dispatch(postaviError(true));
         }
     });
     function savedGameInfo()
@@ -46,47 +52,58 @@ function SpremiUtakmicuButton() {
         //provjera svih polja
         if(!natjecanje)
         {
-            console.log('Odaberite natjecanje');
+            setErrorMessage('Odaberite natjecanje');
+            dispatch(postaviError(true));
         }
         else if(!(brojUtakmice.length>0))//jer je inicijalno prazan string
         {
-            console.log('Unesite broj utakmice');
+            setErrorMessage('Unesite broj utakmice');
+            dispatch(postaviError(true));
         }
         else if(!dvorana)
         {
-            console.log('Odaberite lokaciju');
+            setErrorMessage('Odaberite lokaciju');
+            dispatch(postaviError(true));
         }
         else if(!(kolo>0))
         {
-            console.log('Odaberite kolo');
+            setErrorMessage('Odaberite kolo');
+            dispatch(postaviError(true));
         }
         else if(!(datum.length>0))
         {
-            console.log('Odaberite datum');
+            setErrorMessage('Odaberite datum');
+            dispatch(postaviError(true));
         }
         else if(!(vrijeme.length>0))
         {
-            console.log('Odaberite vrijeme');
+            setErrorMessage('Odaberite vrijeme');
+            dispatch(postaviError(true));
         }
         else if(!nadzornik)
         {
-            console.log('Odaberite nadzornika');
+            setErrorMessage('Odaberite nadzornika');
+            dispatch(postaviError(true));
         }
         else if(!zapisnicar)
         {
-            console.log('Odaberite zapisnicara');
+            setErrorMessage('Odaberite zapisnicara');
+            dispatch(postaviError(true));
         }
         else if((!sudac1))//mora odabrat barem jednog
         {
-            console.log('Odaberite barem jednog sudca');
+            setErrorMessage('Odaberite barem jednog sudca');
+            dispatch(postaviError(true));
         }
         else if(!timDomaci)
         {
-            console.log('Odaberite domaći tim');
+            setErrorMessage('Odaberite domaći tim');
+            dispatch(postaviError(true));
         }
         else if(!timGosti)
         {
-            console.log('Odaberite gostujući tim');
+            setErrorMessage('Odaberite gostujući tim');
+            dispatch(postaviError(true));
         }
         else {
             spremiUtakmicaInfo({
@@ -113,11 +130,16 @@ function SpremiUtakmicuButton() {
 
     if(loading) return <CircularProgress color='primary'/>
 
-    if(error) return (<Alert severity="error">{error.message}</Alert>)
     
     return (
        <Fragment>
            <Button disabled={(spremljenGameInfo)? true : false} onClick={()=>savedGameInfo()} title='Spremi utakmicu' disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>}>SAVE</Button> 
+           {
+            (isError)?//u slicaju errora pozivamo poopup
+            <ErrorDialog errorText={errorMessage}/>
+            :
+            null
+           }
        </Fragment>
     )
 }

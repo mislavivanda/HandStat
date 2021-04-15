@@ -20,6 +20,8 @@ import zapisnicarReducer from './slicers/zapisnicar';
 import mjeracReducer from './slicers/mjeracVremena';
 import sudciReducer from './slicers/sudci';
 import zavrsiUtakmicuReducer from './slicers/zavrsiUtakmicu';
+import errorReducer from './slicers/error';
+import loginReducer from './slicers/adminLogged';
 export default configureStore({
   reducer: {//npr za pristup unutar selektora u timer komponenti ćemo pisati state.timer.ticks/seconds/minutes
     timer:timerReducer, //naziv globalnog statea od timera će se nazivati timer pa za pristup njemu unutar cijelog globalnog state objekta pišemo state.timer-> on se updatea u reducerima od timera
@@ -42,6 +44,8 @@ export default configureStore({
     zapisnicar:zapisnicarReducer,
     mjerac:mjeracReducer,
     sudci:sudciReducer,
-    zavrsiUtakmicu:zavrsiUtakmicuReducer
+    zavrsiUtakmicu:zavrsiUtakmicuReducer,
+    error:errorReducer,
+    login:loginReducer
   }
 })

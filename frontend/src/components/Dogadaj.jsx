@@ -3,7 +3,11 @@ import {Box, Typography,IconButton} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import {useDispatch,useSelector} from 'react-redux';
-import {dodajDogadaj,izbrisiDogadaj} from '../redux/slicers/dogadajiUtakmice';
+import {izbrisiDogadaj} from '../redux/slicers/dogadajiUtakmice';
+import { useMutation } from '@apollo/client';
+import {ukloniDogadaj} from '../graphql/mutation';
+import ErrorDialog from './ErrorDialog';
+import {postaviError} from '../redux/slicers/error';
 const useStyles=makeStyles((theme)=>({
     dogadajGlavniBox:{
         display:'flex',
@@ -34,9 +38,23 @@ function Dogadaj(props) {
     const classes=useStyles();
     const dispatch=useDispatch();
     const {timDomaci,timGosti}=useSelector(state=>state.timovi);
+    const [brisiDogadaj,{error}]=useMutation(ukloniDogadaj,{
+        onCompleted:(data)=>{//u data je vraćen id dogadaja koji je izbrisan
+            //nakon što je uklonjen u bazi možemo ga ukloniti iz statea
+            dispatch(izbrisiDogadaj(data.izbrisidogadaj));
+        },
+        onError:(error)=>{
+            dispatch(postaviError(true));
+        }
+    })
 function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE DOGAĐAJ SPREMI U BAZU,TEK NAKON USPJEŠNOG SPREMANJA U BAZI ĆEMO GA RENDERAT
 {
-  dispatch(izbrisiDogadaj(dogadaj_id)); //IZBACI DOGAĐAJ KOJI ŽELIMO IZBRISATI ODNOSNO ONAJ NA KOJI SMO KLIKNULI REMOVE IKONU
+   //IZBACI DOGAĐAJ KOJI ŽELIMO IZBRISATI ODNOSNO ONAJ NA KOJI SMO KLIKNULI REMOVE IKONU
+   brisiDogadaj({
+       variables:{
+           dogadaj_id:dogadaj_id
+       }
+   });
 }
     return (
       <Fragment>
@@ -136,6 +154,12 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                 )
                 }
             })()
+         }
+         {
+             (error&&error.message)?
+             <ErrorDialog errorText={error.message}/>
+             :
+             null
          }
       </Fragment>
     )

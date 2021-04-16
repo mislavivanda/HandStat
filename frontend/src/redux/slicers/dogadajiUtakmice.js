@@ -7,7 +7,9 @@ const dogadajiUtakmiceSlicer=createSlice({
         state.push(action.payload);
     },
     izbrisiDogadaj:(state,action)=>{
-        state=state.filter((dogadaj)=>dogadaj.id!==action.payload.dogadaj_id);
+        return state.filter((dogadaj)=>{
+            return dogadaj.id!==action.payload
+        });
     },
     resetirajDogadaje:(state)=>{
         return state=[];

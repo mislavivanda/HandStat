@@ -76,4 +76,14 @@ const login=gql`
         }
     }
 `
-export {login,dodajUtakmicu,spremiRosterUtakmice,spremiDogadaj,spremiGolPozicija,azurirajStatus,zavrsiUtakmicu};
+const ukloniDogadaj=gql`
+mutation($dogadaj_id:Int!){
+    izbrisidogadaj(dogadaj_id:$dogadaj_id)
+  }
+`
+const slika=gql`
+mutation($file:File!){
+    slikaupload(slika:$file)
+  }
+`
+export {ukloniDogadaj,slika,login,dodajUtakmicu,spremiRosterUtakmice,spremiDogadaj,spremiGolPozicija,azurirajStatus,zavrsiUtakmicu};

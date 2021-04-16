@@ -54,10 +54,12 @@ const prikazUtakmice=gql`
             domaci{
                 id
                 naziv
+                image_path
             }
             gosti{
                 id
                 naziv
+                image_path
             }
         }
     }
@@ -138,6 +140,7 @@ const dohvatiSveKluboveOdNatjecanja=gql`
         klubovi(natjecanje_id:$natjecanje_id){
             id
             naziv
+            image_path
         }
     }
 `;

@@ -18,25 +18,25 @@ function SelectKlubovi() {
       {//id=null znaci da nije jos odabran taj tim
         if(timDomaci)//isti princip kao za suce
         {
-          setTimPreostali([...new_array,{id:timDomaci.id,naziv:timDomaci.naziv}]);
+          setTimPreostali([...new_array,{id:timDomaci.id,naziv:timDomaci.naziv,image_path:timDomaci.image_path}]);
         }
         else
         {
           setTimPreostali(new_array);
         }
-        dispatch(odabranTimDomaci({id:odabranTim.id,naziv:odabranTim.naziv}));
+        dispatch(odabranTimDomaci({id:odabranTim.id,naziv:odabranTim.naziv,klub_slika:odabranTim.image_path}));
       }
       else
       {
         if(timGosti)
         {
-          setTimPreostali([...new_array,{id:timGosti.id,naziv:timGosti.naziv}]);
+          setTimPreostali([...new_array,{id:timGosti.id,naziv:timGosti.naziv,image_path:timGosti.image_path}]);
         }
         else
         {
           setTimPreostali(new_array);
         }
-      dispatch(odabranTimGosti({id:odabranTim.id,naziv:odabranTim.naziv}));
+      dispatch(odabranTimGosti({id:odabranTim.id,naziv:odabranTim.naziv,klub_slika:odabranTim.image_path}));
       }
   }
    const [dohvatiKlubove,{loading,error,data}]=useLazyQuery(dohvatiSveKluboveOdNatjecanja,{

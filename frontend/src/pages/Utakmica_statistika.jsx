@@ -1,7 +1,5 @@
-import {React,useState,useEffect,Fragment} from 'react'
+import {React,Fragment} from 'react'
 import {Box,Typography,AppBar,Grid} from '@material-ui/core';
-import klub from '../images/zagreb.jpg';
-import klub2 from '../images/barcelona.png';
 import {makeStyles} from '@material-ui/core/styles';
 import logo from '../images/handstat_logo.png';
 import TimStatistika from '../components/TimStatistika';
@@ -89,8 +87,8 @@ function Utakmica_statistika(props) {
     if(data)//kada stignu podaci
     {
         //postavi timove da druge komponenete znaju koji su timovi odabrani
-        dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:klub}));
-        dispatch(odabranTimGosti({id:data.utakmica.gosti.id,naziv:data.utakmica.gosti.naziv,klub_slika:klub2}));
+        dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:data.utakmica.domaci.image_path}));
+        dispatch(odabranTimGosti({id:data.utakmica.gosti.id,naziv:data.utakmica.gosti.naziv,klub_slika:data.utakmica.gosti.image_path}));
     return (
         <div>
              
@@ -106,11 +104,11 @@ function Utakmica_statistika(props) {
                     <Grid item className={classes.lijeviDesniBoxContainer} container direction='row' justify='space-between' alignItems='stretch' xs={12}>{/*container od retka koji sadrži 2 stupca podataka*/}
                         <GeneralInfo vrijeme={data.utakmica.vrijeme} gledatelji={data.utakmica.gledatelji} datum={data.utakmica.datum} lokacija={{id:data.utakmica.lokacija.id,dvorana:data.utakmica.lokacija.dvorana,mjesto:data.utakmica.lokacija.mjesto}}/>
                         <OsobljeInfo nadzornik={{maticni_broj:data.utakmica.nadzornik.maticni_broj,ime:data.utakmica.nadzornik.ime,prezime:data.utakmica.nadzornik.prezime}}
-                                     lijecnik={{maticni_broj:data.utakmica.lijecnik.maticni_broj,ime:data.utakmica.lijecnik.ime,prezime:data.utakmica.lijecnik.prezime}} 
+                                     lijecnik={(data.utakmica.lijecnik)? {maticni_broj:data.utakmica.lijecnik.maticni_broj,ime:data.utakmica.lijecnik.ime,prezime:data.utakmica.lijecnik.prezime}:null} 
                                      zapisnicar={{maticni_broj:data.utakmica.zapisnicar.maticni_broj,ime:data.utakmica.zapisnicar.ime,prezime:data.utakmica.zapisnicar.prezime}}
-                                     mjerac_vremena={{maticni_broj:data.utakmica.mjeracvremena.maticni_broj,ime:data.utakmica.mjeracvremena.ime,prezime:data.utakmica.mjeracvremena.prezime}}
+                                     mjerac_vremena={(data.utakmica.mjeracvremena)? {maticni_broj:data.utakmica.mjeracvremena.maticni_broj,ime:data.utakmica.mjeracvremena.ime,prezime:data.utakmica.mjeracvremena.prezime}: null}
                                      sudac1={{maticni_broj:data.utakmica.sudac1.maticni_broj,ime:data.utakmica.sudac1.ime,prezime:data.utakmica.sudac1.prezime}}
-                                     sudac2={{maticni_broj:data.utakmica.sudac2.maticni_broj,ime:data.utakmica.sudac2.ime,prezime:data.utakmica.sudac2.prezime}}
+                                     sudac2={(data.utakmica.sudac2)? {maticni_broj:data.utakmica.sudac2.maticni_broj,ime:data.utakmica.sudac2.ime,prezime:data.utakmica.sudac2.prezime}: null}
                         />
                     </Grid>
                 </Grid>

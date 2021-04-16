@@ -37,7 +37,7 @@ function MoguciDogadaji() {
     const [spremiOdabraniDogadaj,{error:mutationError}]=useMutation(spremiDogadaj,{
       onCompleted:(data)=>{
         dispatch(dodajDogadaj({
-          id:data.spremidogadaj.dogadaj.id,
+          id:data.spremidogadaj.id,
           vrijeme:data.spremidogadaj.vrijeme,
           klubikona:data.spremidogadaj.tim,//ako je domaći->1-> prikazi sliku od odmaćeg tima,inače od gostujućeg NE PSREMAMO SLIKU NEGO SAMO OVI FLAG
           tip:data.spremidogadaj.dogadaj.tip,

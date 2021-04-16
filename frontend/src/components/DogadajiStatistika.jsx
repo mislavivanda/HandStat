@@ -1,4 +1,4 @@
-import React,{Fragment,useState} from 'react'
+import React,{Fragment} from 'react'
 import {Box} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import DogadajBox from '../components/Dogadaj.jsx';
@@ -41,7 +41,7 @@ function DogadajiStatistika({broj_utakmice}) {//inace preko useEffecta dohvat
                                     {
                                         return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.tim} dogadaj={dogadajutk.dogadaj.naziv} tip={2}/>
                                     }
-                                    else return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.klubgrb} ime={dogadajutk.akter.ime} prezime={dogadajutk.akter.prezime} dogadaj={dogadajutk.dogadaj.naziv} tip={3}/>
+                                    else return <DogadajBox key={dogadajutk.dogadaj.id} aktivan={false} vrijeme={dogadajutk.vrijeme} klubikona={dogadajutk.tim} ime={dogadajutk.akter.ime} prezime={dogadajutk.akter.prezime} dogadaj={dogadajutk.dogadaj.naziv} tip={3}/>
                                 })}
                 </Box>
         </Fragment>

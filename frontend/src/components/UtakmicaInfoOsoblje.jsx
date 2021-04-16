@@ -1,7 +1,6 @@
 import React,{Fragment,useState} from 'react'
 import {Grid,Typography,Box} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
-import utakmica from '../mockdata/utakmica.js';
 const useStyles=makeStyles((theme)=>({
     desniInfoGlavniBox:{
         backgroundColor:theme.palette.secondary.main
@@ -53,7 +52,7 @@ function UtakmicaInfoOsoblje(props) {
                                     <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaOsoblje.nadzornik.maticni_broj+' '+utakmicaOsoblje.nadzornik.ime+' '+utakmicaOsoblje.nadzornik.prezime}</Typography></Box>
                                 </Grid>
                                 <Grid item xs={5}>
-                                    <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaOsoblje.lijecnik.maticni_broj+' '+utakmicaOsoblje.lijecnik.ime+' '+utakmicaOsoblje.lijecnik.prezime}</Typography></Box>
+                                    <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{(utakmicaOsoblje.lijecnik)? (utakmicaOsoblje.lijecnik.maticni_broj+' '+utakmicaOsoblje.lijecnik.ime+' '+utakmicaOsoblje.lijecnik.prezime) : ''}</Typography></Box>
                                 </Grid>
                             </Grid> 
                             <Grid item container direction='row' justify='space-evenly' alignItems='center' xs>{/* redak sa 2 boxa*/}
@@ -69,7 +68,7 @@ function UtakmicaInfoOsoblje(props) {
                                     <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaOsoblje.zapisnicar.maticni_broj+' '+utakmicaOsoblje.zapisnicar.ime+' '+utakmicaOsoblje.zapisnicar.prezime}</Typography></Box>
                                 </Grid>
                                 <Grid item xs={5}>
-                                    <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaOsoblje.mjeracVremena.maticni_broj+' '+utakmicaOsoblje.mjeracVremena.ime+ ' '+utakmicaOsoblje.mjeracVremena.prezime}</Typography></Box>
+                                    <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{(utakmicaOsoblje.mjeracVremena)? (utakmicaOsoblje.mjeracVremena.maticni_broj+' '+utakmicaOsoblje.mjeracVremena.ime+ ' '+utakmicaOsoblje.mjeracVremena.prezime) : ''}</Typography></Box>
                                 </Grid>
                             </Grid> 
                             <Grid item container direction='row' justify='space-evenly' alignItems='center' xs>{/* redak sa 2 boxa*/}
@@ -85,7 +84,7 @@ function UtakmicaInfoOsoblje(props) {
                                     <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaOsoblje.sudac1.maticni_broj+' '+utakmicaOsoblje.sudac1.ime+' '+utakmicaOsoblje.sudac1.prezime}</Typography></Box>
                                 </Grid>
                                 <Grid item xs={5}>
-                                    <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaOsoblje.sudac2.maticni_broj+' '+utakmicaOsoblje.sudac2.ime+' '+utakmicaOsoblje.sudac2.prezime}</Typography></Box>
+                                    <Box className={classes.desniInfoBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{(utakmicaOsoblje.sudac2)? (utakmicaOsoblje.sudac2.maticni_broj+' '+utakmicaOsoblje.sudac2.ime+' '+utakmicaOsoblje.sudac2.prezime) : ''}</Typography></Box>
                                 </Grid>
                             </Grid> 
                         </Grid>

@@ -1,9 +1,11 @@
 var {graphqlHTTP}=require('express-graphql');//npm paket koji omogućava implmeentaciju graphql arhitekure API-a u zadani express server
 // graphqlnpm paket koji omogućava korištenje graphql funkcija i tipova(sheme,mutacije,query,...)
 const config=require('../config');
+const express=require('express');
 const session=require('express-session');
 const session_store=require('./session_store');
 const schema=require('../graphql/schema');
+const { graphqlUploadExpress }=require('graphql-upload');
 var cors = require('cors');
 var corsOptions = {
     origin: 'http://localhost:3000',
@@ -32,8 +34,11 @@ module.exports=(app,httplogger)=>{//U OVOJ FUNKCIJI LOADAMO SVE ŠTO JE POTREBNO
        //secure za produkciju samo
       }
     }))
+    app.use(express.static('images'));//ime direktorija iz kojeg servamo fileove/slike-> VAŽNOOOO-> KOD REQUESTOVA SA FRONTENDA U URL NE STAVLJAMO /images jer express racuna path relativno u donosu na onaj koji mu stavimo u .static
 //graphql http je obicni middleware za postavljanje postavki graphql sheme na serveru i vraća taj objekt-> im pristup req i res objektima
-    app.use('/graphql',graphqlHTTP((req,res)=>({
+    app.use('/graphql',
+    graphqlUploadExpress({ maxFileSize:config.images. maxImageFileSize}),//middleware za parisranje fileova u multipart byte request bodyima
+    graphqlHTTP((req,res)=>({
        schema,
        graphiql:true,
        customFormatErrorFn:(err) => ({ message: err.message, status: (err.status || 500) }),//error handleanje kada throwamo error unutar resolvera

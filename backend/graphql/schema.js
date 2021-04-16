@@ -2,8 +2,14 @@ const { Op } = require("sequelize");
 const bcrypt=require('bcrypt');
 const {nodelogger}=require('../loaders/logger.js');
 const graphql=require('graphql');
+const config=require('../config');
+const {createWriteStream}=require('fs');//kod spremanja fileova
 const models=require('../models');//u njemu se nalaze svi loadani modeli bitni za resolvere
-const {GraphQLObjectType,
+const {GraphQLObjectType,//OUTPUT I INPUT MOGU BITI
+  //INPUT TIPOVI DEFINIRAJU KAKVOG FORMATA TREBAJU BITI DOBIVENI ARGUMENTI U MUTACIJI,!!!!!NJIH NE STAVLJAMO NA MJESTA KOJA DEFINIRAJU OTPUT TIP QEURYA I MUTACIJA ODNOSNO KAKAV FORMAT VRAĆAJU QUERYI I MUTACIJE
+  //NEGO IH SAMO MOŽEMO STAVLJATI ZA DEEFINICIJU TIPOVA ARGUMENATA, OMOGUĆUJU NAM DA U SLUČAJEVIMA DA IMAMO VIŠE QUERYA/MUTACIJA KOJE PRIHVAĆAJU NEKE ISTE PARAMETRE DA TE KRITERIJE DEFINIRAMO U 
+  // OVOM 1 INPUT TIPU I DA ONDA NJEGA KORISTIMO ZA DEFINICIJU INPUT SHEME KOJE PARAMETRI THI QUERYA/MUTACIJA MORJAU ZADOVOLJIT
+  GraphQLInputObjectType,//koristi se za definiciju input tipova-> definicija tipa input objekta u mutaciji npr,nema resolvera, a obicni objecttype se koristit za definiciju ostalih tipova
         GraphQLInt,
         GraphQLScalarType,
         GraphQLString,
@@ -13,7 +19,7 @@ const {GraphQLObjectType,
         GraphQLList,
         GraphQLBoolean,
         Kind}=graphql;//KIND SADRŽI SVE TIPOVE VARIJABLI AKO JE POTREBNO U RESOLVERIMA PROVJERAVAT JELI PRIMLJENA VARIJALBA ISPRAVNOG TIPA
-const { GraphQLUpload } = require('graphql-upload');//OVO JE TIP KOJI NAM OMOGUĆAVA RUKOVANJE S FILEOVIMA,SVUGDJE DI KORISTIMO FILEOVE KAO TIP STAVIMO OVAJ TIP
+  const { GraphQLUpload } = require('graphql-upload');//OVO JE TIP KOJI NAM OMOGUĆAVA RUKOVANJE S FILEOVIMA,SVUGDJE DI KORISTIMO FILEOVE KAO INPUT TIP STAVIMO OVAJ SCALAR ZA TIP U GRAPHQL SHEMI MUTACIJA/QUERYA
 
 //Definicija našeg vlastitog skalarnog tipa,datum nije defaultni skalarni tip
 const Datum = new GraphQLScalarType({
@@ -55,6 +61,16 @@ const Vrijeme=new GraphQLScalarType({
   parseLiteral(ast){
     return new Date(Date.parse(ast.value))
   }
+});
+const File=new GraphQLInputObjectType({//INPUT TIP ZA FILE UPLOADOVE-> ODGOVARA FORMATU req.file KOJEG PARSIRA MULTER
+  name:'File',
+  fields:()=>({
+    originalname:{type:GraphQLString},
+    encoding:{type:GraphQLString},
+    mimetype:{type:GraphQLString},
+    size:{type:GraphQLInt},
+    filename:{type:GraphQLString}
+  })
 });
 const MoguciDogadaji=new GraphQLObjectType({
   name:'MoguciDogadaji',
@@ -125,7 +141,8 @@ const Klub=new GraphQLObjectType({
     naziv:{type:new GraphQLNonNull(GraphQLString)},
     drzava:{type:GraphQLString},
     grad:{type:GraphQLString},
-    osnutak:{type:GraphQLString}
+    osnutak:{type:GraphQLString},
+    image_path:{type:GraphQLString}
   })
 })
 const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
@@ -670,6 +687,7 @@ const GolPozicija=new GraphQLObjectType({
     }
   })
 })
+
 const RootQuery=new GraphQLObjectType({
   name:'Svi_queryi_za_entrypoint',
   fields:{//ovde ne triba funkcija jer ih sve ovde definiramo
@@ -1188,7 +1206,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
       }
     },
     login:{//kod logiranja provjera unesenih usernamea i passworda
-      type:SluzbenaOsoba,//vrati true ako je prosa login/false ako nije
+      type:SluzbenaOsoba,//vrati podatke osobe koja se logirala, npr za ispisat poruku dobrodoslice mozda
       args:{
         username:{type:GraphQLString},
         password:{type:GraphQLString}
@@ -1224,6 +1242,62 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
           nodelogger.error('Greska prilikom logiranja'+error);
           throw(error);
       }
+      }
+    },
+    izbrisidogadaj:{
+      type:GraphQLInt,//vratimo id izbrisanog dogadaja
+      args:{
+        dogadaj_id:{type:new GraphQLNonNull(GraphQLInt)}
+      },
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+          return models.dogadajiutakmice.destroy({
+            where:{
+              id:args.dogadaj_id
+            }
+          }).then((data)=>args.dogadaj_id).catch((error)=>{
+            nodelogger.error('Greška kod birsanja događaja utakmice '+error);
+            throw(error);
+          })
+        }
+        else {
+          nodelogger.error('Greška u autorizaciji kod brisanja događaja');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
+        }
+      }
+    },
+    spremisliku:{
+      type:GraphQLString,//vrati filename od spremljenog filea-> slike u ovom slučaju
+      args:{
+        file:{type:new GraphQLNonNull(GraphQLUpload)}
+      },
+      resolve:async (parent,args,context)=>{
+        if(context.req.session.user_id)//SAMO ADMINI MOGU UPLOADAT SLIKE KLUBOVA
+        {
+          try {
+            const {filename, mimetype, createReadStream}=await args.file;//primljeni file u multipart bodyu od requesta se predstavlja prekp promisea koji će nakon što ga middleware obradi resolvati sa objektom koji ima propertiese na lijevoj strani jednakosti
+            const stream=createReadStream();//dobivamo ovu funkciju nakon što se gornji promise resolva i pomoćui nje kreiramo Readable stream-> ista funkcija se nalazi i u node.js file system(fs) modulu
+            //READABLE STREAM?-> STREAM IZ KOJEG ČITAMO ODREĐENE PODATKE(npr kao i stdout)->U OVOM SLUČAJU JE READABLE JER U NJEGA ČITAMO FILE IZ REQUEST BODYA
+            //nakon što pročitamo file mi ga želimo ZAPISATI-> UMJESTO READABLE STREAMA POTREBAN NAM JE WRITEABLE STREAM KOJI ĆE ZAPISATI ONO ŠTO JE READABLE PROČITAO
+            //-> RJEŠENJE-> PIPEAMO READABLE STREAM U WRITABLE STREAM-> NA TAJ NAČIN PREUMJSERAVAMO PROČITANE PODATKE U WRITEBALE STREAM KOJI ĆE IH ZAPISATI
+            //Piping is a mechanism where we provide the output of one stream as the input to another stream
+            stream.pipe(createWriteStream(config.images.question_images_storage)).on('finish',()=>{//poziva se nakon što se zatvroi stream
+              nodelogger.info('File uspješno upisan');
+            }).on('error',(error)=>{
+              throw(error);
+            })
+            //SPREMI U BAZU PODATKE O PATHU DO SLIKE
+            return filename;//vrati ime spremljenog filea
+          } catch (error) {
+            nodelogger.error('Greška prilikom spremanja slike '+error);
+            throw(error);
+          }
+        }
+        else {
+          nodelogger.error('Greška u autorizaciji prilikom spremanja slike '+error);
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
+        }
       }
     }
 

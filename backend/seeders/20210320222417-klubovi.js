@@ -3,8 +3,8 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
   await queryInterface.bulkInsert('klub',[
-    {naziv:'RK PPD Zagreb',drzava:'Hrvatska',grad:'Zagreb',osnutak:'1945.'},
-    {naziv:'RK Barcelona',drzava:'Spanjolska',grad:'Barcelona',osnutak:'1945.'},
+    {naziv:'RK PPD Zagreb',drzava:'Hrvatska',grad:'Zagreb',osnutak:'1945.',image_path:'http://localhost:3001/zagreb.jpg'},
+    {naziv:'RK Barcelona',drzava:'Spanjolska',grad:'Barcelona',osnutak:'1945.',image_path:'http://localhost:3001/barcelona.png'},
      {naziv:'RK Split',drzava:'Hrvatska',grad:'Split',osnutak:'1945.'},
      {naziv:'RK Varaždin',drzava:'Hrvatska',grad:'Varaždin',osnutak:'1945.'},
      {naziv:'RK Bjelovar',drzava:'Hrvatska',grad:'Bjelovar',osnutak:'1945.'},

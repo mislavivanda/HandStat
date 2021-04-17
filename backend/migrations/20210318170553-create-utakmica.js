@@ -27,6 +27,10 @@ module.exports = {
         type: Sequelize.SMALLINT,
         defaultValue:0
       },
+      minuta:{
+        type: Sequelize.SMALLINT,
+        defaultValue:1
+      },
       sudac1_ocjena:{
         type:Sequelize.FLOAT,
         defaultValue:0
@@ -35,7 +39,7 @@ module.exports = {
         type:Sequelize.FLOAT,
         defaultValue:0
       },
-      status: {//nije jos pocelo ali upisano=1,igra=2,pauza=3,kraj=4
+      status: {//nije jos pocelo ali upisano=1,igra=2,poluvreme=3,kraj=4
         type: Sequelize.SMALLINT,
         defaultValue:1
       }

@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     gledatelji: DataTypes.SMALLINT,
     rezultat_domaci: DataTypes.SMALLINT,
     rezultat_gosti: DataTypes.SMALLINT,
+    minuta:DataTypes.SMALLINT,
     sudac1_ocjena:DataTypes.FLOAT,
     sudac2_ocjena:DataTypes.FLOAT,
     status: DataTypes.SMALLINT

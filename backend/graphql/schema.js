@@ -1140,8 +1140,8 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
     azurirajstatusutakmice:{
       type:GraphQLInt,//vrati postavljeni status
       args:{
-        status:{type:GraphQLInt},
-        broj_utakmice:{type:GraphQLString},
+        status:{type:new GraphQLNonNull(GraphQLInt)},
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
       },
       resolve(parent,args,context){
         if(context.req.session.user_id)
@@ -1159,6 +1159,30 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
             nodelogger.error('Greška u autorizaciji kod ažuriranja statusa utakmice');
             throw(new Error('Niste autorizirani za zadanu operaciju'));
           }
+      }
+    },
+    azurirajvrijeme:{
+      type:GraphQLBoolean,
+      args:{
+        minuta:{type: new GraphQLNonNull(GraphQLInt)},
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}
+      },
+      resolve(parent,args,context){
+        if(context.req.session.user_id)
+        {
+          return models.utakmica.update({minuta:args.minuta},{
+            where:{
+              broj_utakmice:args.broj_utakmice
+            }
+          }).then(()=>true).catch((error)=>{
+            nodelogger.error('Greška kod azuriranja vremena utakmice '+error);
+            throw(error);
+          })
+        }
+        else {
+          nodelogger.error('Greška u autorizaciji kod ažuriranja vremena utakmice');
+          throw(new Error('Niste autorizirani za zadanu operaciju'));
+        }
       }
     },
     zavrsiutakmicu:{//kada ide zavrsiti utakmicu onda korisnik unosi ocjene sudaca i postavlja se i konacni rezultat utakmice i status na kraj

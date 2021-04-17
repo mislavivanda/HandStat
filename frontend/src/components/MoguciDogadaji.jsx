@@ -57,7 +57,6 @@ function MoguciDogadaji() {
         {
         if(odabraniDogadaj.id>=1 && odabraniDogadaj.id<=8)//ovo su događaji za koje otključavamo branku
         {
-          console.log('Otključaj branku');
           dispatch(otkljucajGol(true));
         }
         else if(odabraniDogadaj.tip===2)//ovo su dogadaji kao timeout gosti i domaci-> bez aktera samo dogadaj-> spremi ga u niz dogadaja utakmice

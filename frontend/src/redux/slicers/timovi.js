@@ -20,12 +20,6 @@ const timSlicer=createSlice({
         spremljenGosti:(state)=>{
             state.timGostiSpremljen=true
         },
-        slikaTimDomaci:(state,action)=>{
-            state.timDomaci.klub_slika=action.payload;
-        },
-        slikaTimGosti:(state,action)=>{
-            state.timGosti.klub_slika=action.payload;
-        },
         resetirajTimove:(state)=>{
             state.timDomaci=null;
             state.timGosti=null;

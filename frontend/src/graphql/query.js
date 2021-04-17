@@ -131,6 +131,7 @@ const dohvatiSveSuce=gql`
             maticni_broj
             ime
             prezime
+            mjesto
         }
     }
 `;

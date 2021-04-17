@@ -51,7 +51,6 @@ function SelectKlubovi() {
       dohvatiKlubove({//poziva query i onda se izvodi donji dio s loading,error i data
         variables:{natjecanje_id:natjecanje.id}
     });
-    console.log('Pozvan query');
     //OČISTI TRENUTNO ODABRANA NATJECANJA AKO IH IMA-> POSTAVIT ODABRANE TIMOVE NA NULL
     dispatch(odabranTimDomaci(null));
     dispatch(odabranTimGosti(null));
@@ -64,7 +63,6 @@ function SelectKlubovi() {
 
   if(data)
   {
-    console.log('DATA: '+JSON.stringify(data)+' state: '+JSON.stringify(timPreostali));
     return (
        <Fragment>
              <Grid  item style={{textAlign: 'center'}}  xs={12} md={5}>

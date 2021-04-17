@@ -66,6 +66,8 @@ const [timTehniko,setTimTehniko]=useState({});
 const [timSviFizio,setTimSviFizio]=useState(null);
 const [timFizio,setTimFizio]=useState({});
 const [timSpremljen,setTimSpremljen]=useState(false);
+const isError=useSelector((state)=>state.error);
+const [errorMessage,setErrorMessage]=useState('');//da znamo koji tekst poslati error dialogu
 function isEmpty(obj) {//custom utility funkcija koja gleda jeli objekt prazan-> ako jest onda ne iscrtavamo ništa odnosno return null
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
@@ -83,7 +85,10 @@ function dodajClana(tip)//postavi/dodaj polje sa select komponentom u niz ODABRA
         let new_array=[...timIgraci,null];//postavit cemo clan na null i dodat ga u niz pa ćemo promijenit state koji ce trigerat renderiranje svih odabranih igraca a dio di je null ce renderirat komponentu za selektiranje
         setTimIgraci(new_array);//ovo će triogerat ponovno renderiranje dolje kod funkcije renderOdabraniIgraci
         }
-        else console.log('Dodani su svi igraci');
+        else{
+          setErrorMessage('Dodani su svi igraci');
+          dispatch(postaviError(true));
+        }
       }
       else if(tip===2)//golman
       {
@@ -92,10 +97,13 @@ function dodajClana(tip)//postavi/dodaj polje sa select komponentom u niz ODABRA
           let new_array=[...timGolmani,null];
           setTimGolmani(new_array);
         }
-        else console.log('Dodani su svi golmani');
+        else{
+          setErrorMessage('Dodani su svi golmani');
+          dispatch(postaviError(true));
+        }
       }
       else if(tip===3)//trener
-      {//ako je već odabran trener onda nema mogućnosti dodavanja prije nego ga removea
+      {//ako je već odabran trener onda nema mogućnosti dodavanja prije nego ga removea-> prikazat ce select komponentu samo ako nije odabran nijedan odnosno ako je state={}
         if(isEmpty(timTrener))//ako je prazan objekt {} u stateu onda još nije odabran nijedan trener-> prikazi mu slekect komponentu tako da postavis state na null
         {
         setTimTrener(null);//ovo će renderat izbornik za select u funkciji renderOdabraniTrener
@@ -145,6 +153,7 @@ const [spremiRoster,{loading:mutationLoading,error:mutationError}]=useMutation(s
     setTimSpremljen(true);//u oba slucaja postavi da je tim spremljen
   },
   onError:(error)=>{
+    setErrorMessage(error.message);
     dispatch(postaviError(true));
   }
 })
@@ -153,15 +162,18 @@ function spremiTim()//poziva se kada spremimo odabrane clanove tima za tu utakmi
   //provjeri polja-> barem 1 golman i 6 igrača + trener prije spremanja
     if(timIgraci&&timIgraci.length<6)
     {
-      console.log('Odaberite minimalno 6 igrača');
+      setErrorMessage('Odaberite minimalno 6 igrača');
+      dispatch(postaviError(true));
     }
     else if(timGolmani&&!(timGolmani.length>0))
     {
-      console.log('Odabertie barem 1 golmana');
+      setErrorMessage('Odaberite barem 1 golmana');
+      dispatch(postaviError(true));
     }
     else if(isEmpty(timTrener))//ako je prazan objekt
     {
-      console.log('Odaberite trenera za utakmicu');
+      setErrorMessage('Odaberite trenera za utakmicu');
+      dispatch(postaviError(true));
     }
     else{
       spremiRoster({
@@ -333,8 +345,8 @@ function RenderOdabraniFizio()
     return (
        <Fragment>
                   <Box className={classes.klubBox}>
-                      <img src={(tim_id===timovi.timDomaci.id)? timovi.timDomaci.klub_slika : timovi.timGosti.klub_slika} alt='ikona_kluba' className={classes.klubSlika}/>
-                      <Typography color='secondary' align='center' variant='h4'>{(tim_id===timovi.timDomaci.id)? timovi.timDomaci.naziv : timovi.timGosti.naziv}</Typography>
+                      <img src={(tim_id===1)? timovi.timDomaci.klub_slika : timovi.timGosti.klub_slika} alt='ikona_kluba' className={classes.klubSlika}/>
+                      <Typography color='secondary' align='center' variant='h4'>{(tim_id===1)? timovi.timDomaci.naziv : timovi.timGosti.naziv}</Typography>
                     </Box>
                     <Box className={classes.timBox}>
                         <Box className={classes.titulaBox}>{/*ako je spremljen tim za tu utakmicu onda je onemoguceno dodavanje*/}
@@ -381,8 +393,8 @@ function RenderOdabraniFizio()
                        })()}
                     </Box>
                     {
-                      (mutationError&&mutationError.message)?
-                      <ErrorDialog errorText={mutationError.message}/>
+                      (isError&&errorMessage)?//u slucaju errora pozivamo poopup
+                      <ErrorDialog errorText={errorMessage}/>
                       :
                       null
                     }

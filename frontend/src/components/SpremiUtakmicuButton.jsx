@@ -1,9 +1,6 @@
 import React,{Fragment,useState} from 'react'
 import {spremiUtakmicu} from '../redux/slicers/spremiUtakmicu';
 import {useDispatch,useSelector } from 'react-redux';
-import klub1 from '../images/zagreb.jpg';
-import klub2 from '../images/barcelona.png';
-import {slikaTimDomaci,slikaTimGosti} from '../redux/slicers/timovi';//spremanje slike kada je dohvatimo
 import {Button} from '@material-ui/core'
 import SaveIcon from '@material-ui/icons/Save';
 import { useMutation } from '@apollo/client';
@@ -31,15 +28,6 @@ function SpremiUtakmicuButton() {
     const [errorMessage,setErrorMessage]=useState('');//da znamo koji tekst poslati error dialogu
     const [spremiUtakmicaInfo,{loading,error}]=useMutation(dodajUtakmicu,{
         onCompleted:(data)=>{
-            if(data.dodajutakmicu[0].id===timDomaci.id)
-            {
-                dispatch(slikaTimDomaci(klub1));//ovde ce ic slika iz dodajutakmicu[0] clana
-                dispatch(slikaTimGosti(klub2));//ovde ce ic slika iz ddoajutakmuc[1] clana
-            }
-            else {//obrnut redoslijed
-                dispatch(slikaTimDomaci(klub2));
-                dispatch(slikaTimGosti(klub1));
-            }
             dispatch(spremiUtakmicu(true));
         },
         onError:(error)=>{
@@ -135,7 +123,7 @@ function SpremiUtakmicuButton() {
        <Fragment>
            <Button disabled={(spremljenGameInfo)? true : false} onClick={()=>savedGameInfo()} title='Spremi utakmicu' disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>}>SAVE</Button> 
            {
-            (isError)?//u slicaju errora pozivamo poopup
+            (isError&&errorMessage)?//u slicaju errora pozivamo poopup
             <ErrorDialog errorText={errorMessage}/>
             :
             null

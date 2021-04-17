@@ -58,6 +58,12 @@ const azurirajStatus=gql`
         azurirajstatusutakmice(broj_utakmice:$broj_utakmice,status:$status)
     }
 `;
+//azuriranje vremena utakmice
+const azurirajVrijeme=gql`
+    mutation($broj_utakmice:String!,$minuta:Int!){
+        azurirajvrijeme(broj_utakmice:$broj_utakmice,minuta:$minuta)
+    }
+`
 // kada zavrsavamo utakmicu i postavljamo zadnje parametre, sigurno ce biti barem 1 sudac pa zato ocjena drugog suca nije obavezna
 //ako je sve dobro spremljeno onda vratimo broj utakmice
 const zavrsiUtakmicu=gql`
@@ -86,4 +92,5 @@ mutation($file:File!){
     slikaupload(slika:$file)
   }
 `
-export {ukloniDogadaj,slika,login,dodajUtakmicu,spremiRosterUtakmice,spremiDogadaj,spremiGolPozicija,azurirajStatus,zavrsiUtakmicu};
+
+export {ukloniDogadaj,slika,login,dodajUtakmicu,spremiRosterUtakmice,spremiDogadaj,spremiGolPozicija,azurirajStatus,zavrsiUtakmicu,azurirajVrijeme};

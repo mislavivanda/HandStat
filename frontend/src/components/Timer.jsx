@@ -35,7 +35,7 @@ const useStyles=makeStyles((theme)=>({
 export default function Timer() {
     const classes=useStyles();
     const [paused,setPaused]=useState(true);
-    const [poluvremeTrajanje,setPoluvremeTrajanje]=useState(1);//trajanje poluvremena
+    const [poluvremeTrajanje,setPoluvremeTrajanje]=useState(10);//trajanje poluvremena
     const [spremljenoTrajanje,setSpremljenoTrajanje]=useState(false);
     const [disablePausePlay,setDisablePausePlay]=useState(false);//disablea se nakon kraja utakmice
     const [prviPoziv,setPrviPoziv]=useState(true);//da znamo kada prvi put stisne odbrojavanje timera da prominimo status utakmice kkao bi je mogli prikazivati live
@@ -147,7 +147,7 @@ export default function Timer() {
                                     <InputLabel>TRAJANJE POLUVREMENA</InputLabel>
                                     <TextField
                                     type="number"
-                                    inputProps={{min:1,max:30,step:1}}
+                                    inputProps={{min:10,max:30,step:1}}
                                     label=" "
                                     value={poluvremeTrajanje}
                                     onChange={(e)=>setPoluvremeTrajanje(e.target.value)}//JER INAČE ŠALJE INPUT U OBLIKU STRINGA A NE INTEGERA

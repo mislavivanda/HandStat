@@ -67,8 +67,8 @@ const azurirajVrijeme=gql`
 // kada zavrsavamo utakmicu i postavljamo zadnje parametre, sigurno ce biti barem 1 sudac pa zato ocjena drugog suca nije obavezna
 //ako je sve dobro spremljeno onda vratimo broj utakmice
 const zavrsiUtakmicu=gql`
-    mutation($broj_utakmice:String!,$rez_domaci:Int!,$rez_gosti:Int!,$sudac1_ocjena:Float!,$sudac2_ocjena:Float){
-        zavrsiutakmicu(broj_utakmice:$broj_utakmice,rez_domaci:$rez_domaci,rez_gosti:$rez_gosti,sudac1_ocjena:$sudac1_ocjena,sudac2_ocjena:$sudac2_ocjena)
+    mutation($broj_utakmice:String!,$sudac1_ocjena:Float!,$sudac2_ocjena:Float){
+        zavrsiutakmicu(broj_utakmice:$broj_utakmice,sudac1_ocjena:$sudac1_ocjena,sudac2_ocjena:$sudac2_ocjena)
     }
 `;
 

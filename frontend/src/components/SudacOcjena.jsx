@@ -39,7 +39,6 @@ function SudacOcjena({history}) {
     const [ocjena1,setOcjena1]=useState(1);
     const [ocjena2,setOcjena2]=useState(1);
     const brojUtakmice=useSelector(state=>state.brojUtakmice);
-    const {timDomaci,timGosti}=useSelector(state=>state.rezultat);
     const [spremiZavrsiUtakmicu,{loading,error}]=useMutation(zavrsiUtakmicu,{
         //nakon spremanja podataka će biti automatski premjesten na home page i ODLOGIRAN-> MAKNUT ĆE MU SE SESSION COOKIE
         onCompleted:(data)=>{
@@ -88,8 +87,6 @@ function SudacOcjena({history}) {
         spremiZavrsiUtakmicu({
             variables:{
                 broj_utakmice:brojUtakmice,
-                rez_domaci:timDomaci,
-                rez_gosti:timGosti,
                 sudac1_ocjena:ocjena1,
                 sudac2_ocjena:ocjena2
             }

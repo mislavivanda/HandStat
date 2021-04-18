@@ -31,9 +31,9 @@ function MoguciDogadaj(props) {
                 }));
     }
     return (
-      <Fragment> {/* dok nisu spremljena oba tima nema klika na dogadaje+za dogadaje timeout gosti i domaci nema aktera pa stoga ako je izabran neki akter njih ne možemo kliknuti      ako je nije odabran nijedna clan onda ne smimo dopustit klik na nijedan događaj koji zahtijeva aktera odnosno samo možemo kliknut na timeout*/            }
-          <Button disabled={(!(timDomaciSpremljen&&timGostiSpremljen)||(odabraniClan&&(props.id===15 || props.id===16))||(odabraniClan&&((odabraniClan.tip>2)&&((props.id!==12)&&(props.id!==13)&&(props.id!==14))))||((!odabraniClan)&&((props.id!==15)&&(props.id!==16))))? true : false } onClick={()=>dogadajKlik(props.id,props.naziv,props.tip)}  disableRipple className={classes.dogadajButton}>
-              <Typography align='center' variant='h6' className={classes.dogadaj}>{props.naziv}</Typography>                 {/* ako je odabran trener,fizio,tehniko ili predstavnik onda treba omogućit samo događaje žuti,crveni i plavi karton*/}
+      <Fragment> {/* dok nisu spremljena oba tima nema klika na dogadaje+za dogadaje timeout gosti i domaci nema aktera pa stoga ako je izabran neki akter njih ne možemo kliknuti      ako je nije odabran nijedna clan onda ne smimo dopustit klik na nijedan događaj koji zahtijeva aktera odnosno samo možemo kliknut na timeout                                            ako nije odabran igrac onda ne dopustamo dogadaje svojestvene samo za igraca: asistencija i tehnicka-> omogucen sedmerac promasaj/pogodak za golmane->*/            }
+          <Button disabled={(!(timDomaciSpremljen&&timGostiSpremljen)||(odabraniClan&&(props.id===15 || props.id===16))||(odabraniClan&&((odabraniClan.tip>2)&&((props.id!==12)&&(props.id!==13)&&(props.id!==14))))||((!odabraniClan)&&((props.id!==15)&&(props.id!==16)))||((odabraniClan&&odabraniClan.tip!==2)&&(props.id===2||props.id===4||props.id===6||props.id===8))||((odabraniClan&&odabraniClan.tip!==1)&&(props.id===10||props.id===11)))? true : false } onClick={()=>dogadajKlik(props.id,props.naziv,props.tip)}  disableRipple className={classes.dogadajButton}>
+              <Typography align='center' variant='h6' className={classes.dogadaj}>{props.naziv}</Typography>                 {/* ako je odabran trener,fizio,tehniko ili predstavnik onda treba omogućit samo događaje žuti,crveni i plavi karton                      ako NIJE odabran golman onda ne dopuštamo događaje tipa obrana i primljeni pogoci  */}
            </Button>                        
       </Fragment>
     )

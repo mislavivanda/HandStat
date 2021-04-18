@@ -62,48 +62,40 @@ const Vrijeme=new GraphQLScalarType({
     return new Date(Date.parse(ast.value))
   }
 });
-const File=new GraphQLInputObjectType({//INPUT TIP ZA FILE UPLOADOVE-> ODGOVARA FORMATU req.file KOJEG PARSIRA MULTER
-  name:'File',
-  fields:()=>({
-    originalname:{type:GraphQLString},
-    encoding:{type:GraphQLString},
-    mimetype:{type:GraphQLString},
-    size:{type:GraphQLInt},
-    filename:{type:GraphQLString}
-  })
-});
 const MoguciDogadaji=new GraphQLObjectType({
   name:'MoguciDogadaji',
   fields:()=>({     //!!!!!!Stavljamo u funkciju jer kod asocijacija između elemenata moramo vodit računa o redoslijedu definiranja tipova pa ako oba tipa imaju asocijaciju onda kojin god 
-    //redolsijedom definirali objekte bit ce nedefiniran jedan od tih clanova-> zato ih stavimo u funkciju koja će se pozvat i u tom trenutku pozivanja će svi tipovi već bili učitani i definirani
+    //redoslijedom definirali objekte bit ce nedefiniran jedan od tih clanova-> zato ih stavimo u funkciju koja će se pozvat i u tom trenutku pozivanja će svi tipovi već bili učitani i definirani
     id:{type: GraphQLInt},
-    naziv:{type:new GraphQLNonNull(GraphQLString)},
-    tip:{type: new GraphQLNonNull(GraphQLInt)}
+    naziv:{type:GraphQLString},
+    tip:{type: GraphQLInt}
   })
 })
 const Natjecanje=new GraphQLObjectType({
   name:'Natjecanje',
   fields:()=>({
     id:{type:GraphQLInt},
-    naziv:{type:new GraphQLNonNull(GraphQLString)},
-    sezona:{type:new GraphQLNonNull(GraphQLString)},
+    naziv:{type:GraphQLString},
+    sezona:{type:GraphQLString},
   })
 })
 const Dvorana=new GraphQLObjectType({
   name:'Dvorana',
   fields:()=>({
   id:{type:GraphQLInt},
-  dvorana:{type:new GraphQLNonNull(GraphQLString)},
-  mjesto:{type:new GraphQLNonNull(GraphQLString)}
+  dvorana:{type:GraphQLString},
+  mjesto:{type:GraphQLString}
   })
 })
 const SluzbenaOsoba=new GraphQLObjectType({
   name:'SluzbenaOsoba',
   fields:()=>({
-    maticni_broj:{type:new GraphQLNonNull(GraphQLString)},
-    ime:{type:new GraphQLNonNull(GraphQLString)},
-    prezime:{type:new GraphQLNonNull(GraphQLString)},
-    datum_rodenja:{type:Datum}
+    maticni_broj:{type:GraphQLString},
+    ime:{type:GraphQLString},
+    prezime:{type:GraphQLString},
+    datum_rodenja:{type:Datum},
+    rola:{type:GraphQLInt},
+    image_path:{type:GraphQLString}
   })
 
 })
@@ -117,7 +109,8 @@ const Sudac=new GraphQLObjectType({
     mjesto:{type:new GraphQLNonNull(GraphQLString)},
     datum_rodenja:{type:Datum},
     broj_utakmica:{type:new GraphQLNonNull(GraphQLString)},
-    prosjecna_ocjena:{type:GraphQLFloat}
+    prosjecna_ocjena:{type:GraphQLFloat},
+    image_path:{type:GraphQLString}
   })
 })
 const ClanTima=new GraphQLObjectType({
@@ -131,7 +124,8 @@ const ClanTima=new GraphQLObjectType({
       datum_rodenja:{type:Datum},
       visina:{type:GraphQLInt},
       tezina:{type:GraphQLInt},
-      rola:{type:GraphQLInt}
+      rola:{type:GraphQLInt},
+      image_path:{type:GraphQLString}
   })
 })
 const Klub=new GraphQLObjectType({
@@ -481,6 +475,7 @@ const Utakmica=new GraphQLObjectType({
     gledatelji:{type:GraphQLInt},
     rezultat_domaci:{type:GraphQLInt},
     rezultat_gosti:{type:GraphQLInt},
+    minuta:{type:GraphQLInt},
     sudac1_ocjena:{type:GraphQLFloat},
     sudac2_ocjena:{type:GraphQLFloat},
     status:{type:GraphQLInt},
@@ -694,7 +689,7 @@ const RootQuery=new GraphQLObjectType({
     //fileds=entry pointovi za sve querye servera
     utakmica:{//DOHVAT PODATAKA VEZANIH ZA UTAKMICU-> za dohvat generalInfo i osoba utakmice isti ovi query samo specificiramo atribute koji nam trebaju
       type:Utakmica,
-      args:{broj_utakmice:{type:GraphQLString}},//specificiramo sve argumente querya
+      args:{broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}},//specificiramo sve argumente querya
       resolve(parent,args){//NIJE POTREBNA AUTORIZACIJA JER JE TO ZA GENERALNOG KORISNIKA
           return models.utakmica.findOne({
             where:{
@@ -842,7 +837,7 @@ const RootQuery=new GraphQLObjectType({
     },
     klubovi:{
       type:new GraphQLList(Klub),
-      args:{natjecanje_id:{type:GraphQLInt}},//dohvat SAMO ONIH KLUBOVA IZ ODABRANOG NATJECANJA-> KOD VOĐENJA UTAKMICE-> OMOGUĆENO SAMO ADMINU
+      args:{natjecanje_id:{type:new GraphQLNonNull(GraphQLInt)}},//dohvat SAMO ONIH KLUBOVA IZ ODABRANOG NATJECANJA-> KOD VOĐENJA UTAKMICE-> OMOGUĆENO SAMO ADMINU
       resolve:async(parent,args,context)=>{
         if(context.req.session.user_id)
         {
@@ -884,7 +879,7 @@ const RootQuery=new GraphQLObjectType({
     },
     timclanovi:{//vraća sve moguće članove tima od igrača i golmana do stožera kod vođenja utakmice-> AUTORIZIRANO SAMO ZA ADMINE
       type:Tim,
-      args:{klub_id:{type:GraphQLInt}},
+      args:{klub_id:{type:new GraphQLNonNull(GraphQLInt)}},
       resolve(parent,args,context){//OVAJ RESOLVER ĆE VRATITI ID OD KLUBA U OBJECT TYPE TIM U KOJEM MU MOŽEMO PRISTUPATI I KOJI ĆE POMOĆU NJEGA DOBITI SVE POTREBNE CLANOVE TIMA
         if(context.req.session.user_id)
         {
@@ -901,8 +896,8 @@ const RootQuery=new GraphQLObjectType({
     },
     timstatistika:{//vraća statistike igraca,golmana i stozera za određenu utakmicu od određenog kluba
       type:TimStatistika,
-      args:{broj_utakmice:{type:GraphQLString},
-            klub_id:{type:GraphQLInt}
+      args:{broj_utakmice:{type: new GraphQLNonNull(GraphQLString)},
+            klub_id:{type:new GraphQLNonNull(GraphQLInt)}
       },
       resolve(parent,args){//samo vratimo argumente u resolveru koje ćemo koristiti u TimStatistika object typeu za resolvanje
           return {
@@ -913,7 +908,7 @@ const RootQuery=new GraphQLObjectType({
     },
     dogadajiutakmice:{//vraća sve događaje utakmice za pojedinu utakmicu
       type:new GraphQLList(DogadajiUtakmice),
-      args:{broj_utakmice:{type:GraphQLString}},
+      args:{broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}},
       resolve(parent,args){
           return models.dogadajiutakmice.findAll({
             where:{
@@ -947,21 +942,21 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
     dodajutakmicu:{
       type:new GraphQLList(Klub),
       args:{
-        broj_utakmice:{type:GraphQLString},
-        kolo:{type:GraphQLInt},
-        datum:{type:Datum},
-        vrijeme:{type:Vrijeme},
-        gledatelji:{type:GraphQLInt},
-        natjecanje_id:{type:GraphQLInt},
-        dvorana_id:{type:GraphQLInt},
-        nadzornik_id:{type:GraphQLString},
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
+        kolo:{type:new GraphQLNonNull(GraphQLInt)},
+        datum:{type:new GraphQLNonNull(Datum)},
+        vrijeme:{type:new GraphQLNonNull(Vrijeme)},
+        gledatelji:{type:new GraphQLNonNull(GraphQLInt)},
+        natjecanje_id:{type:new GraphQLNonNull(GraphQLInt)},
+        dvorana_id:{type:new GraphQLNonNull(GraphQLInt)},
+        nadzornik_id:{type:new GraphQLNonNull(GraphQLString)},
         lijecnik_id:{type:GraphQLString},
-        zapisnicar_id:{type:GraphQLString},
+        zapisnicar_id:{type:new GraphQLNonNull(GraphQLString)},
         mjvremena_id:{type:GraphQLString},
-        sudac1_id:{type:GraphQLString},
+        sudac1_id:{type:new GraphQLNonNull(GraphQLString)},
         sudac2_id:{type:GraphQLString},
-        timdomaci_id:{type:GraphQLInt},
-        timgosti_id:{type:GraphQLInt}
+        timdomaci_id:{type:new GraphQLNonNull(GraphQLInt)},
+        timgosti_id:{type: new GraphQLNonNull(GraphQLInt)}
       },
       resolve(parent,args,context){
         if(context.req.session.user_id)
@@ -1008,11 +1003,11 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
     spremitimzautakmicu:{//Potrebno je da mutacija barem nešto vrati pa makar to bilo null,ako želimo da vrati null onda definiramo NOVI SCALAR TYPE VOID KOJI JE UVIJEK NULL I NJEGA STAVIMO ZA TYPE
       type:GraphQLBoolean,//VRATIMO TRUE AKO JE USPJEŠNO
       args:{
-        broj_utakmice:{type:GraphQLString},
-        klub_id:{type:GraphQLInt},
-        igraci_id:{type:new GraphQLList(GraphQLString)},//niz maticnih brojava koji su stringovi
-        golmani_id:{type:new GraphQLList(GraphQLString)},
-        trener_id:{type:GraphQLString},
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
+        klub_id:{type:new GraphQLNonNull(GraphQLInt)},
+        igraci_id:{type:new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))},//niz maticnih brojava koji su stringovi, ekvivalentno uvjetu [String!]!
+        golmani_id:{type:new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))},
+        trener_id:{type:new GraphQLNonNull(GraphQLString)},
         sluzpredstavnik_id:{type:GraphQLString},
         tehniko_id:{type:GraphQLString},
         fizio_id:{type:GraphQLString}
@@ -1078,44 +1073,169 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
     spremidogadaj:{
       type:DogadajiUtakmice,//vrati dogadajID ako je uspjesno spremljen
       args:{
-        broj_utakmice:{type:GraphQLString},
-        vrijeme:{type:GraphQLString},
-        klubgrb:{type:GraphQLInt},//domaci ili gostujuci tim
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
+        vrijeme:{type:new GraphQLNonNull(GraphQLString)},
+        klubgrb:{type:new GraphQLNonNull(GraphQLInt)},//domaci ili gostujuci tim
         maticni_broj:{type:GraphQLString},
-        dogadaj_id:{type:GraphQLInt},
+        dogadaj_id:{type:new GraphQLNonNull(GraphQLInt)},
         domaci:{type:GraphQLInt},
         gosti:{type:GraphQLInt},
       },
-      resolve(parent,args,context){
-        if(context.req.session.user_id)
-        {
-            return models.dogadajiutakmice.create({//AKO NE POŠALJEMO NEKI PARSMETAR U MUTACIJI ON ĆE PO DEFAULTU BITI NULL I SEQUELIZE GA NEĆE UOPĆE SPREMATI U QUERYU NEGO ĆE ON ZAUZET DEFAULT VRIJEDNOST
-              vrijeme:args.vrijeme,
-              tim:args.klubgrb,
-              rez_domaci:args.domaci,
-              rez_gosti:args.gosti,
-              broj_utakmice:args.broj_utakmice,
-              dogadaj_id:args.dogadaj_id,
-              maticni_broj:args.maticni_broj
-            }).then((data)=>data).catch((error)=>{
-            nodelogger.error('Greška kod spremanja događaja '+error);
-            throw(error);
-          })
-        }
-        else {
-          nodelogger.error('Greška u autorizaciji prilikom spremanja događaja');
-          throw(new Error('Niste autorizirani za zadanu operaciju'));
+      resolve: async(parent,args,context)=>{
+        try {
+          if(context.req.session.user_id)
+          {
+            //1) Spremi događaja u bazu
+            //2) Update statistike određenog polja utakmice od zadanog igraca
+            //3) Pushaj nove podatke u subscription zadani
+             const spremljenidogadaj = await models.dogadajiutakmice.create({//AKO NE POŠALJEMO NEKI PARAMETAR U MUTACIJI ON ĆE PO DEFAULTU BITI NULL I SEQUELIZE GA NEĆE UOPĆE SPREMATI U QUERYU NEGO ĆE ON ZAUZET DEFAULT VRIJEDNOST
+                vrijeme:args.vrijeme,
+                tim:args.klubgrb,
+                rez_domaci:args.domaci,
+                rez_gosti:args.gosti,
+                broj_utakmice:args.broj_utakmice,
+                dogadaj_id:args.dogadaj_id,
+                maticni_broj:args.maticni_broj
+              });
+              if(!(args.dogadaj_id===15||args.dogadaj_id===16))//ako su timeout dogadaji onda je nepotrebno sve ovo doli,radimo samo subscription za novi dogadaj
+              {
+                const clan=await models.clanovitima.findOne({
+                  where:{
+                    maticni_broj:args.maticni_broj
+                  }
+                });
+                
+                const dogadaj=await models.dogadaj.findOne({
+                  where:{
+                    id:args.dogadaj_id
+                  }
+                });
+                if(dogadaj.tip===1&&clan.rola===1)//promjena rezultata od strane igraca
+                {
+                  //za događaje s promjenom rezultata updateamo i rezultat utakmice-> ako je timdomaci onda uvećamo domaći rezultat
+                  if(args.klubgrb===1)//uvećali smo domaci rezultat-> smanjimo domaće
+                  {
+                    await models.utakmica.increment('rezultat_domaci',{where:{broj_utakmice:args.broj_utakmice}});
+                  }
+                  else await models.utakmica.increment('rezultat_gosti',{where:{broj_utakmice:args.broj_utakmice}});
+                  if(args.dogadaj_id===5)//gol sedmerac-> increment i gol i sedmerac pogodak stupce
+                  {
+                    await models.igracutakmica.increment(['golovi','pokusaji','sedmerac_golovi','sedmerac_pokusaji'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                  }
+                  else {
+                    //gol-> increment samo gol
+                    await models.igracutakmica.increment(['golovi','pokusaji'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                  }
+                }
+                else if(dogadaj.tip===1&&clan.rola===2)//pogodak od golmana-> ima samo 1 rubriku za to
+                {
+                    //za događaje s promjenom rezultata updateamo i rezultat utakmice
+                    if(args.klubgrb===1)//uvećali smo domaci rezultat-> smanjimo domaće
+                    {
+                      await models.utakmica.increment('rezultat_domaci',{where:{broj_utakmice:args.broj_utakmice}});
+                    }
+                    else await models.utakmica.increment('rezultat_gosti',{where:{broj_utakmice:args.broj_utakmice}});
+                  await models.golmanutakmica.increment(['golovi','pokusaji'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===2)//obrana-> samo za golmane
+                {
+                  await models.golmanutakmica.increment('obrane_ukupno',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===3&&clan.rola===1)//promasaj igraca
+                {
+                  await models.igracutakmica.increment('pokusaji',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if((args.dogadaj_id===3||args.dogadaj_id===7)&&clan.rola===2)//promasaj sedmerca ili obicni promasaj od golmana-> nema odvojene rubrike
+                {
+                  await models.golmanutakmica.increment('pokusaji',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===4)//primljen pogodak-> samo golman
+                {
+                  await models.golmanutakmica.increment('primljeni_ukupno',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===6)//obrana sedmerca-> samo golman
+                {
+                  await models.golmanutakmica.increment('sedmerac_obrane',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===7&&clan.rola===1)//sedmerac promasaj od strane igraca
+                {
+                  await models.igracutakmica.increment(['pokusaji','sedmerac_pokusaji'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===8)//sedmerac primljen-> samo za golmana
+                {
+                  await models.golmanutakmica.increment('sedmerac_primljeni',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===9&&clan.rola===1)//iskljucenje igraca
+                {
+                  await models.igracutakmica.increment('iskljucenja',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===9&&clan.rola===2)//iskljucenje golmana
+                {
+                  await models.golmanutakmica.increment('iskljucenja',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===10)//asistencija-> samo za igraca
+                {
+                  await models.igracutakmica.increment('asistencije',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===11)//tehnicka greska-> samo za igraca
+                {
+                  await models.igracutakmica.increment('tehnicke',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===12&&clan.rola===1)//zuti karton igrac
+                {
+                  await models.igracutakmica.increment('zuti',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===12&&clan.rola===2)
+                {
+                  await models.golmanutakmica.increment('zuti',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===12&&clan.rola===3)//zuti karton stozer
+                {
+                  await models.stozerutakmica.increment('zuti',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===13&&clan.rola===1)//zuti karton igrac
+                {
+                  await models.igracutakmica.increment('crveni',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===13&&clan.rola===2)
+                {
+                  await models.golmanutakmica.increment('crveni',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===13&&clan.rola===3)//zuti karton stozer
+                {
+                  await models.stozerutakmica.increment('crveni',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===14&&clan.rola===1)//zuti karton igrac
+                {
+                  await models.igracutakmica.increment('plavi',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===14&&clan.rola===2)
+                {
+                  await models.golmanutakmica.increment('plavi',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+                else if(args.dogadaj_id===14&&clan.rola===3)//zuti karton stozer
+                {
+                  await models.stozerutakmica.increment('plavi',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                }
+              }
+              //za timeout domac i gosti samo pushat dogadaje u subscriptionsima a za ostale i redak statistike+ za tip1 pushat i subscriptions rezultate
+              return spremljenidogadaj;//uvijek vrati spremljeni dogadaj
+            }
+          else throw(new Error('Niste autorizirani za zadanu operaciju'));
+        } catch (error) {
+          nodelogger.error('Greška prilikom spremanja događaja '+error);
+          throw(error);
         }
       }
     },
     spremigolpoziciju:{
       type:GolPozicija,//vrati id novokreirani ako je dobro sve
       args:{
-        pozicija:{type:GraphQLInt},
-        gol:{type:GraphQLBoolean},
-        broj_utakmice:{type:GraphQLString},
-        maticni_broj:{type:GraphQLString},
-        dogadaj_id:{type:GraphQLInt}
+        pozicija:{type:new GraphQLNonNull(GraphQLInt)},
+        gol:{type:new GraphQLNonNull(GraphQLBoolean)},
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
+        maticni_broj:{type: new GraphQLNonNull(GraphQLString)},
+        dogadaj_id:{type:new GraphQLNonNull(GraphQLInt)}
       },
       resolve(parent,args,context){
         if(context.req.session.user_id)
@@ -1188,21 +1308,16 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
     zavrsiutakmicu:{//kada ide zavrsiti utakmicu onda korisnik unosi ocjene sudaca i postavlja se i konacni rezultat utakmice i status na kraj
       type:GraphQLString,//vratit broj utakmice koja je zavrsena
       args:{
-        broj_utakmice:{type:GraphQLString},
-        rez_domaci:{type:GraphQLInt},
-        rez_gosti:{type:GraphQLInt},
-        sudac1_ocjena:{type:GraphQLFloat},
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
+        sudac1_ocjena:{type:new GraphQLNonNull(GraphQLFloat)},
         sudac2_ocjena:{type:GraphQLFloat}
       },
       resolve(parent,args,context){
         if(context.req.session.user_id)
         {
             return models.utakmica.update({
-              rezultat_domaci:args.rez_domaci,
-              rezultat_gosti:args.rez_gosti,
               sudac1_ocjena:args.sudac1_ocjena,
               sudac2_ocjena:args.sudac2_ocjena,
-              status:4
             },{
               where:{
                 broj_utakmice:args.broj_utakmice
@@ -1232,8 +1347,8 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
     login:{//kod logiranja provjera unesenih usernamea i passworda
       type:SluzbenaOsoba,//vrati podatke osobe koja se logirala, npr za ispisat poruku dobrodoslice mozda
       args:{
-        username:{type:GraphQLString},
-        password:{type:GraphQLString}
+        username:{type:new GraphQLNonNull(GraphQLString)},
+        password:{type:new GraphQLNonNull(GraphQLString)}
       },
       resolve: async(parent,args,context)=>{//u contextu nam se nalazi req objekt kojem pristupamo
         try {
@@ -1273,21 +1388,149 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
       args:{
         dogadaj_id:{type:new GraphQLNonNull(GraphQLInt)}
       },
-      resolve(parent,args,context){
-        if(context.req.session.user_id)
-        {
-          return models.dogadajiutakmice.destroy({
-            where:{
-              id:args.dogadaj_id
+      resolve:async(parent,args,context)=>{
+        try {
+          if(context.req.session.user_id)
+          {
+            //1) dohvatit podatke o dogadaju kojeg brisemo da znamo koju statistiku treba dekrementirat
+            const spremljenidogadaj=await models.dogadajiutakmice.findOne({
+              where:{
+                id:args.dogadaj_id
+              }
+            });
+            await models.dogadajiutakmice.destroy({
+              where:{
+                id:args.dogadaj_id
+              }
+            });
+            if(!(spremljenidogadaj.dogadaj_id===15||spremljenidogadaj.dogadaj_id===16))//za timeout ne treba nikakvu statistiku mijenjat
+            {
+              const clan=await models.clanovitima.findOne({
+                where:{
+                  maticni_broj:spremljenidogadaj.maticni_broj
+                }
+              });
+              
+              const dogadaj=await models.dogadaj.findOne({
+                where:{
+                  id:spremljenidogadaj.dogadaj_id
+                }
+              });
+              if(dogadaj.tip===1&&clan.rola===1)//promjena rezultata od strane igraca
+              {
+                //za događaje s promjenom rezultata updateamo i rezultat utakmice
+                if(spremljenidogadaj.tim===1)//uvećali smo domaci rezultat-> smanjimo domaće
+                {
+                  await models.utakmica.decrement('rezultat_domaci',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                }
+                else await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                if(spremljenidogadaj.dogadaj_id===5)//gol sedmerac-> increment i gol i sedmerac pogodak stupce
+                {
+                  await models.igracutakmica.decrement(['golovi','pokusaji','sedmerac_golovi','sedmerac_pokusaji'],{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+                }
+                else {
+                  //gol-> increment samo gol
+                  await models.igracutakmica.decrement(['golovi','pokusaji'],{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+                }
+              }
+              else if(dogadaj.tip===1&&clan.rola===2)//pogodak od golmana-> ima samo 1 rubriku za to
+              {
+                  //za događaje s promjenom rezultata updateamo i rezultat utakmice
+                  if(spremljenidogadaj.tim===1)//uvećali smo domaci rezultat-> smanjimo domaće
+                  {
+                    await models.utakmica.decrement('rezultat_domaci',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                  }
+                  else await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                await models.golmanutakmica.decrement(['golovi','pokusaji'],{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===2)//obrana-> samo za golmane
+              {
+                await models.golmanutakmica.decrement('obrane_ukupno',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===3&&clan.rola===1)//promasaj igraca
+              {
+                await models.igracutakmica.decrement('pokusaji',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if((spremljenidogadaj.dogadaj_id===3||spremljenidogadaj.dogadaj_id===7)&&clan.rola===2)//promasaj sedmerca ili obicni promasaj od golmana-> nema odvojene rubrike
+              {
+                await models.golmanutakmica.decrement('pokusaji',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===4)//primljen pogodak-> samo golman
+              {
+                await models.golmanutakmica.decrement('primljeni_ukupno',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===6)//obrana sedmerca-> samo golman
+              {
+                await models.golmanutakmica.decrement('sedmerac_obrane',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===7&&clan.rola===1)//sedmerac promasaj od strane igraca
+              {
+                await models.igracutakmica.decrement(['pokusaji','sedmerac_pokusaji'],{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===8)//sedmerad primljen-> samo za golmana
+              {
+                await models.golmanutakmica.decrement('sedmerac_primljeni',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===9&&clan.rola===1)//iskljucenje igraca
+              {
+                await models.igracutakmica.decrement('iskljucenja',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===9&&clan.rola===2)//iskljucenje golmana
+              {
+                await models.golmanutakmica.decrement('iskljucenja',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===10)//asistencija-> samo za igraca
+              {
+                await models.igracutakmica.decrement('asistencije',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===11)//tehnicka greska-> samo za igraca
+              {
+                await models.igracutakmica.decrement('tehnicke',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===12&&clan.rola===1)//zuti karton igrac
+              {
+                await models.igracutakmica.decrement('zuti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===12&&clan.rola===2)
+              {
+                await models.golmanutakmica.decrement('zuti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===12&&clan.rola===3)//zuti karton stozer
+              {
+                await models.stozerutakmica.decrement('zuti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===13&&clan.rola===1)//zuti karton igrac
+              {
+                await models.igracutakmica.decrement('crveni',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===13&&clan.rola===2)
+              {
+                await models.golmanutakmica.decrement('crveni',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===13&&clan.rola===3)//zuti karton stozer
+              {
+                await models.stozerutakmica.decrement('crveni',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===14&&clan.rola===1)//zuti karton igrac
+              {
+                await models.igracutakmica.decrement('plavi',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===14&&clan.rola===2)
+              {
+                await models.golmanutakmica.decrement('plavi',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              else if(spremljenidogadaj.dogadaj_id===14&&clan.rola===3)//zuti karton stozer
+              {
+                await models.stozerutakmica.decrement('plavi',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
             }
-          }).then((data)=>args.dogadaj_id).catch((error)=>{
-            nodelogger.error('Greška kod birsanja događaja utakmice '+error);
-            throw(error);
-          })
-        }
-        else {
-          nodelogger.error('Greška u autorizaciji kod brisanja događaja');
-          throw(new Error('Niste autorizirani za zadanu operaciju'));
+            //obavijestit statistiku,promjenu rezultata i dogadaje u subscriptionsima
+            return args.dogadaj_id
+          }
+          else throw(new Error('Niste autorizirani za zadanu operaciju'));
+        } catch (error) {
+          nodelogger.error('Greska kod brisanja dogadaja '+error);
+          throw(error);
         }
       }
     },

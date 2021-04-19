@@ -8,9 +8,7 @@ async function start()
 {
     try {
         await loaders.load(app);//poziv load funkcije iz index.js filea u loadersima koji će loadati sve u express server i povezati se na bazu
-        app.listen(config.port,()=>{
-            nodelogger.info('App listening on port '+config.port);
-        })
+        nodelogger.info('Server listening on port '+config.port);
     } catch (error) {
         nodelogger.error('Error in starting application server'+error);
     }

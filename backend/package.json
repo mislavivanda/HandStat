@@ -17,11 +17,13 @@
     "express-graphql": "^0.12.0",
     "express-session": "^1.17.1",
     "graphql": "^15.5.0",
+    "graphql-subscriptions": "^1.2.1",
     "graphql-upload": "^11.0.0",
     "morgan": "^1.10.0",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.5.1",
+    "subscriptions-transport-ws": "^0.9.18",
     "winston": "^3.3.3"
   }
 }

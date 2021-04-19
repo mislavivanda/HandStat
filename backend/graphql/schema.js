@@ -3,6 +3,13 @@ const bcrypt=require('bcrypt');
 const {nodelogger}=require('../loaders/logger.js');
 const graphql=require('graphql');
 const config=require('../config');
+const { PubSub }=require('graphql-subscriptions');//za rukovanje sa subscriptionsima-> pomoću njega publishamo subscription eventove i definiramo resolvere u subscriptionsima
+/*PubSub is a class that exposes a simple publish and subscribe API.-> takav obrazac
+
+It sits between your application's logic and the GraphQL subscriptions engine 
+- it receives a publish command from your app logic and pushes it to your GraphQL execution engine.-> sa publishom zapravo pushamo podatke koje mu damo u graphQL 
+subscriptions engine (o kojem brine subscribe funkcija koju smo proslijedili subscriptionsserveru)-> dodatno sučelje između pubsub publish podataka i enginea je ASYNCITERABLE KOJU STAVLJAMO U SUBSCRIPTIONS RESOLVERIMA-> ona dobija pubsub.publish podatke ako 
+je pretplaćena na publishani događaj i onda ih prosljeđuje subcribe execution engineu koji se brine za transport i ostatak*/
 const {createWriteStream}=require('fs');//kod spremanja fileova
 const models=require('../models');//u njemu se nalaze svi loadani modeli bitni za resolvere
 const {GraphQLObjectType,//OUTPUT I INPUT MOGU BITI

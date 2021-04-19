@@ -6,6 +6,9 @@ const session=require('express-session');
 const session_store=require('./session_store');
 const schema=require('../graphql/schema');
 const { graphqlUploadExpress }=require('graphql-upload');
+const {createServer}=require('http');//node.js paket za kreiranje servera, kao parametar prima funkciju koja će odgovoarat na zahtjeve-> u našem slučaju to će biti sami app
+const { SubscriptionServer }=require('subscriptions-transport-ws');//kreiranje subscriptions servera koji će slušati zahtjeve od web socket linka na apollo clientu
+const { execute, subscribe }=require('graphql');//za kreiranje subscription servera
 var cors = require('cors');
 var corsOptions = {
     origin: 'http://localhost:3000',
@@ -36,7 +39,7 @@ module.exports=(app,httplogger)=>{//U OVOJ FUNKCIJI LOADAMO SVE ŠTO JE POTREBNO
     }))
     app.use(express.static('images'));//ime direktorija iz kojeg servamo fileove/slike-> VAŽNOOOO-> KOD REQUESTOVA SA FRONTENDA U URL NE STAVLJAMO /images jer express racuna path relativno u donosu na onaj koji mu stavimo u .static
 //graphql http je obicni middleware za postavljanje postavki graphql sheme na serveru i vraća taj objekt-> im pristup req i res objektima
-    app.use('/graphql',
+    app.use('/graphql',//na toj ruti ćemo koristiti ove middleware u nastavku
     graphqlUploadExpress({ maxFileSize:config.images. maxImageFileSize}),//middleware za parisranje fileova u multipart byte request bodyima
     graphqlHTTP((req,res)=>({
        schema,
@@ -47,5 +50,20 @@ module.exports=(app,httplogger)=>{//U OVOJ FUNKCIJI LOADAMO SVE ŠTO JE POTREBNO
        > ONO ŠTO OVJDE STAVIMO CE PREDSTAVLJATI KONTEKST ODNOSNO TO ĆE BITI 3. PARAEMTAR U SVIM GRAPHQL RESOOLVERIMA I NA TAJ NAČIN ĆEMO MOĆ PRISTUPAT CONTEXT VARIJABAMA U SVIM RESOLVERIMA,
        -> NPR TREBA NAM PRISTUP REQ.SESSION OBJEKTU ZA SESSION COOKIESE*/
     })));
+
+    const server=createServer(app);//napravimo server sa postojećim app koji predstavlja middleware funkcije za slusanje zahtjeva
+    //na taj server nadogradimo i subscriptions server za subscriptionse kao middleware
+    server.listen(config.port,() => {
+        new SubscriptionServer(
+        {//opcije servera
+          execute,//graphql funkcija koja se kontrolira resolvanje i fullfill/rejection od querya i mutacija
+          subscribe,//ista stvar kao execute samo za mutacije
+          schema: schema,//graphql shema
+        },
+        {//opcije soketa
+          server: server,//existing HTTP server to use-> zato smo i pretovrili gornji app u server-> na njega idu zahtjevi sa http linka
+          path: '/subscriptions',//uri  na kojem sluša ovaj server odnosno na kojem je web socket konekcija-> ws://localhost:port/subscriptions-> tu nam treba slat klijent subscriptions zahtjeve a mi njemu odgovore
+        });
+    });
     
 }

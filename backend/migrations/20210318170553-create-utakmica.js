@@ -39,7 +39,7 @@ module.exports = {
         type:Sequelize.FLOAT,
         defaultValue:0
       },
-      status: {//nije jos pocelo ali upisano=1,igra=2,poluvreme=3,kraj=4
+      status: {//nije jos pocelo ali upisano=1,igra=2,poluvreme=3,4=drugo poluvreme,5=kraj->kada se spremi i zavrsi utakmica
         type: Sequelize.SMALLINT,
         defaultValue:1
       }

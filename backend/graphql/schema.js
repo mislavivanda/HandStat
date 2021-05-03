@@ -9,7 +9,11 @@ const { PubSub }=require('graphql-subscriptions');//za rukovanje sa subscription
 It sits between your application's logic and the GraphQL subscriptions engine 
 - it receives a publish command from your app logic and pushes it to your GraphQL execution engine.-> sa publishom zapravo pushamo podatke koje mu damo u graphQL 
 subscriptions engine (o kojem brine subscribe funkcija koju smo proslijedili subscriptionsserveru)-> dodatno sučelje između pubsub publish podataka i enginea je ASYNCITERABLE KOJU STAVLJAMO U SUBSCRIPTIONS RESOLVERIMA-> ona dobija pubsub.publish podatke ako 
-je pretplaćena na publishani događaj i onda ih prosljeđuje subcribe execution engineu koji se brine za transport i ostatak*/
+je pretplaćena na publishani događaj i onda ih prosljeđuje subcribe execution engineu koji se brine za transport i ostatak
+publish subscribe arhitektura-> publish-> obavijestimo komponente koje slušaju, subscribe-> pretplatimo se na odredene dogadaje
+-> subscribe metoda i async iterable prolsjeduju podakte koje prime od .publish metode u graphql subscription engine koji se brine o transportu tih podataka i ostalim stvarima*/
+const pubsub=new PubSub();
+
 const {createWriteStream}=require('fs');//kod spremanja fileova
 const models=require('../models');//u njemu se nalaze svi loadani modeli bitni za resolvere
 const {GraphQLObjectType,//OUTPUT I INPUT MOGU BITI
@@ -27,6 +31,7 @@ const {GraphQLObjectType,//OUTPUT I INPUT MOGU BITI
         GraphQLBoolean,
         Kind}=graphql;//KIND SADRŽI SVE TIPOVE VARIJABLI AKO JE POTREBNO U RESOLVERIMA PROVJERAVAT JELI PRIMLJENA VARIJALBA ISPRAVNOG TIPA
   const { GraphQLUpload } = require('graphql-upload');//OVO JE TIP KOJI NAM OMOGUĆAVA RUKOVANJE S FILEOVIMA,SVUGDJE DI KORISTIMO FILEOVE KAO INPUT TIP STAVIMO OVAJ SCALAR ZA TIP U GRAPHQL SHEMI MUTACIJA/QUERYA
+const { Console } = require("console");
 
 //Definicija našeg vlastitog skalarnog tipa,datum nije defaultni skalarni tip
 const Datum = new GraphQLScalarType({
@@ -689,6 +694,33 @@ const GolPozicija=new GraphQLObjectType({
     }
   })
 })
+process.setMaxListeners(50);
+const NOVA_UTAKMICA="NOVA_UTAKMICA";
+const PROMJENA_STATUSA="PROMJENA_STATUSA";//kada se status utakmice mijenja-> kada bude 5-> zavrsi utakmicu
+const PROMJENA_VREMENA="PROMJENA_VREMENA";
+const PROMJENA_REZULTATA="PROMJENA_REZULTATA";
+const RootSubscriptions=new GraphQLObjectType({
+  name:'Svi_subscriptionsi',
+  fields:{
+    novautakmica:{
+      type:Utakmica,
+      subscribe:(parent,args)=> pubsub.asyncIterator(NOVA_UTAKMICA)
+      },
+      promjenastatusa:{//saljemo broj_utakmice i status samo-> to je dovoljno za render
+        type:Utakmica,
+        subscribe:(parent,args)=>pubsub.asyncIterator(PROMJENA_STATUSA)
+      },
+      promjenavremena:{//kod promjene minute azuriramo frontend-> saljemo broj utakmice i minutut
+        type:Utakmica,
+        subscribe:(parent,args)=>pubsub.asyncIterator(PROMJENA_VREMENA)
+      },
+      promjenarezultata:{//vracamo broj utakmice i gosti i domaci rezultat
+        type:Utakmica,
+        subscribe:(parent,args)=>pubsub.asyncIterator(PROMJENA_REZULTATA)
+      }
+
+    }
+})
 
 const RootQuery=new GraphQLObjectType({
   name:'Svi_queryi_za_entrypoint',
@@ -936,6 +968,30 @@ const RootQuery=new GraphQLObjectType({
         }
         else return false;//nije logiran
       }
+    },
+    rezultatiuzivo:{
+      type:new GraphQLList(Utakmica),
+      resolve(parent,args){
+        return models.utakmica.findAll({
+          where:{
+            [Op.and]: [//dohvati one kojima je status [2,4]-> jos se igraju
+              { 
+                status:{
+                [Op.gt]:1
+                }
+              },
+               {
+                status:{
+                [Op.lt]: 5
+               }
+              }
+            ],
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška kod dohvata live rezultata '+error);
+          throw(error);
+        })
+      }
     }
   }
 })
@@ -1125,6 +1181,13 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                     await models.utakmica.increment('rezultat_domaci',{where:{broj_utakmice:args.broj_utakmice}});
                   }
                   else await models.utakmica.increment('rezultat_gosti',{where:{broj_utakmice:args.broj_utakmice}});
+                  pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja-> već imamo koji je novi rezultat
+                    promjenarezultata:{
+                      broj_utakmice:args.broj_utakmice,
+                      rezultat_domaci:args.domaci,
+                      rezultat_gosti:args.gosti
+                    }
+                  })
                   if(args.dogadaj_id===5)//gol sedmerac-> increment i gol i sedmerac pogodak stupce
                   {
                     await models.igracutakmica.increment(['golovi','pokusaji','sedmerac_golovi','sedmerac_pokusaji'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
@@ -1142,6 +1205,13 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                       await models.utakmica.increment('rezultat_domaci',{where:{broj_utakmice:args.broj_utakmice}});
                     }
                     else await models.utakmica.increment('rezultat_gosti',{where:{broj_utakmice:args.broj_utakmice}});
+                    pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja-> već imamo koji je novi rezultat
+                      promjenarezultata:{
+                        broj_utakmice:args.broj_utakmice,
+                        rezultat_domaci:args.domaci,
+                        rezultat_gosti:args.gosti
+                      }
+                    })
                   await models.golmanutakmica.increment(['golovi','pokusaji'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
                 }
                 else if(args.dogadaj_id===2)//obrana-> samo za golmane
@@ -1228,7 +1298,10 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
               //za timeout domac i gosti samo pushat dogadaje u subscriptionsima a za ostale i redak statistike+ za tip1 pushat i subscriptions rezultate
               return spremljenidogadaj;//uvijek vrati spremljeni dogadaj
             }
-          else throw(new Error('Niste autorizirani za zadanu operaciju'));
+          else{
+            nodelogger.error('Greška u autorizaciji kod spremanja događaja utakmice');
+            throw(new Error('Niste autorizirani za zadanu operaciju'));
+          }
         } catch (error) {
           nodelogger.error('Greška prilikom spremanja događaja '+error);
           throw(error);
@@ -1270,22 +1343,56 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         status:{type:new GraphQLNonNull(GraphQLInt)},
         broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
       },
-      resolve(parent,args,context){
-        if(context.req.session.user_id)
-        {
-            return models.utakmica.update({status:args.status},{
-              where:{
-                broj_utakmice:args.broj_utakmice
+      resolve:async(parent,args,context)=>{
+        try {
+          if(context.req.session.user_id)
+          {
+             await models.utakmica.update({status:args.status},{
+                where:{
+                  broj_utakmice:args.broj_utakmice
+                }
+              })
+                if(args.status===2)//pocela utakmica-> dohvati podatke i dodaj je u nove live utakmice na frontendu
+                {
+                  const data=await models.utakmica.findOne({
+                    where:{
+                      broj_utakmice:args.broj_utakmice
+                    }
+                  })
+                  pubsub.publish(NOVA_UTAKMICA,{//nakon spremanja utakmice saljemo u subscription koji će dodat tu utakmicu među live rezultate
+                    //!!!!!VAŽNOOOOO-> FORMAT OVOG OBJEKTA U PUBSUBU MORA ODGOVARATI FORMATU KAKO ĆE IZGLEDATI STRUKTURA PODATAKA U SUBSCRIPTIONU->
+                    /*struktura podataka je uvijek(kao i kod querya i mutacija)
+                    NAZIV_SUBSCRIPTIONA{
+                      fiield1
+                      field2
+                      filed3
+                      ....
+                    } 
+                    to je potrebno kako bi resolveri u povratnom tipu od mutacije mogli resolvati fieldove odnosno u ovom sklučaju da se mogu resolvati fieldoci od utakmice sa podacima koje im vratimo u async iteratoru od pubsuba
+                    vjv je ista stvar kod querya i mutacija u resolverima samo što tamo vraćamo samo objekt sa propertisima bez imena mutacije i querya jer ga bice resolver tamop automatski pošalje
+                    OVDE NEMAMO RESOLVE FUNKCIJU NEGO SUBSCRIBU FUNKCIJU*/ 
+                      novautakmica:data
+                    });
+                }
+                else {
+                  pubsub.publish(PROMJENA_STATUSA,{
+                    promjenastatusa:{
+                      broj_utakmice:args.broj_utakmice,
+                      status:args.status
+                    }
+                  });
+                }
+                return args.status;
               }
-            }).then(()=>args.status).catch((error)=>{
-              nodelogger.error('Greška kod azuriranja statusa utakmice '+error);
-              throw(error);
-            })
-          }
-        else {
-            nodelogger.error('Greška u autorizaciji kod ažuriranja statusa utakmice');
-            throw(new Error('Niste autorizirani za zadanu operaciju'));
-          }
+              else {
+                nodelogger.error('Greška u autorizaciji kod ažuriranja statusa utakmice');
+                throw(new Error('Niste autorizirani za zadanu operaciju'));
+              }
+        } catch (error) {
+          nodelogger.error('Greška kod azuriranja statusa utakmice '+error);
+          throw(error);
+        }
+      
       }
     },
     azurirajvrijeme:{
@@ -1301,7 +1408,15 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
             where:{
               broj_utakmice:args.broj_utakmice
             }
-          }).then(()=>true).catch((error)=>{
+          }).then(()=>{
+            pubsub.publish(PROMJENA_VREMENA,{
+              promjenavremena:{
+                broj_utakmica:args.broj_utakmice,
+                minuta:args.minuta
+              }
+            });
+            return true
+          }).catch((error)=>{
             nodelogger.error('Greška kod azuriranja vremena utakmice '+error);
             throw(error);
           })
@@ -1338,6 +1453,12 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 secure:false
             });
             context.req.session.destroy();//IZBRISE SESIJU IZ MEMORY STOREA
+            pubsub.publish(PROMJENA_STATUSA,{
+              promjenastatusa:{
+                broj_utakmice:args.broj_utakmice,
+                status:6//makni rezultat s prikaza
+              }
+            });
             return args.broj_utakmice;
             }).catch((error) => {
               nodelogger.error('Greška kod zavrsavanja utakmice '+error);
@@ -1391,7 +1512,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
       }
     },
     izbrisidogadaj:{
-      type:GraphQLInt,//vratimo id izbrisanog dogadaja
+      type:DogadajiUtakmice,//vratimo id izbrisanog dogadaja+tip izbrisanog dogadaja da znamo je li treba promijenit rezultat na frontnedu
       args:{
         dogadaj_id:{type:new GraphQLNonNull(GraphQLInt)}
       },
@@ -1428,9 +1549,26 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 //za događaje s promjenom rezultata updateamo i rezultat utakmice
                 if(spremljenidogadaj.tim===1)//uvećali smo domaci rezultat-> smanjimo domaće
                 {
-                  await models.utakmica.decrement('rezultat_domaci',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                  //sequelize increment/decrement metode vraćaju 3D matricu u kojoj se nalazi uvećani model
+                  const utakmica=await models.utakmica.decrement('rezultat_domaci',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                  pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
+                    promjenarezultata:{
+                      broj_utakmice:spremljenidogadaj.broj_utakmice,
+                      rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
+                      rezultat_gosti:utakmica[0][0][0].rezultat_gosti
+                    }
+                  })
                 }
-                else await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                else{ 
+                  const utakmica=await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                  pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
+                    promjenarezultata:{
+                      broj_utakmice:spremljenidogadaj.broj_utakmice,
+                      rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
+                      rezultat_gosti:utakmica[0][0][0].rezultat_gosti
+                    }
+                  })
+                }
                 if(spremljenidogadaj.dogadaj_id===5)//gol sedmerac-> increment i gol i sedmerac pogodak stupce
                 {
                   await models.igracutakmica.decrement(['golovi','pokusaji','sedmerac_golovi','sedmerac_pokusaji'],{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
@@ -1445,9 +1583,29 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                   //za događaje s promjenom rezultata updateamo i rezultat utakmice
                   if(spremljenidogadaj.tim===1)//uvećali smo domaci rezultat-> smanjimo domaće
                   {
-                    await models.utakmica.decrement('rezultat_domaci',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                    const utakmica=await models.utakmica.decrement('rezultat_domaci',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                    pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
+                      promjenarezultata:{
+                        promjenarezultata:{
+                          broj_utakmice:spremljenidogadaj.broj_utakmice,
+                          rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
+                          rezultat_gosti:utakmica[0][0][0].rezultat_gosti
+                        }
+                      }
+                    })
                   }
-                  else await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                  else{
+                    const utakmica=await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
+                    pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
+                      promjenarezultata:{
+                        promjenarezultata:{
+                          broj_utakmice:spremljenidogadaj.broj_utakmice,
+                          rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
+                          rezultat_gosti:utakmica[0][0][0].rezultat_gosti
+                        }
+                      }
+                    })
+                  }
                 await models.golmanutakmica.decrement(['golovi','pokusaji'],{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
               }
               else if(spremljenidogadaj.dogadaj_id===2)//obrana-> samo za golmane
@@ -1532,7 +1690,11 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
               }
             }
             //obavijestit statistiku,promjenu rezultata i dogadaje u subscriptionsima
-            return args.dogadaj_id
+            return {//vracamp id izbrisanog dogadaj, dogadaj_id iz kojeg cemo u resokverima moc queryat tip dogadaja i tim da znamo koji rezultat treba umanjit
+              id:args.dogadaj_id,
+              dogadaj_id:spremljenidogadaj.dogadaj_id,
+              tim:spremljenidogadaj.tim
+            }
           }
           else throw(new Error('Niste autorizirani za zadanu operaciju'));
         } catch (error) {
@@ -1579,7 +1741,8 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
 })
 module.exports=new GraphQLSchema({//definicija sheme koju stavljamo u express graphql server
   query:RootQuery,
-  mutation:Mutation
+  mutation:Mutation,
+  subscription:RootSubscriptions
 })
 
 //PITANJE???-> OVDE LOADAMO SAMO QUERYE I MUTACIJE A NIGDI NE LOADAMO GORNJE NAVEDENE OBJEKTNE TIPOVE SHEME I SKALARANE TIPOVE, KAKO GRAPHQL ZNA ZA NJIH??

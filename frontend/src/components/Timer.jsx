@@ -35,7 +35,7 @@ const useStyles=makeStyles((theme)=>({
 export default function Timer() {
     const classes=useStyles();
     const [paused,setPaused]=useState(true);
-    const [poluvremeTrajanje,setPoluvremeTrajanje]=useState(10);//trajanje poluvremena
+    const [poluvremeTrajanje,setPoluvremeTrajanje]=useState(1);//trajanje poluvremena
     const [spremljenoTrajanje,setSpremljenoTrajanje]=useState(false);
     const [disablePausePlay,setDisablePausePlay]=useState(false);//disablea se nakon kraja utakmice
     const [prviPoziv,setPrviPoziv]=useState(true);//da znamo kada prvi put stisne odbrojavanje timera da prominimo status utakmice kkao bi je mogli prikazivati live
@@ -72,10 +72,10 @@ export default function Timer() {
         else if(time.ticks===(2*poluvremeTrajanje*60)&&!paused)//kraj utakmice-> promijeni status za kraj,stopiraj pause button i disableaj ga
         {
             console.log('Kraj utakmice');
-            promijeniStatus({//status=poluvreme pauza
+            promijeniStatus({
                 variables:{
                     broj_utakmice:brojUtakmice,
-                    status:4
+                    status:5
                 }
             });
             setPaused(true);
@@ -92,7 +92,7 @@ export default function Timer() {
                 promijeniStatus({
                     variables:{
                         broj_utakmice:brojUtakmice,
-                        status:2
+                        status:4
                     }
                 });
             }//ne stavljamo %60===0 jer nam se onda ne bi promijenilo u 31. minutu zbog toga što u slučaju sa 1800sekundi neće uć u ovaj dio jer je to kraj poluvremena oznaka ili bi se u slučaju kraja utakmice na 60:00 mijenjala minuta u 61
@@ -147,7 +147,7 @@ export default function Timer() {
                                     <InputLabel>TRAJANJE POLUVREMENA</InputLabel>
                                     <TextField
                                     type="number"
-                                    inputProps={{min:10,max:30,step:1}}
+                                    inputProps={{min:1,max:30,step:1}}
                                     label=" "
                                     value={poluvremeTrajanje}
                                     onChange={(e)=>setPoluvremeTrajanje(e.target.value)}//JER INAČE ŠALJE INPUT U OBLIKU STRINGA A NE INTEGERA

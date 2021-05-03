@@ -12,11 +12,17 @@ const rezultatSlicer=createSlice({
         incrementGosti:(state)=>{
             state.timGosti+=1;
         },
+        decrementDomaci:(state)=>{
+            state.timDomaci-=1;
+        },
+        decrementGosti:(state)=>{
+            state.timGosti-=1;
+        },
         resetirajRezultat:(state)=>{
             state.timDomaci=0;
             state.timGosti=0;
         }
     }
 })
-export const{resetirajRezultat,incrementDomaci,incrementGosti}=rezultatSlicer.actions;
+export const{resetirajRezultat,incrementDomaci,incrementGosti,decrementDomaci,decrementGosti}=rezultatSlicer.actions;
 export default rezultatSlicer.reducer;

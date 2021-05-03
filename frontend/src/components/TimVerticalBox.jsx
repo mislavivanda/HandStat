@@ -43,7 +43,7 @@ const useStyles=makeStyles((theme)=>({
       },
 
 }))
-function TimVerticalBox({tim_id})//inace cemo slat tim_id pa će po njemu dohvaćat sve clanove tima,zasad saljemo niz
+function TimVerticalBox({tim_id})
 {
 const classes=useStyles();
 const timovi=useSelector(state=>state.timovi);

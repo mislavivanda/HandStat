@@ -270,7 +270,27 @@ const dohvatiSveDogadajeUtakmice=gql`
         }
     }
 `;
-
+//kad otovri homepage dohvatimo mu sve trenutno live rezultate a kasnije ih mijenjamo sa subscriptionsima
+const dohvatiLiveRezultate=gql`
+    query{
+        rezultatiuzivo{
+            broj_utakmice
+            natjecanje{
+            naziv
+            }
+            domaci{
+            naziv
+            }
+            gosti{
+            naziv
+            }
+            rezultat_domaci
+            rezultat_gosti
+            minuta
+            status
+        }
+    }
+`
 //provjera je li korisnik logiran
 const checkLogin=gql`
     query{
@@ -278,4 +298,5 @@ const checkLogin=gql`
     }`
 
 export {prikazUtakmice,dohvatiSvaNatjecanja,dohvatiSveDvorane,dohvatiSveNadzornike,dohvatiSveLijecnike,dohvatiSveZapisnicare,
-dohvatiSveMjerace,dohvatiSveSuce,dohvatiSveKluboveOdNatjecanja,dohvatiSveMoguceDogadaje,dohvatiSveClanoveTima,dohvatiStatistikuTima,dohvatiSveDogadajeUtakmice,checkLogin};
+dohvatiSveMjerace,dohvatiSveSuce,dohvatiSveKluboveOdNatjecanja,dohvatiSveMoguceDogadaje,dohvatiSveClanoveTima,dohvatiStatistikuTima,dohvatiSveDogadajeUtakmice,checkLogin,
+dohvatiLiveRezultate};

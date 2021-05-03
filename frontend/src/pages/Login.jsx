@@ -3,7 +3,7 @@ import {Grid,Typography,Box,Paper,TextField,Button} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles';
 import {login} from '../graphql/mutation';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { useMutation } from '@apollo/client';//hook za poziv querya
+import { useMutation } from '@apollo/client';
 import ErrorDialog from '../components/ErrorDialog';
 import { useDispatch,useSelector} from 'react-redux';
 import {postaviError} from '../redux/slicers/error';

@@ -60,8 +60,6 @@ function Gol() {
     const otkljucanGol=useSelector(state=>state.otkljucajGol);
     const odabraniDogadaj=useSelector(state=>state.odabraniDogadaj.dogadaj);
     const odabraniClan=useSelector(state=>state.odabraniClan.clan);
-    const timDomaciId=useSelector(state=>state.timovi.timDomaci.id);
-    const timGostiId=useSelector(state=>state.timovi.timGosti.id);
     const time=useSelector(state=>state.timer);
     let domaciRez=useSelector(state=>state.rezultat.timDomaci);
     let gostiRez=useSelector(state=> state.rezultat.timGosti);
@@ -98,18 +96,18 @@ function Gol() {
   //ODABIR GOLA JE ZADNJA FAZA U TOM DOGAĐAJU-> NAKON ODABIRA SPREMI GA U NIZ DOGAĐAJA I U BAZU
     if(odabraniDioGola)//ako je različit od null onda je odabran neki dio
     {
-      if(odabraniDogadaj.tip===1 && (timDomaciId===odabraniClan.klub_id))//za golove promijenimo i rezultat
+      if(odabraniDogadaj.tip===1 && (odabraniClan.klub_id===1))//za golove promijenimo i rezultat
       {
         dispatch(incrementDomaci());
         domaciRez+=1;//uvećamo odma jer je setter asinkron pa nam se dolje kod saveanja dogadaja ne stigne saveati prava vrijednost nego kasni za 1 rezultat
       }
-      else if(odabraniDogadaj.tip===1 && (timGostiId===odabraniClan.klub_id))
+      else if(odabraniDogadaj.tip===1 && (odabraniClan.klub_id===2))
       {
        dispatch(incrementGosti());
        gostiRez+=1;
       }
       //SPREMI DOGAĐAJ I SPREMI U BAZU DIO KOJI SE ODNOSI NA POZICIJU GOLA
-      if(timDomaciId=== odabraniClan.klub_id)
+      if(odabraniClan.klub_id===1)
       {
         spremiOdabraniDogadaj({
           variables:{

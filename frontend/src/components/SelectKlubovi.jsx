@@ -18,7 +18,7 @@ function SelectKlubovi() {
       {//id=null znaci da nije jos odabran taj tim
         if(timDomaci)//isti princip kao za suce
         {
-          setTimPreostali([...new_array,{id:timDomaci.id,naziv:timDomaci.naziv,image_path:timDomaci.image_path}]);
+          setTimPreostali([...new_array,{id:timDomaci.id,naziv:timDomaci.naziv,image_path:timDomaci.klub_slika}]);
         }
         else
         {
@@ -30,7 +30,7 @@ function SelectKlubovi() {
       {
         if(timGosti)
         {
-          setTimPreostali([...new_array,{id:timGosti.id,naziv:timGosti.naziv,image_path:timGosti.image_path}]);
+          setTimPreostali([...new_array,{id:timGosti.id,naziv:timGosti.naziv,image_path:timGosti.klub_slika}]);
         }
         else
         {

@@ -1,10 +1,9 @@
 import React from 'react'
-import {Grid,Typography,Box,GridList} from '@material-ui/core'
+import {Grid,Typography,Box} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles';
 import Navbar from '../components/Navbar';
-import Rezultat from '../components/Rezultat';
 import logo from '../images/handstat_logo.png';
-import rezultati from '../mockdata/rezultatiUzivo';
+import RezultatiUzivo from '../components/RezultatiUzivoBox';
 const useStyles=makeStyles((theme)=>({
     logoBox:{
         display:'flex',
@@ -57,13 +56,7 @@ export default function Guest_homepage(props) {//props su defaultni propsi koje 
                 <Typography align='center' variant='h6'style={{fontWeight:'bold',fontSize:'1.5rem'}} color='secondary'>REZULTATI UŽIVO</Typography>
                 </Grid>
                 <Grid item xs={12}>
-                    <GridList  className={classes.gridList} cols={1} cellHeight={50} spacing={20} >
-                        {rezultati.map((rezultat)=>(
-                            <Grid key={rezultat.broj_utakmice} item sm={8} xs={12} className={classes.gridItem}>
-                                <Rezultat history={props.history} broj_utakmice={rezultat.broj_utakmice}  natjecanje={rezultat.natjecanje} domaci={rezultat.domaci} gosti={rezultat.gosti} golovi_domaci={rezultat.golovi_domaci} golovi_gosti={rezultat.golovi_gosti}/>
-                           </Grid>
-                        ))}
-                    </GridList>
+                    <RezultatiUzivo history={props.history}/>
                 </Grid>
             </Grid>
         </Grid>

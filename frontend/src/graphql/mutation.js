@@ -84,7 +84,13 @@ const login=gql`
 `
 const ukloniDogadaj=gql`
 mutation($dogadaj_id:Int!){
-    izbrisidogadaj(dogadaj_id:$dogadaj_id)
+    izbrisidogadaj(dogadaj_id:$dogadaj_id){
+        id
+        tim
+        dogadaj{
+            tip
+        }
+    }
   }
 `
 const slika=gql`

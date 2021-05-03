@@ -3,11 +3,12 @@ import {Box, Typography,IconButton} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import {useDispatch,useSelector} from 'react-redux';
-import {izbrisiDogadaj} from '../redux/slicers/dogadajiUtakmice';
+import {izbrisiDogadaj,promjenaRezultataDogadaja} from '../redux/slicers/dogadajiUtakmice';
 import { useMutation } from '@apollo/client';
 import {ukloniDogadaj} from '../graphql/mutation';
 import ErrorDialog from './ErrorDialog';
 import {postaviError} from '../redux/slicers/error';
+import {decrementDomaci,decrementGosti} from '../redux/slicers/rezultat';
 const useStyles=makeStyles((theme)=>({
     dogadajGlavniBox:{
         display:'flex',
@@ -41,7 +42,21 @@ function Dogadaj(props) {
     const [brisiDogadaj,{error}]=useMutation(ukloniDogadaj,{
         onCompleted:(data)=>{//u data je vraćen id dogadaja koji je izbrisan
             //nakon što je uklonjen u bazi možemo ga ukloniti iz statea
-            dispatch(izbrisiDogadaj(data.izbrisidogadaj));
+            //ako je dogadaj tipa 1 onda je potrebno umanjit rezultat i SVIM OSTALIM DOGAĐAJIMA S PROMJENOM REZULTATA UMANJIT REZULTAT ZA 1
+            if(data.izbrisidogadaj.dogadaj.tip===1)//potrebno smanjit rezultat
+            {
+                if(data.izbrisidogadaj.tim===1)//smanji rezultat od domaceg tima
+                {
+                    dispatch(decrementDomaci());
+                }
+                else dispatch(decrementGosti());
+                //pozovi action za smanjivanje rezultata svih rezultatskih dogadaja nakon ovog
+                dispatch(promjenaRezultataDogadaja({
+                    id:data.izbrisidogadaj.id,
+                    tim:data.izbrisidogadaj.tim,
+                }));//saljemo mu id dogadaja da ga pronade U NIZU DOGADAJA + oznaku tima da zna čiji rezultat treba smanjiti
+            }
+            dispatch(izbrisiDogadaj(data.izbrisidogadaj.id));
         },
         onError:(error)=>{
             dispatch(postaviError(true));

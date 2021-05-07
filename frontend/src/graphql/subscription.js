@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+//OVA PRVA 4 SUBSCRIPTIONSA SU ZA PROMJENE PODATAKA O ODREĐENOJUTAKMICI U LISTI UTAKMICA  
 //kada nova utakmica bude live-> dodajemo je u prikaz
 const novaUtakmica=gql`
     subscription{
@@ -48,4 +49,12 @@ const promjenaRezultata=gql`
     }
   }
 `
-export {novaUtakmica,promjenaStatusa,promjenaVremena,promjenaRezultata};
+//OVI SUBSCRIPTIONSI SU ZA PROMJENU PODATAKA/STANJA OD SPEICIFIČNE UTAKMICE-> IMAJU ARGUMENT BROJ_UTAKMICE
+const rezultatUtakmice=gql`
+  subscription($broj_utakmice:String!){
+    rezultatutakmice(broj_utakmice:$broj_utakmice){
+      rezultat_domaci
+      rezultat_gosti
+    }
+  }`
+export {novaUtakmica,promjenaStatusa,promjenaVremena,promjenaRezultata,rezultatUtakmice};

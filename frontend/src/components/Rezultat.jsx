@@ -77,9 +77,9 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
     }
     function odvediNaUtakmicu()
     {
-        {history.push(`${history.location.pathname}`);
+        history.push(`${history.location.pathname}`);
         let broj=encodeURIComponent(broj_utakmice);
-        history.replace(`utakmica/${broj}`)}
+        history.replace(`utakmica/live/${broj}`);
     }
     return (
         <Box>

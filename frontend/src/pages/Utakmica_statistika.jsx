@@ -86,8 +86,8 @@ function Utakmica_statistika(props) {
 
     if(data)//kada stignu podaci
     {
-        //postavi timove da druge komponenete znaju koji su timovi odabrani
-        dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:data.utakmica.domaci.image_path}));
+        //postavi odabrane timove kako bi znali rednera dogadaje utakmice
+        dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:data.utakmica.gosti.image_path}));
         dispatch(odabranTimGosti({id:data.utakmica.gosti.id,naziv:data.utakmica.gosti.naziv,klub_slika:data.utakmica.gosti.image_path}));
     return (
         <div>
@@ -131,8 +131,8 @@ function Utakmica_statistika(props) {
                 </Grid>
             <Grid item  container direction='row' justify='space-evenly' alignItems='center' xs={12}>{/*container koji sadrzi tablice statistike i listu događaja*/}
                 <Grid item  container direction='column' justify='space-evenly' alignItems='center' xs={12} md={7}>{/*container koji sadrzi tablice statistike za oba tima*/}
-                    <TimStatistika tim_id={data.utakmica.domaci.id} broj_utakmice={brojUtakmice}/>
-                    <TimStatistika tim_id={data.utakmica.gosti.id}  broj_utakmice={brojUtakmice}/>
+                    <TimStatistika tim_id={data.utakmica.domaci.id} broj_utakmice={brojUtakmice} klub_slika={data.utakmica.domaci.image_path} naziv={data.utakmica.domaci.naziv} tim={1}/>
+                    <TimStatistika tim_id={data.utakmica.gosti.id}  broj_utakmice={brojUtakmice} klub_slika={data.utakmica.gosti.image_path} naziv={data.utakmica.gosti.naziv} tim={2}/>
                 </Grid>
                 <Grid style={{width:'100%',marginTop:50}} item container direction='row' justify='center' xs={12} md={4}>
                          <DogadajiUtakmice broj_utakmice={brojUtakmice}/>

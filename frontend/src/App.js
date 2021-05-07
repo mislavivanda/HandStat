@@ -4,6 +4,7 @@ import { Route ,Switch} from "react-router-dom";
 import GuestHomePage from './pages/Guest_homepage';
 import VodenjeStatistike from './pages/Vodenje_statistike';
 import UtakmicaStatistika from './pages/Utakmica_statistika';
+import UtakmicaStatistikaLive from './pages/Utakmica_statistika_live';
 import Login from './pages/Login';
 import {checkLogin} from './graphql/query';
 import { useQuery } from '@apollo/client';
@@ -48,6 +49,7 @@ export default function App() {
           {(logged)? <Route exact path='/statistika' component={VodenjeStatistike}/> : null}
           <Route exact path='/login' component={Login}/>
           <Route exact path='/utakmica/:broj_utakmice' component={UtakmicaStatistika}/>
+          <Route exact path='/utakmica/live/:broj_utakmice' component={UtakmicaStatistikaLive}/>
         </Switch>
         {
           (error&&error.message)?

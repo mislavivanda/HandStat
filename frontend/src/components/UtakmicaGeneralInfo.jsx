@@ -1,4 +1,4 @@
-import React,{Fragment,useState} from 'react'
+import React from 'react'
 import {Grid,Box,Typography} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 const useStyles=makeStyles((theme)=>({
@@ -25,42 +25,33 @@ const useStyles=makeStyles((theme)=>({
 }))//nakon dohvata podataka utakmice salju se ko propsovi i postavljaju se u state
 function UtakmicaGeneralInfo(props) {//za dohvat nam treba samo broj utakmice kojeg imamo iz URL
     const classes=useStyles();
-    const [utakmicaInfo,setUtakmicaInfo]=useState({ 
-        datum:props.datum,
-        vrijeme:props.vrijeme,
-        gledatelji:props.gledatelji,
-        lokacija:props.lokacija
-    });
     return (
-       <Fragment>
-         
             <Grid item className={classes.lijeviInfoGlavniBox} container direction='column' justify='space-evenly' alignItems='flex-start' xs={12} sm={8} md={4}>{/*container sa podacima LIJEVO*/}
                             <Grid item style={{width:'100%'}}>
                                 <Box className={classes.leftInfoBox}>
                                    <Typography style={{color:'#FFFFFF'}} variant='h6'>DATUM:</Typography>
-                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaInfo.datum}</Typography></Box>
+                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{props.datum}</Typography></Box>
                                 </Box>
                             </Grid>
                             <Grid item style={{width:'100%'}}>
                                 <Box className={classes.leftInfoBox}>
                                    <Typography style={{color:'#FFFFFF'}}  variant='h6'>VRIJEME:</Typography>
-                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaInfo.vrijeme}</Typography></Box>
+                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{props.vrijeme}</Typography></Box>
                                 </Box>
                             </Grid>
                             <Grid item style={{width:'100%'}}>
                                 <Box className={classes.leftInfoBox}>
                                    <Typography style={{color:'#FFFFFF'}}  variant='h6'>GLEDATELJA:</Typography>
-                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaInfo.gledatelji}</Typography></Box>
+                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{props.gledatelji}</Typography></Box>
                                 </Box>
                             </Grid>
                             <Grid item style={{width:'100%'}}>
                                 <Box className={classes.leftInfoBox}>
                                    <Typography style={{color:'#FFFFFF'}}  variant='h6'>LOKACIJA:</Typography>
-                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{utakmicaInfo.lokacija.dvorana +' '+utakmicaInfo.lokacija.mjesto}</Typography></Box>
+                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{props.lokacija.dvorana +' '+props.lokacija.mjesto}</Typography></Box>
                                 </Box>
                             </Grid>
-                        </Grid>
-       </Fragment>
+                </Grid>
     )
 }
 

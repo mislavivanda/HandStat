@@ -1,7 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles'
 import React,{Fragment} from 'react'
 import {Box,Typography,Grid} from '@material-ui/core';
-import { useSelector} from 'react-redux';
 import StatistikaBox from '../components/Table_stats_box.jsx';
 import { useQuery } from '@apollo/client';//hook za poziv querya
 import {dohvatiStatistikuTima} from '../graphql/query';
@@ -53,9 +52,8 @@ const useStyles=makeStyles((theme)=>({
       height:60
     }
 }));
-function TimStatistika({tim_id,broj_utakmice}) {//parametri potrebni za dohvat stati
+function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv}) {//parametri potrebni za dohvat stati
     const classes=useStyles();
-    const timovi=useSelector(state=>state.timovi);
     function odrediTitulu(rola)
     {
         if(rola===3)
@@ -89,8 +87,8 @@ function TimStatistika({tim_id,broj_utakmice}) {//parametri potrebni za dohvat s
       <Fragment>
                 <Grid item  className={classes.statistikaGlavniBox}  container direction='column' justify='space-evenly' alignItems='center' xs={12}>{/*container tablice statistike igraca*/}
                         <Box className={classes.statistikaBoxKlub}>
-                            <img src={(tim_id===timovi.timDomaci.id)? timovi.timDomaci.klub_slika : timovi.timGosti.klub_slika} alt='ikona_kluba' className={classes.klubSlika}/>
-                            <Typography align='center' variant='h4' style={{color:'#FFFFFF'}}>{(tim_id===timovi.timDomaci.id)? timovi.timDomaci.naziv : timovi.timGosti.naziv}</Typography>
+                            <img src={klub_slika} alt='ikona_kluba' className={classes.klubSlika}/>
+                            <Typography align='center' variant='h4' style={{color:'#FFFFFF'}}>{naziv}</Typography>
                         </Box>
                         <Box className={classes.statistikaBoxTitula}><Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>IGRAČI</Typography></Box>
                         <Box className={classes.statistikaBoxStupciBox}>{/*maknemo tekst za 5% sirine-> kakda ga maknemo za 5% udesno tada će se za centiranje elementa paddgin racunat od ostatka odnosno sve-5% a to će bit isto centriranje ko kod polja ispod-> pomak udesno koliko zauzima dres a to je 12.5% unutarnjeg containera */ }

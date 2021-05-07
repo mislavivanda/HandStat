@@ -1,8 +1,7 @@
 import React,{Fragment} from 'react'
-import {Box, Typography,IconButton} from '@material-ui/core';
+import {Box, Typography} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
-import { useSelector, useDispatch } from 'react-redux';
-import {incrementDomaci,incrementGosti} from '../redux/slicers/rezultat';
+import { useSelector} from 'react-redux';
 const useStyles=makeStyles((theme)=>({
     rezultatBox:{
         display:'flex',

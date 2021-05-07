@@ -6,7 +6,7 @@ import {zapisnicarOdabran} from '../redux/slicers/zapisnicar';
 import { useQuery } from '@apollo/client';
 import {dohvatiSveZapisnicare} from '../graphql/query';
 import Alert from '@material-ui/lab/Alert';
-function SelectZapisnicar({zapisnicari}) {
+function SelectZapisnicar() {
     const dispatch=useDispatch();
     const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
     const zapisnicar=useSelector(state=>state.zapisnicar.odabraniZapisnicar);

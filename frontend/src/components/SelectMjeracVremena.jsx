@@ -6,7 +6,7 @@ import TimerIcon from '@material-ui/icons/Timer';
 import { useQuery } from '@apollo/client';
 import {dohvatiSveMjerace} from '../graphql/query';
 import Alert from '@material-ui/lab/Alert';
-function SelectMjeracVremena({mjeraciVremena}) {
+function SelectMjeracVremena() {
     const dispatch=useDispatch();
     const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
     const mjeracVremena=useSelector(state=>state.mjerac.odabraniMjerac);

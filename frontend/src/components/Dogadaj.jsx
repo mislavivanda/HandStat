@@ -33,6 +33,11 @@ const useStyles=makeStyles((theme)=>({
         borderColor:theme.palette.secondary.main,
         borderStyle:'solid',
         borderWidth:1
+    },
+    dogadajImePrezimeDogadajBox:{
+        display:'flex',
+        alignItems:'center',
+        justifyContent:'center'
     }
 }))
 function Dogadaj(props) {
@@ -56,6 +61,7 @@ function Dogadaj(props) {
                     tim:data.izbrisidogadaj.tim,
                 }));//saljemo mu id dogadaja da ga pronade U NIZU DOGADAJA + oznaku tima da zna čiji rezultat treba smanjiti
             }
+            //svakako izbrisi dogadaj
             dispatch(izbrisiDogadaj(data.izbrisidogadaj.id));
         },
         onError:(error)=>{
@@ -88,8 +94,8 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                         </Box>
                         <Box className={classes.dogadajRezultatBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.domaci+':'+props.gosti}</Typography></Box>
                         <Box style={{width:'53%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-                          <Box><Typography align='center' color='secondary'>{props.ime+' '+props.prezime}</Typography></Box>
-                          <Box><Typography align='center' color='secondary'>{props.dogadaj}</Typography></Box>
+                          <Box className={classes.dogadajImePrezimeDogadajBox}><Typography align='center' color='secondary'>{props.ime+' '+props.prezime}</Typography></Box>
+                          <Box className={classes.dogadajImePrezimeDogadajBox}><Typography align='center' color='secondary'>{props.dogadaj}</Typography></Box>
                         </Box>
                         <IconButton onClick={()=>izbrisDogadaj(props.id)} style={{width:'5%',height:'auto'}} align='right' size='small' title='Ukloni' color='secondary'  disableRipple><RemoveCircleIcon/></IconButton>
                     </Box>
@@ -104,8 +110,8 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
                     </Box>
                     <Box className={classes.dogadajRezultatBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.domaci+':'+props.gosti}</Typography></Box>
                     <Box style={{width:'58%',display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-                      <Box><Typography align='center' color='secondary'>{props.ime+' '+props.prezime}</Typography></Box>
-                      <Box><Typography align='center' color='secondary'>{props.dogadaj}</Typography></Box>
+                      <Box className={classes.dogadajImePrezimeDogadajBox}><Typography align='center' color='secondary'>{props.ime+' '+props.prezime}</Typography></Box>
+                      <Box className={classes.dogadajImePrezimeDogadajBox}><Typography align='center' color='secondary'>{props.dogadaj}</Typography></Box>
                     </Box>
                 </Box>
                 )

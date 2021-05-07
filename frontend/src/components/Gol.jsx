@@ -65,6 +65,18 @@ function Gol() {
     let gostiRez=useSelector(state=> state.rezultat.timGosti);
     const [spremiOdabraniDogadaj,{error:dogadajError}]=useMutation(spremiDogadaj,{
       onCompleted:(data)=>{
+        //ako se uspješno spremi događaj uvećavamo rezultat
+        if(data.spremidogadaj.dogadaj.tip===1&&data.spremidogadaj.tim===1)
+        {
+          //uvećaj rezultat domaćih
+          dispatch(incrementDomaci());
+        }
+        else if(data.spremidogadaj.dogadaj.tip===1&&data.spremidogadaj.tim===2)
+        {
+          //uvecaj rezultat gostiju
+          dispatch(incrementGosti());
+        }
+        //svakako dodaj dogadaj
         dispatch(dodajDogadaj({
           id:data.spremidogadaj.id,
           vrijeme:data.spremidogadaj.vrijeme,
@@ -98,12 +110,10 @@ function Gol() {
     {
       if(odabraniDogadaj.tip===1 && (odabraniClan.klub_id===1))//za golove promijenimo i rezultat
       {
-        dispatch(incrementDomaci());
-        domaciRez+=1;//uvećamo odma jer je setter asinkron pa nam se dolje kod saveanja dogadaja ne stigne saveati prava vrijednost nego kasni za 1 rezultat
+        domaciRez+=1;//uvećamo vrijednost/rezultat domaćeg tima
       }
       else if(odabraniDogadaj.tip===1 && (odabraniClan.klub_id===2))
       {
-       dispatch(incrementGosti());
        gostiRez+=1;
       }
       //SPREMI DOGAĐAJ I SPREMI U BAZU DIO KOJI SE ODNOSI NA POZICIJU GOLA

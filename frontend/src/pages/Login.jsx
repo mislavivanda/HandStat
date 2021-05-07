@@ -41,15 +41,9 @@ function Login(props) {
     const [password,setPassword]=useState('');
     const logged=useSelector((state)=>state.login);
 
-    const [pozvan,setPozvan]=useState(false);//kada se prvi put ucita komponenta(ne nakon svakog ucitavanja kod promjene stanja nego bas prvi put) postavimo datum na trenutno vrijeme za slucaj da korisnik ne odabere datum i vrijeme jer mu pasu trenutni
-    //pozivamo useEffect samo 1([]) nakon svakog rerednera ALI SE ON IZVRSI SAMO PRVI PUT KOD PRVOG UCITAVANJA
     useEffect(()=>{
-        if(!pozvan)//ako je pozvan false-> prvi put se mounta komponenta
-        {
-            setPozvan(true);//neće se više izvršiti ovi dio useEffecta
             if(logged)//ako je logiran-> odma ga prebaci na statistika stranicu, ne treba se logirat
             props.history.replace('/statistika');//vodimo usera na statistika stranicu
-        }
     },[]);
     const [loginUser,{loading,error}]=useMutation(login,{
         onCompleted:(data)=>{//ako je dobio podatke-> prosao login,inace se javi error

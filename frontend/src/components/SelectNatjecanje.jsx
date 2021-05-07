@@ -6,7 +6,7 @@ import {useDispatch,useSelector } from 'react-redux';
 import { useQuery } from '@apollo/client';
 import {dohvatiSvaNatjecanja} from '../graphql/query';
 import Alert from '@material-ui/lab/Alert';
-function SelectNatjecanje() {//zasad saljemo props najtecanja inace cemo ih dobijat preko useeffecta
+function SelectNatjecanje() {
     const dispatch=useDispatch();
     const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
     const natjecanje=useSelector(state=>state.natjecanje.odabranoNatjecanje);

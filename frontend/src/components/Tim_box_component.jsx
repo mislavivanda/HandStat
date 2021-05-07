@@ -1,4 +1,4 @@
-import React, { Fragment,useState } from 'react'
+import React, { Fragment } from 'react'
 import {Box,IconButton,Typography,Button} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
@@ -110,8 +110,8 @@ function clanKlubaKlik(maticni_broj,ime,prezime,klub_id,tip)//funkcija koja se p
              <Box className={`${classes.glavniBox} ${(odabraniClan && odabraniClan.maticni_broj===maticni_broj)? classes.odabraniBox : ''}`} >{/*istaknuti odabranog člana*/}
                   <Button disabled={(timDomaciSpremljen&&timGostiSpremljen)? false : true}  onClick={()=> clanKlubaKlik(maticni_broj,ime,prezime,klub,tip)} disableRipple style={{flexGrow:1}}>
                   {/*sve dok nisu spremljene postave OBA TIMA NE MOŽEMO KLIKAT NA ČLANOVE TIMA ZA DOGAĐAJE,AKO SU OBA SPREMLJENA ONDA MOŽEMO */}
-                  <Box className={classes.buttonBox}>
-                      <Box style={{width:'20%'}}><Typography color='secondary'>{maticni_broj}</Typography></Box>
+                  <Box className={classes.buttonBox}>{/*overflowWrap govori da ukoliko teskt preolazi širinu koja mu je ododijeljena da će razlomit riječ u više djelova i stavit u novi red*/}
+                      <Box style={{width:'20%',overflowWrap:'break-word'}}><Typography color='secondary'>{maticni_broj}</Typography></Box>
                       <Box className={classes.dres}><Typography style={{color:'#FFFFFF'}}>{dres}</Typography></Box>
                       <Box className={classes.imePrezimeBox}><Typography color='secondary'>{ime + ' '+prezime}</Typography></Box>
                   </Box>

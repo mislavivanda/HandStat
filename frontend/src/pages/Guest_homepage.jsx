@@ -52,10 +52,14 @@ export default function Guest_homepage(props) {//props su defaultni propsi koje 
             <Typography  variant='h6'style={{ fontWeight:'bold',fontSize:'1.5rem', marginTop:'2vh'}} color='secondary'>Ako ste se pronašli u gornjoj rečenici na pravom ste mjestu. Handstat Vam omogućava detaljno praćenje rezultata uživo, pregled odigranih utakmica, statistike igrača i klubova za pojedina natjecanja . </Typography>
             </Grid>
             <Grid  className={classes.rezultatiBox} item container display='column' justify='center' alignItems='center' spacing={3}>
-                <Grid item xs={6} >
-                <Typography align='center' variant='h6'style={{fontWeight:'bold',fontSize:'1.5rem'}} color='secondary'>REZULTATI UŽIVO</Typography>
+                <Grid item container xs={12} justify='center' >
+                    <Grid item sm={8} xs={12} >{/*naslov REZULTATI UŽIVO nestamo u ove grid i box iteme da ga uskladimo sa rezultatima u gridlisti kako bi ga mogli realtivno dobro centrirat u odnosu na centar rezultata-> tamo mičemo za 9% ovde za 10% pošto je veći grid(jer nije unutar grid liste) pa treba malo više i pomaknit */}
+                        <Box>
+                            <Typography align='center'  variant='h6'style={{fontWeight:'bold',fontSize:'1.5rem',marginRight:'10%'}} color='secondary'>REZULTATI UŽIVO</Typography>
+                        </Box>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item container justify='center' xs={12} >
                     <RezultatiUzivo history={props.history}/>
                 </Grid>
             </Grid>

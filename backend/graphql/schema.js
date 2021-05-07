@@ -3,7 +3,7 @@ const bcrypt=require('bcrypt');
 const {nodelogger}=require('../loaders/logger.js');
 const graphql=require('graphql');
 const config=require('../config');
-const { PubSub }=require('graphql-subscriptions');//za rukovanje sa subscriptionsima-> pomoću njega publishamo subscription eventove i definiramo resolvere u subscriptionsima
+const { PubSub, withFilter }=require('graphql-subscriptions');//za rukovanje sa subscriptionsima-> pomoću njega publishamo subscription eventove i definiramo resolvere u subscriptionsima
 /*PubSub is a class that exposes a simple publish and subscribe API.-> takav obrazac
 
 It sits between your application's logic and the GraphQL subscriptions engine 
@@ -699,6 +699,7 @@ const NOVA_UTAKMICA="NOVA_UTAKMICA";
 const PROMJENA_STATUSA="PROMJENA_STATUSA";//kada se status utakmice mijenja-> kada bude 5-> zavrsi utakmicu
 const PROMJENA_VREMENA="PROMJENA_VREMENA";
 const PROMJENA_REZULTATA="PROMJENA_REZULTATA";
+const PROMJENA_REZULTATA_UTAKMICE="PROMJENA_REZULTATA_UTAKMICE";
 const RootSubscriptions=new GraphQLObjectType({
   name:'Svi_subscriptionsi',
   fields:{
@@ -717,6 +718,24 @@ const RootSubscriptions=new GraphQLObjectType({
       promjenarezultata:{//vracamo broj utakmice i gosti i domaci rezultat
         type:Utakmica,
         subscribe:(parent,args)=>pubsub.asyncIterator(PROMJENA_REZULTATA)
+      },
+      //ZA RAZLIKU OD PRVA 4 SUBSCRIPTIONSA OVI OSTALI SU VEZANI ZA SPECIFIČNU UTAKMICU-> NE PUSHAMO PODATKE NAKON SVAKE PROMJENE STATISTIKE/REZULTATA NEGO JEDINO AKO JE KORISNIK UŠA U TU UTAKMICU
+      //2 OPCIJE:
+      //1) IMAT EVENTOVE TIPA PROMJENA_REZULTATA_UTAKMICE_${BROJUTAKMICE} I ONDA TRIGERAT ASYNCITERATOR NA TEKST PROMJENA_REZULTATA_UTAKMICE_${ARGS.BROJ_UTAKMICE}
+      //2) KORISTITI WITH FILTER U SUBSCRIBE METODI(KO DOLJE) ZA VIDIT JE LI TREBA SLAT ZADANE PODATKE KORISNIKU(AKO JE UŠA U TAJ PAGE ZA LIVE STATISITIKU UTAKMICE ONDA DA) ILI NE
+      rezultatutakmice:{
+        type:Utakmica,
+        args:{broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}},
+        /*The withFilter function takes two parameters:
+
+        The first parameter is exactly the function you would use for subscribe if you weren't applying a filter.
+        The second parameter is a filter function that returns true if a subscription update should be sent to a particular client, and false otherwise (Promise<boolean> is also allowed). This function takes two parameters of its own:
+        payload is the payload of the event that was published.
+        variables is an object containing all arguments the client provided when initiating their subscription. */
+        subscribe:withFilter(()=>pubsub.asyncIterator(PROMJENA_REZULTATA_UTAKMICE),
+        (payload,variables)=>{
+         return (payload.rezultatutakmice.broj_utakmice==variables.broj_utakmice)
+        })
       }
 
     }
@@ -1188,6 +1207,13 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                       rezultat_gosti:args.gosti
                     }
                   })
+                  pubsub.publish(PROMJENA_REZULTATA_UTAKMICE,{
+                    rezultatutakmice:{
+                      broj_utakmice:args.broj_utakmice,
+                      rezultat_domaci:args.domaci,
+                      rezultat_gosti:args.gosti
+                    }
+                  })
                   if(args.dogadaj_id===5)//gol sedmerac-> increment i gol i sedmerac pogodak stupce
                   {
                     await models.igracutakmica.increment(['golovi','pokusaji','sedmerac_golovi','sedmerac_pokusaji'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
@@ -1207,6 +1233,13 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                     else await models.utakmica.increment('rezultat_gosti',{where:{broj_utakmice:args.broj_utakmice}});
                     pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja-> već imamo koji je novi rezultat
                       promjenarezultata:{
+                        broj_utakmice:args.broj_utakmice,
+                        rezultat_domaci:args.domaci,
+                        rezultat_gosti:args.gosti
+                      }
+                    })
+                    pubsub.publish(PROMJENA_REZULTATA_UTAKMICE,{
+                      rezultatutakmice:{
                         broj_utakmice:args.broj_utakmice,
                         rezultat_domaci:args.domaci,
                         rezultat_gosti:args.gosti
@@ -1558,11 +1591,25 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                       rezultat_gosti:utakmica[0][0][0].rezultat_gosti
                     }
                   })
+                  pubsub.publish(PROMJENA_REZULTATA_UTAKMICE,{
+                    rezultatutakmice:{
+                      broj_utakmice:spremljenidogadaj.broj_utakmice,
+                      rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
+                      rezultat_gosti:utakmica[0][0][0].rezultat_gosti
+                    }
+                  })
                 }
                 else{ 
                   const utakmica=await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
                   pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
                     promjenarezultata:{
+                      broj_utakmice:spremljenidogadaj.broj_utakmice,
+                      rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
+                      rezultat_gosti:utakmica[0][0][0].rezultat_gosti
+                    }
+                  })
+                  pubsub.publish(PROMJENA_REZULTATA_UTAKMICE,{
+                    rezultatutakmice:{
                       broj_utakmice:spremljenidogadaj.broj_utakmice,
                       rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
                       rezultat_gosti:utakmica[0][0][0].rezultat_gosti
@@ -1593,6 +1640,13 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                         }
                       }
                     })
+                    pubsub.publish(PROMJENA_REZULTATA_UTAKMICE,{
+                      rezultatutakmice:{
+                        broj_utakmice:spremljenidogadaj.broj_utakmice,
+                        rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
+                        rezultat_gosti:utakmica[0][0][0].rezultat_gosti
+                      }
+                    })
                   }
                   else{
                     const utakmica=await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
@@ -1603,6 +1657,13 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                           rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
                           rezultat_gosti:utakmica[0][0][0].rezultat_gosti
                         }
+                      }
+                    })
+                    pubsub.publish(PROMJENA_REZULTATA_UTAKMICE,{
+                      rezultatutakmice:{
+                        broj_utakmice:spremljenidogadaj.broj_utakmice,
+                        rezultat_domaci:utakmica[0][0][0].rezultat_domaci,
+                        rezultat_gosti:utakmica[0][0][0].rezultat_gosti
                       }
                     })
                   }

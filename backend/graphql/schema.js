@@ -373,7 +373,7 @@ const IgracStatistika=new GraphQLObjectType({
               rola:1,//dodatnui osigurac iako je maticni broj sam dovoljan
               maticni_broj:parent.maticni_broj//maticni broj koji je sadrzan u retku tablice za statistiku igraca i koji će se vratiti iz resolvera za ispis statistike svih igraca
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju clana tima unutar IgracStatistika objekta '+error);
           throw(error);
         })
@@ -401,7 +401,7 @@ const GolmanStatistika=new GraphQLObjectType({
             where:{
               maticni_broj:parent.maticni_broj//maticni broj ce doci iz resolvera od ispisa statistike cijelog tima iz niza objekata koji sadrze podatke o statistici golmana medu kojima se nalazi i maticni_broj
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju clana tima unutar GolmanStatistika objekta '+error);
           throw(error);
         })
@@ -422,7 +422,7 @@ const StozerStatistika=new GraphQLObjectType({
             where:{
             maticni_broj: parent.maticni_broj
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju clana tima unutar StozerStatistika objekta '+error);
           throw(error);
         })
@@ -441,7 +441,7 @@ const TimStatistika=new GraphQLObjectType({
               broj_utakmice:parent.broj_utakmice,//iz parent objekti koji smo dobili iz resolvera u queryu koji samo prosljeduje primljene parametre
               klub_id:parent.klub_id//bitna i utakmica i klub za koji igra(jer su 2 kluba na toj utakmici)
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju statistike igrača unutar TimStaitstika objekta '+error);
           throw(error);
         })
@@ -455,7 +455,7 @@ const TimStatistika=new GraphQLObjectType({
               broj_utakmice:parent.broj_utakmice,
               klub_id:parent.klub_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju staitstike golmana unutar TimStatistika objekta '+error);
           throw(error);
         })
@@ -469,7 +469,7 @@ const TimStatistika=new GraphQLObjectType({
               broj_utakmice:parent.broj_utakmice,
               klub_id:parent.klub_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju statistike stožera unutar TimStatistika objekta '+error);
           throw(error);
         })
@@ -499,7 +499,7 @@ const Utakmica=new GraphQLObjectType({
             where:{
               id:parent.natjecanje_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja natjecanja unutar Utakmica objekta '+error);
           throw(error);
         });
@@ -512,7 +512,7 @@ const Utakmica=new GraphQLObjectType({
             where:{
               id:parent.mjesto_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja dvorane unutar Utakmica objekta '+error);
           throw(error);
         })
@@ -525,7 +525,7 @@ const Utakmica=new GraphQLObjectType({
             where:{
               maticni_broj:parent.nadzornik_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja ndozrnika unutar Utakmica objekta '+error);
           throw(error);
         })
@@ -538,7 +538,7 @@ const Utakmica=new GraphQLObjectType({
             where:{
               maticni_broj:parent.lijecnik_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja liječnika unutar Utakmica objekta '+error);
           throw(error);
         })
@@ -551,7 +551,7 @@ const Utakmica=new GraphQLObjectType({
             where:{
               maticni_broj:parent.zapisnicar_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja zapisničara unutar Utakmica objekta '+error);
           throw(error);
         });
@@ -564,7 +564,7 @@ const Utakmica=new GraphQLObjectType({
             where:{
               maticni_broj:parent.mjvremena_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja mjeraca vremena unutar Utakmica objekta '+error);
           throw(error);
         })
@@ -577,7 +577,7 @@ const Utakmica=new GraphQLObjectType({
             where:{
               maticni_broj:parent.sudac1_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvaćanja sudca1 unutar Utakmica objekta '+error);
           throw(error);
         })
@@ -590,7 +590,7 @@ const Utakmica=new GraphQLObjectType({
               where:{
                 maticni_broj:parent.sudac2_id
               }
-            }).then((data)=>data).catch((error)=>{
+            }).catch((error)=>{
             nodelogger.error('Greska kod dohvaćanja sudca2 unutar Utakmica objekta '+error);
             throw(error);
           })
@@ -603,7 +603,7 @@ const Utakmica=new GraphQLObjectType({
               where:{
                 id:parent.domaci_id
               }
-            }).then((data)=>data).catch((error)=>{
+            }).catch((error)=>{
             nodelogger.error('Greška kod dohvaćanja domaćeg kluba unutar Utakmica objekta '+error);
             throw(error);
           })
@@ -616,7 +616,7 @@ const Utakmica=new GraphQLObjectType({
               where:{
                 id:parent.gosti_id
               }
-            }).then((data)=>data).catch((error)=>{
+            }).catch((error)=>{
             nodelogger.error('Greska kod dohvaćanja gostujućeg kluba unutar Utakmica objekta '+error);
             throw(error);
           })
@@ -639,7 +639,7 @@ const DogadajiUtakmice=new GraphQLObjectType({
             where:{
               id:parent.dogadaj_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvata događaja unutar DogadajiUtakmice objekta '+error);
           throw(error);
         })
@@ -652,7 +652,7 @@ const DogadajiUtakmice=new GraphQLObjectType({
             where:{
               maticni_broj:parent.maticni_broj
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvata clana tima unutar DogadajiUtakmice objekta '+error);
           throw(error);
         })
@@ -673,7 +673,7 @@ const GolPozicija=new GraphQLObjectType({
             where:{
               maticni_broj:parent.maticni_broj
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvata clana tima unutar GolPozicija objekta '+error);
           throw(error);
         })
@@ -686,7 +686,7 @@ const GolPozicija=new GraphQLObjectType({
             where:{
               id:parent.dogadaj_id
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvata događaja unutar GolPozicija objekta '+error);
           throw(error);
         })
@@ -699,7 +699,10 @@ const NOVA_UTAKMICA="NOVA_UTAKMICA";
 const PROMJENA_STATUSA="PROMJENA_STATUSA";//kada se status utakmice mijenja-> kada bude 5-> zavrsi utakmicu
 const PROMJENA_VREMENA="PROMJENA_VREMENA";
 const PROMJENA_REZULTATA="PROMJENA_REZULTATA";
+//ZA POJEDINU UTAKMICU PROMJENA->KADA UĐEMO U LIVE STATISTIKA STRANICU OD UTAKMICE
 const PROMJENA_REZULTATA_UTAKMICE="PROMJENA_REZULTATA_UTAKMICE";
+const PROMJENA_STATUSA_UTAKMICE="PROMJENA_STATUSA_UTAKMICE";
+const PROMJENA_VREMENA_UTAKMICE="PROMJENA_VREMENA_UTAKMICE";
 const RootSubscriptions=new GraphQLObjectType({
   name:'Svi_subscriptionsi',
   fields:{
@@ -736,6 +739,22 @@ const RootSubscriptions=new GraphQLObjectType({
         (payload,variables)=>{
          return (payload.rezultatutakmice.broj_utakmice==variables.broj_utakmice)
         })
+      },
+      statusutakmice:{
+        type:Utakmica,
+        args:{broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}},
+        subscribe:withFilter(()=>pubsub.asyncIterator(PROMJENA_STATUSA_UTAKMICE),
+        (payload,variables)=>{
+          return (payload.statusutakmice.broj_utakmice==variables.broj_utakmice)
+         })
+      },
+      minutautakmice:{
+        type:Utakmica,
+        args:{broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}},
+        subscribe:withFilter(()=>pubsub.asyncIterator(PROMJENA_VREMENA_UTAKMICE),
+        (payload,variables)=>{
+          return (payload.minutautakmice.broj_utakmice==variables.broj_utakmice)
+         })
       }
 
     }
@@ -753,7 +772,7 @@ const RootQuery=new GraphQLObjectType({
             where:{
               broj_utakmice:args.broj_utakmice
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greška kod dohvata podataka utakmice '+error);
           throw(error);
         })
@@ -770,7 +789,7 @@ const RootQuery=new GraphQLObjectType({
       resolve(parent,args,context){
         if(context.req.session.user_id)
         {
-            return models.natjecanje.findAll({}).then((data)=>data).catch((error)=> {
+            return models.natjecanje.findAll({}).catch((error)=> {
             nodelogger.error('Greška kod dohvata svih najtecanja '+error);
             throw(error);
           })
@@ -786,7 +805,7 @@ const RootQuery=new GraphQLObjectType({
       resolve(parent,args,context){
         if(context.req.session.user_id)
         {
-            return models.mjestodvorana.findAll({}).then((data)=>data).catch((error)=>{
+            return models.mjestodvorana.findAll({}).catch((error)=>{
             nodelogger.error('Greška kod dohvaćanja svih dvorana '+error);
             throw(error);
           })
@@ -806,7 +825,7 @@ const RootQuery=new GraphQLObjectType({
               where:{
                 rola:1
               }
-            }).then((data)=>data).catch((error)=>{
+            }).catch((error)=>{
             nodelogger.error('Greška kod dohvata svih nadzornika '+error);
             throw(error);
           })
@@ -826,7 +845,7 @@ const RootQuery=new GraphQLObjectType({
               where:{
                 rola:4
               }
-            }).then((data)=>data).catch((error)=>{
+            }).catch((error)=>{
             nodelogger.error('Greška kod dohvata svih liječnika '+error);
             throw(error);
           })
@@ -842,11 +861,11 @@ const RootQuery=new GraphQLObjectType({
       resolve(parent,args,context){
         if(context.req.session.user_id)
         {
-            return  models.sluzbenoosoblje.findAll({
+            return models.sluzbenoosoblje.findAll({
               where:{
                 rola:2
               }
-            }).then((data)=>data).catch((error)=>{
+            }).catch((error)=>{
             nodelogger.error('Greška kod dohvata svih zapisničara '+error);
             throw(error);
           })
@@ -862,11 +881,11 @@ const RootQuery=new GraphQLObjectType({
       resolve(parent,args,context){
         if(context.req.session.user_id)
         {
-            return  models.sluzbenoosoblje.findAll({
+            return models.sluzbenoosoblje.findAll({
               where:{
                 rola:3
               }
-            }).then((data)=>data).catch((error)=>{
+            }).catch((error)=>{
             nodelogger.error('Greška kod dohvata svih mjerača vremena '+error);
             throw(error);
           })
@@ -882,7 +901,7 @@ const RootQuery=new GraphQLObjectType({
       resolve(parent,args,context){
         if(context.req.session.user_id)
         {
-            return models.suci.findAll({}).then((data)=>data).catch((error)=>{
+            return models.suci.findAll({}).catch((error)=>{
             nodelogger.error('Greška kod dohvata svih sudaca '+error);
             throw(error);
           })
@@ -908,7 +927,7 @@ const RootQuery=new GraphQLObjectType({
                   id:args.natjecanje_id
                 }
               }
-            }).then((data)=>data).catch((error)=>{
+            }).catch((error)=>{
             nodelogger.error('Greška kod dohvata svih klubova odabranog natjecanja '+error);
             throw(error);
           })
@@ -924,7 +943,7 @@ const RootQuery=new GraphQLObjectType({
       resolve(parent,args,context){
         if(context.req.session.user_id)
         {
-            return models.dogadaj.findAll({}).then((data)=>data).catch((error)=>{
+            return models.dogadaj.findAll({}).catch((error)=>{
             nodelogger.error('Greška kod dohvata svih mogućih događaja '+error);
             throw(error);
           })
@@ -972,7 +991,7 @@ const RootQuery=new GraphQLObjectType({
             where:{
               broj_utakmice:args.broj_utakmice
             }
-          }).then((data)=>data).catch((error)=>{
+          }).catch((error)=>{
           nodelogger.error('Greska kod dohvata događaja utakmice '+error);
           throw(error);
         })
@@ -1008,6 +1027,20 @@ const RootQuery=new GraphQLObjectType({
           }
         }).catch((error)=>{
           nodelogger.error('Greška kod dohvata live rezultata '+error);
+          throw(error);
+        })
+      }
+    },
+    rezultatutakmice:{
+      type:Utakmica,
+      args:{broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}},
+      resolve(parent,args){
+        return models.utakmica.findOne({
+          where:{
+            broj_utakmice:args.broj_utakmice
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška kod dohvaćanja rezultata,statusa i minute utakmice '+error);
           throw(error);
         })
       }
@@ -1359,7 +1392,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
               broj_utakmice:args.broj_utakmice,
               maticni_broj:args.maticni_broj,
               dogadaj_id:args.dogadaj_id
-            }).then((data)=>data).catch((error)=> {
+            }).catch((error)=> {
             nodelogger.error('Greška kod spremanja pozicije gola '+error);
             throw(error);
           })
@@ -1414,6 +1447,12 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                       status:args.status
                     }
                   });
+                  pubsub.publish(PROMJENA_STATUSA_UTAKMICE,{
+                    statusutakmice:{
+                      broj_utakmice:args.broj_utakmice,
+                      status:args.status
+                    }
+                  })
                 }
                 return args.status;
               }
@@ -1448,6 +1487,12 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 minuta:args.minuta
               }
             });
+            pubsub.publish(PROMJENA_VREMENA_UTAKMICE,{
+              minutautakmice:{
+                broj_utakmica:args.broj_utakmice,
+                minuta:args.minuta
+              }
+            })
             return true
           }).catch((error)=>{
             nodelogger.error('Greška kod azuriranja vremena utakmice '+error);
@@ -1492,6 +1537,12 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 status:6//makni rezultat s prikaza
               }
             });
+            pubsub.publish(PROMJENA_STATUSA_UTAKMICE,{
+              statusutakmice:{
+                broj_utakmice:args.broj_utakmice,
+                status:6
+              }
+            })
             return args.broj_utakmice;
             }).catch((error) => {
               nodelogger.error('Greška kod zavrsavanja utakmice '+error);

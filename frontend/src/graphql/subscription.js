@@ -57,4 +57,19 @@ const rezultatUtakmice=gql`
       rezultat_gosti
     }
   }`
-export {novaUtakmica,promjenaStatusa,promjenaVremena,promjenaRezultata,rezultatUtakmice};
+
+const statusUtakmice=gql`
+  subscription($broj_utakmice:String!){
+    statusutakmice(broj_utakmice:$broj_utakmice){
+      status
+    }
+  }`
+
+const minutaUtakmice=gql`
+  subscription($broj_utakmice:String!){
+    minutautakmice(broj_utakmice:$broj_utakmice){
+      minuta
+    }
+  }
+`
+export {novaUtakmica,promjenaStatusa,promjenaVremena,promjenaRezultata,rezultatUtakmice,statusUtakmice,minutaUtakmice};

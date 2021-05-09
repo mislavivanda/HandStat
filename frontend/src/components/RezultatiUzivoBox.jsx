@@ -27,7 +27,7 @@ function RezultatiUzivoBox({history}) {
     const classes=useStyles();
     const dispatch=useDispatch();
     //dohvat svih live utakmica u trenutku pristupanja stranici
-    const{data,loading,error,subscribeToMore}=useQuery(dohvatiLiveRezultate);
+    const{data,loading,error,subscribeToMore,refetch}=useQuery(dohvatiLiveRezultate);
 
     const subscribeNovaUtakmica=()=>subscribeToMore({
         document:novaUtakmica,//indicates the subscription to execute.
@@ -117,6 +117,12 @@ function RezultatiUzivoBox({history}) {
     //rerender(poziv render funkcije odnosno return donji) ne radi unmountanje komponenete-> on samo updatea stanje te dom komponenete
     //komponeneta se unmounta kod refresha npr ili kada odemo na novu stranicu pa više nije potrebna u virtual domu jer se konstruira novi
     useEffect(()=>{
+        console.log("Pozvan useeefect");
+        refetch();
+          /*DA IZBJEGNEMO SLUČAJ SA DEFAUKT POLICYEN KOJI SAMO QUERYA PRMA CACHEU I AKO VIDI DA U CACHEU IMA PODATAKA NEĆE QUERYAT SERVER
+        NPR KADA UĐEMO U UTAKMICU LIVE STTISTIKA PAGE I VRATIMO SE NAZAD ONDA JE PROBLEM ŠTO ĆE SE KORISTIT REZULTATI U CACHEU KOJI SU OSTALI OTKAD SMO UNMOUNTALI TU KOMPONENETU
+        I OTIŠLI NA LIVE STATISTIKA PAGE-> KORISTIT ĆE SE STARI REZULTATI IZ CACHEA-> ŽELIMO PONOVO POSLAT ZAHTJEV NA SERVER DA PEJVJERIMO JELI SE DOGODILO IŠTA NOVO
+        AKO SE DOGODILO ONDA ĆE SE RAZLIKOVAT PODACI U CACHEU I DOBIFENI OD SERVERA PA ĆE SE UPDATEAT TO JE TOČNO ŠTO OVO RADI*/
         subscribeNovaUtakmica();
         subscribePromjenaStatusa();
         subscribePromjenaVremena();
@@ -125,6 +131,12 @@ function RezultatiUzivoBox({history}) {
     /*Any associated subscriptions should be unsubscribed for you when the component unmounts.
      You shouldn't have to manually manage it unless you want to unsubscribe before then.-> automatski će se unsubscribeat nakon što se komponeneta unmounta-> ne trebamo raditi
      sa hookovima ekvivalent funkcije componentWillUnmount */
+
+     useEffect(()=>{
+         return ()=>{
+             console.log('Unmountala se komponeneta');
+         }
+     },[]);
     if(loading) return  (<CircularProgress color='primary'/>)
 
     if(error)

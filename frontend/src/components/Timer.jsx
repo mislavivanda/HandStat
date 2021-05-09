@@ -43,6 +43,7 @@ export default function Timer() {
     const dispatchEnable=useSelector(state=>state.timer.dispatch);//odreduje jeli omogceno dispatchanje odnosno uvecavanje timera
     const time=useSelector(state=>state.timer);
     const brojUtakmice=useSelector(state=>state.brojUtakmice);
+    const {timDomaciSpremljen,timGostiSpremljen}=useSelector(state=>state.timovi);//može započeti timer samo ako su spremljena oba tima-> tek kada spremi oba tima pojavit će mu se pause/continue ikone
     const dispatch = useDispatch();
     const [promijeniStatus,{error:statusError}]=useMutation(azurirajStatus,{//azuriranje statusa utakmice
         onError:(error)=>{
@@ -162,11 +163,17 @@ export default function Timer() {
                         <Box style={{width:'10%',display:'flex',flexDirection:'row', justifyContent:'center'}}><Typography color='primary' variant='h3'>:</Typography></Box>
                         <Box style={{width:'40%',display:'flex',flexDirection:'row', justifyContent:'center'}}><Typography color='primary' variant='h3'>{time.seconds}</Typography></Box>
                     </Box>
-                <Box className={classes.iconBox}> { (paused) ?
-                <IconButton title='Start' disabled={disablePausePlay} onClick={handlePauseChange} disableRipple style={{height:'100%'}} color='secondary'><PlayArrowIcon style={{width:50,height:'auto'}}/></IconButton>
-                : 
-                <IconButton title='Stop' disabled={disablePausePlay} onClick={handlePauseChange} disableRipple style={{height:'100%'}} color='secondary'><PauseIcon style={{width:50,height:'auto'}}/></IconButton>
-                } </Box> 
+                {
+                //pause/continue ikona samo kada se spreme oba tima
+                (timDomaciSpremljen&&timGostiSpremljen)?
+                    (<Box className={classes.iconBox}> { (paused) ?
+                    <IconButton title='Start' disabled={disablePausePlay} onClick={handlePauseChange} disableRipple style={{height:'100%'}} color='secondary'><PlayArrowIcon style={{width:50,height:'auto'}}/></IconButton>
+                    : 
+                    <IconButton title='Stop' disabled={disablePausePlay} onClick={handlePauseChange} disableRipple style={{height:'100%'}} color='secondary'><PauseIcon style={{width:50,height:'auto'}}/></IconButton>
+                    } </Box>)
+                    :
+                    null
+                }
             </Box>)
         }
         {

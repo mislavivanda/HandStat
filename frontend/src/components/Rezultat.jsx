@@ -52,6 +52,7 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
     const [renderGostiRezultat,setRenderGostiRezultat]=useState(false);
     const [prevRezultatDomaci,setPrevRezultatDomaci]=useState(null);//pamtimo prethodne rezultate kako bi znali koji rezultat treba rerednerat
     const [prevRezultatGosti,setPrevRezultatGosti]=useState(null);//kad se komponeneta tek mounta-> ne znamo prethodni rezultat pa ćemo ga postavit na dobiveni samo
+   
     if(golovi_domaci!==prevRezultatDomaci)
     {
         if(prevRezultatDomaci)//ako nije null-> postavljen na neki broj-> promijenio se rezultat

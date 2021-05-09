@@ -291,6 +291,17 @@ const dohvatiLiveRezultate=gql`
         }
     }
 `
+//dohvat podataka o utakmici koji se tiču rezultata,vremena i statusa kada se otovri live statistika utakmice
+const dohvatiLiveRezultatUtakmice=gql`
+    query($broj_utakmice:String!){
+        rezultatutakmice(broj_utakmice:$broj_utakmice){
+            rezultat_domaci
+            rezultat_gosti
+            minuta
+            status
+        }
+    }
+`
 //provjera je li korisnik logiran
 const checkLogin=gql`
     query{
@@ -299,4 +310,4 @@ const checkLogin=gql`
 
 export {prikazUtakmice,dohvatiSvaNatjecanja,dohvatiSveDvorane,dohvatiSveNadzornike,dohvatiSveLijecnike,dohvatiSveZapisnicare,
 dohvatiSveMjerace,dohvatiSveSuce,dohvatiSveKluboveOdNatjecanja,dohvatiSveMoguceDogadaje,dohvatiSveClanoveTima,dohvatiStatistikuTima,dohvatiSveDogadajeUtakmice,checkLogin,
-dohvatiLiveRezultate};
+dohvatiLiveRezultate,dohvatiLiveRezultatUtakmice};

@@ -37,11 +37,10 @@ function RezultatiUzivoBox({history}) {
         updateQuery:(prev,{ subscriptionData })=>{
             if (!subscriptionData.data) return prev;//ako smo primili null-> vratimo prethodno stanje u cacheu
             //inace dodamo novu utakmicu u cache
-            const noviRezultat=subscriptionData.data.novautakmica;
             let noviNiz=[];
             for(let i=0;i<prev.rezultatiuzivo.length;i++)
             noviNiz.push(prev.rezultatiuzivo[i]);
-            noviNiz.push(noviRezultat);
+            noviNiz.push(subscriptionData.data.novautakmica);
             return {
                 rezultatiuzivo:noviNiz
             }

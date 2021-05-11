@@ -125,7 +125,7 @@ function RezultatUtakmiceLive(props) {
             <Fragment>
                 <Grid item container direction='row' justify='center' alignItems='center' xs={12} style={{marginTop:50}}>
                     <Box>
-                        <Typography align='center' variant='h5' color='primary'>{data.rezultatutakmice.minuta}'</Typography>
+                        <Typography align='center' variant='h5' color='primary' style={{fontWeight: 'bold'}}>{data.rezultatutakmice.minuta}'</Typography>
                     </Box>
                 </Grid>
                 <Grid item container direction='row' justify='space-evenly' alignItems='stretch' xs={12}>{/*container od rezultata*/}

@@ -135,7 +135,7 @@ function Utakmica_statistika(props) {
                     <TimStatistika tim_id={data.utakmica.gosti.id}  broj_utakmice={brojUtakmice} klub_slika={data.utakmica.gosti.image_path} naziv={data.utakmica.gosti.naziv} tim={2}/>
                 </Grid>
                 <Grid style={{width:'100%',marginTop:50}} item container direction='row' justify='center' xs={12} md={4}>
-                         <DogadajiUtakmice broj_utakmice={brojUtakmice}/>
+                         <DogadajiUtakmice brojUtakmice={brojUtakmice} live={false}/>
                       </Grid>
             </Grid>
             </Fragment>

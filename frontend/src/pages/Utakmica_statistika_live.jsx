@@ -85,7 +85,7 @@ function Utakmica_statistika_live(props) {
     if(data)//kada stignu podaci
     {
        //postavi odabrane timove kako bi znali rednera dogadaje utakmice
-       dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:data.utakmica.gosti.image_path}));
+       dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:data.utakmica.domaci.image_path}));
        dispatch(odabranTimGosti({id:data.utakmica.gosti.id,naziv:data.utakmica.gosti.naziv,klub_slika:data.utakmica.gosti.image_path}));
         return (
             <div>
@@ -118,7 +118,7 @@ function Utakmica_statistika_live(props) {
                         <TimStatistika tim_id={data.utakmica.gosti.id}  broj_utakmice={brojUtakmice} klub_slika={data.utakmica.gosti.image_path} naziv={data.utakmica.gosti.naziv}/>
                     </Grid>
                     <Grid style={{width:'100%',marginTop:50}} item container direction='row' justify='center' xs={12} md={4}>
-                            <DogadajiUtakmice broj_utakmice={brojUtakmice}/>
+                            <DogadajiUtakmice brojUtakmice={brojUtakmice} live={true}/>
                         </Grid>
                 </Grid>
             </Fragment>

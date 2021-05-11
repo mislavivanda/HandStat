@@ -72,4 +72,34 @@ const minutaUtakmice=gql`
     }
   }
 `
-export {novaUtakmica,promjenaStatusa,promjenaVremena,promjenaRezultata,rezultatUtakmice,statusUtakmice,minutaUtakmice};
+
+const noviDogadaj=gql`
+  subscription($broj_utakmice:String!){
+    novidogadajutakmice(broj_utakmice:$broj_utakmice){
+            id
+            vrijeme
+            tim
+            rez_domaci
+            rez_gosti
+            dogadaj{
+                id
+                naziv
+                tip
+            }
+            akter{
+                maticni_broj
+                ime
+                prezime
+            }
+    }
+  }
+`
+
+const brisiDogadaj=gql`
+  subscription($broj_utakmice:String!){
+    brisidogadajutakmice(broj_utakmice:$broj_utakmice){
+        id
+    }
+  }
+`
+export {novaUtakmica,promjenaStatusa,promjenaVremena,promjenaRezultata,rezultatUtakmice,statusUtakmice,minutaUtakmice,noviDogadaj,brisiDogadaj};

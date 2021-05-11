@@ -77,6 +77,7 @@ function izbrisDogadaj(dogadaj_id)//ID JE ID IZ BAZE KOJI DOBIJEMO NAKON ŠTO SE
        }
    });
 }
+
     return (
       <Fragment>
          {

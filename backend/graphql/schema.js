@@ -703,6 +703,8 @@ const PROMJENA_REZULTATA="PROMJENA_REZULTATA";
 const PROMJENA_REZULTATA_UTAKMICE="PROMJENA_REZULTATA_UTAKMICE";
 const PROMJENA_STATUSA_UTAKMICE="PROMJENA_STATUSA_UTAKMICE";
 const PROMJENA_VREMENA_UTAKMICE="PROMJENA_VREMENA_UTAKMICE";
+const NOVI_DOGADAJ_UTAKMICE="NOVI_DOGADAJ_UTAKMICE";
+const BRISI_DOGADAJ_UTAKMICE="BRISI_DOGADAJ_UTAKMICE";
 const RootSubscriptions=new GraphQLObjectType({
   name:'Svi_subscriptionsi',
   fields:{
@@ -754,6 +756,22 @@ const RootSubscriptions=new GraphQLObjectType({
         subscribe:withFilter(()=>pubsub.asyncIterator(PROMJENA_VREMENA_UTAKMICE),
         (payload,variables)=>{
           return (payload.minutautakmice.broj_utakmice==variables.broj_utakmice)
+         })
+      },
+      novidogadajutakmice:{
+        type:DogadajiUtakmice,
+        args:{broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}},
+        subscribe:withFilter(()=>pubsub.asyncIterator(NOVI_DOGADAJ_UTAKMICE),
+        (payload,variables)=>{
+          return (payload.novidogadajutakmice.broj_utakmice==variables.broj_utakmice)
+         })
+      },
+      brisidogadajutakmice:{
+        type:DogadajiUtakmice,
+        args:{broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}},
+        subscribe:withFilter(()=>pubsub.asyncIterator(BRISI_DOGADAJ_UTAKMICE),
+        (payload,variables)=>{
+          return (payload.brisidogadajutakmice.broj_utakmice==variables.broj_utakmice)
          })
       }
 
@@ -1212,6 +1230,19 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 dogadaj_id:args.dogadaj_id,
                 maticni_broj:args.maticni_broj
               });
+              pubsub.publish(NOVI_DOGADAJ_UTAKMICE,{
+                novidogadajutakmice:{
+                  broj_utakmice:args.broj_utakmice,
+                  id:spremljenidogadaj.id,
+                  vrijeme:args.vrijeme,
+                  tim:args.klubgrb,
+                  rez_domaci:args.domaci,
+                  rez_gosti:args.gosti,
+                  broj_utakmice:args.broj_utakmice,
+                  dogadaj_id:args.dogadaj_id,
+                  maticni_broj:args.maticni_broj
+                }
+              });
               if(!(args.dogadaj_id===15||args.dogadaj_id===16))//ako su timeout dogadaji onda je nepotrebno sve ovo doli,radimo samo subscription za novi dogadaj
               {
                 const clan=await models.clanovitima.findOne({
@@ -1612,6 +1643,12 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
             });
             await models.dogadajiutakmice.destroy({
               where:{
+                id:args.dogadaj_id
+              }
+            });
+            pubsub.publish(BRISI_DOGADAJ_UTAKMICE,{
+              brisidogadajutakmice:{
+                broj_utakmice:spremljenidogadaj.broj_utakmice,
                 id:args.dogadaj_id
               }
             });

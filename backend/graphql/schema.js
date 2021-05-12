@@ -705,6 +705,9 @@ const PROMJENA_STATUSA_UTAKMICE="PROMJENA_STATUSA_UTAKMICE";
 const PROMJENA_VREMENA_UTAKMICE="PROMJENA_VREMENA_UTAKMICE";
 const NOVI_DOGADAJ_UTAKMICE="NOVI_DOGADAJ_UTAKMICE";
 const BRISI_DOGADAJ_UTAKMICE="BRISI_DOGADAJ_UTAKMICE";
+const PROMJENA_STATISTIKE_IGRACA="PROMJENA_STATISTIKE_IGRACA";
+const PROMJENA_STATISTIKE_GOLMANA="PROMJENA_STATISTIKE_GOLMANA";
+const PROMJENA_STATISTIKE_STOZERA="PROMJENA_STATISTIKE_STOZERA";
 const RootSubscriptions=new GraphQLObjectType({
   name:'Svi_subscriptionsi',
   fields:{
@@ -772,6 +775,56 @@ const RootSubscriptions=new GraphQLObjectType({
         subscribe:withFilter(()=>pubsub.asyncIterator(BRISI_DOGADAJ_UTAKMICE),
         (payload,variables)=>{
           return (payload.brisidogadajutakmice.broj_utakmice==variables.broj_utakmice)
+         })
+      },
+      statistikaigrac:{
+        type:IgracStatistika,
+        args:{
+          broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
+          klub_id:{type:new GraphQLNonNull(GraphQLInt)}
+        },
+        subscribe:withFilter(()=>pubsub.asyncIterator(PROMJENA_STATISTIKE_IGRACA),
+        (payload,variables)=>{
+          if(payload.statistikaigrac.broj_utakmice==variables.broj_utakmice&&payload.statistikaigrac.klub_id==variables.klub_id)
+          {
+            return true;
+          }
+          else return false;
+         })
+      },
+      statistikagolman:{
+        type:GolmanStatistika,
+        args:{
+          broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
+          klub_id:{type:new GraphQLNonNull(GraphQLInt)}
+        },
+        subscribe:withFilter(()=>pubsub.asyncIterator(PROMJENA_STATISTIKE_GOLMANA),
+        (payload,variables)=>{
+          nodelogger.error('Usa san u staitstika golman filčter'+JSON.stringify(payload));
+          if(payload.statistikagolman.broj_utakmice==variables.broj_utakmice&&payload.statistikagolman.klub_id==variables.klub_id)
+          {
+            nodelogger.info('True usa tu golman');
+            return true;
+          }
+          else{
+            console.log('Fale ne vracaj nista golman');
+             return false;
+          }
+         })
+      },
+      statistikastozer:{
+        type:StozerStatistika,
+        args:{
+          broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
+          klub_id:{type:new GraphQLNonNull(GraphQLInt)}
+        },
+        subscribe:withFilter(()=>pubsub.asyncIterator(PROMJENA_STATISTIKE_STOZERA),
+        (payload,variables)=>{
+          if(payload.statistikastozer.broj_utakmice==variables.broj_utakmice&&payload.statistikastozer.klub_id==variables.klub_id)
+          {
+            return true;
+          }
+          else return false;
          })
       }
 
@@ -1391,6 +1444,45 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 {
                   await models.stozerutakmica.increment('plavi',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
                 }
+                //pozovi subscription statistike ovisno o roli
+                if(clan.rola===1)
+                {
+                  const igrac_statistika=await models.igracutakmica.findOne({
+                    where:{
+                      broj_utakmice:args.broj_utakmice,
+                      maticni_broj:args.maticni_broj
+                    }
+                  })
+                  pubsub.publish(PROMJENA_STATISTIKE_IGRACA,{
+                    statistikaigrac:igrac_statistika
+                  })
+                }
+                else if(clan.rola===2)
+                {
+                  nodelogger.error('Rola=2 usao u golman statistika');
+                  const golman_statistika=await models.golmanutakmica.findOne({
+                    where:{
+                      broj_utakmice:args.broj_utakmice,
+                      maticni_broj:args.maticni_broj
+                    }
+                  })
+                  nodelogger.error('Publish promjena golman statistike');
+                  pubsub.publish(PROMJENA_STATISTIKE_GOLMANA,{
+                    statistikagolman:golman_statistika
+                  })
+                  nodelogger.error('Publishan golman');
+                }
+                else {
+                  const stozer_statistika=await models.stozerutakmica.findOne({
+                    where:{
+                      broj_utakmice:args.broj_utakmice,
+                      maticni_broj:args.maticni_broj
+                    }
+                  })
+                  pubsub.publish(PROMJENA_STATISTIKE_STOZERA,{
+                    statistikastozer:stozer_statistika
+                  })
+                }
               }
               //za timeout domac i gosti samo pushat dogadaje u subscriptionsima a za ostale i redak statistike+ za tip1 pushat i subscriptions rezultate
               return spremljenidogadaj;//uvijek vrati spremljeni dogadaj
@@ -1836,6 +1928,42 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
               else if(spremljenidogadaj.dogadaj_id===14&&clan.rola===3)//zuti karton stozer
               {
                 await models.stozerutakmica.decrement('plavi',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice,maticni_broj:spremljenidogadaj.maticni_broj}});
+              }
+              //promjenit statistiku ovisno o roli
+              if(clan.rola===1)
+              {
+                const igrac_statistika=await models.igracutakmica.findOne({
+                  where:{
+                    broj_utakmice:spremljenidogadaj.broj_utakmice,
+                    maticni_broj:spremljenidogadaj.maticni_broj
+                  }
+                })
+                pubsub.publish(PROMJENA_STATISTIKE_IGRACA,{
+                  statistikaigrac:igrac_statistika
+                })
+              }
+              else if(clan.rola===2)
+              {
+                const golman_statistika=await models.golmanutakmica.findOne({
+                  where:{
+                    broj_utakmice:spremljenidogadaj.broj_utakmice,
+                    maticni_broj:spremljenidogadaj.maticni_broj
+                  }
+                })
+                pubsub.publish(PROMJENA_STATISTIKE_GOLMANA,{
+                  statistikagolman:golman_statistika
+                })
+              }
+              else {
+                const stozer_statistika=await models.stozerutakmica.findOne({
+                  where:{
+                    broj_utakmice:spremljenidogadaj.broj_utakmice,
+                    maticni_broj:spremljenidogadaj.maticni_broj
+                  }
+                })
+                pubsub.publish(PROMJENA_STATISTIKE_STOZERA,{
+                  statistikastozer:stozer_statistika
+                })
               }
             }
             //obavijestit statistiku,promjenu rezultata i dogadaje u subscriptionsima

@@ -50,30 +50,23 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
     const classes=useStyles();
     const [renderDomaciRezultat,setRenderDomaciRezultat]=useState(false);
     const [renderGostiRezultat,setRenderGostiRezultat]=useState(false);
-    const [prevRezultatDomaci,setPrevRezultatDomaci]=useState(null);//pamtimo prethodne rezultate kako bi znali koji rezultat treba rerednerat
-    const [prevRezultatGosti,setPrevRezultatGosti]=useState(null);//kad se komponeneta tek mounta-> ne znamo prethodni rezultat pa ćemo ga postavit na dobiveni samo
+    const [prevRezultatDomaci,setPrevRezultatDomaci]=useState(golovi_domaci);//pamtimo prethodne rezultate kako bi znali koji rezultat treba rerednerat
+    const [prevRezultatGosti,setPrevRezultatGosti]=useState(golovi_gosti);//kad se komponeneta tek mounta-> ne znamo prethodni rezultat pa ćemo ga postavit na dobiveni samo
    
     if(golovi_domaci!==prevRezultatDomaci)
     {
-        if(prevRezultatDomaci)//ako nije null-> postavljen na neki broj-> promijenio se rezultat
-        {
             setRenderDomaciRezultat(true);
-            setTimeout(function(){//nakon 1 sekunde vrati na normalnu boju
+            setTimeout(function(){//nakon 2 sekunde vrati na normalnu boju
                 setRenderDomaciRezultat(false)
             },2000);
-        }//ako je null-> prvi put se mounta komponeneta-> postavi na dobiveni rezultat u propsu
-        //u oba slucaja postavljamo novi rezultat za prethodni
         setPrevRezultatDomaci(golovi_domaci);
     }
     if(golovi_gosti!==prevRezultatGosti)
     {
-        if(prevRezultatGosti)
-        {
             setRenderGostiRezultat(true);
-            setTimeout(function(){//nakon 1 sekunde vrati na normalnu boju
+            setTimeout(function(){//nakon 2 sekunde vrati na normalnu boju
                 setRenderGostiRezultat(false)
             },2000);
-        }
         setPrevRezultatGosti(golovi_gosti);
     }
     function odvediNaUtakmicu()

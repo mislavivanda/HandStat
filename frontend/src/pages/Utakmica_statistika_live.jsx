@@ -114,8 +114,8 @@ function Utakmica_statistika_live(props) {
                 <RezultatLiveBox domaciNaziv={data.utakmica.domaci.naziv} gostiNaziv={data.utakmica.gosti.naziv} rezultatDomaci={data.utakmica.rezultat_domaci} rezultatGosti={data.utakmica.rezultat_gosti} brojUtakmice={brojUtakmice}/>
                 <Grid item  container direction='row' justify='space-evenly' alignItems='center' xs={12}>{/*container koji sadrzi tablice statistike i listu događaja*/}
                     <Grid item  container direction='column' justify='space-evenly' alignItems='center' xs={12} md={7}>{/*container koji sadrzi tablice statistike za oba tima*/}
-                        <TimStatistika tim_id={data.utakmica.domaci.id} broj_utakmice={brojUtakmice} klub_slika={data.utakmica.domaci.image_path} naziv={data.utakmica.domaci.naziv}/>
-                        <TimStatistika tim_id={data.utakmica.gosti.id}  broj_utakmice={brojUtakmice} klub_slika={data.utakmica.gosti.image_path} naziv={data.utakmica.gosti.naziv}/>
+                        <TimStatistika live={true} tim_id={data.utakmica.domaci.id} broj_utakmice={brojUtakmice} klub_slika={data.utakmica.domaci.image_path} naziv={data.utakmica.domaci.naziv}/>
+                        <TimStatistika live={true} tim_id={data.utakmica.gosti.id}  broj_utakmice={brojUtakmice} klub_slika={data.utakmica.gosti.image_path} naziv={data.utakmica.gosti.naziv}/>
                     </Grid>
                     <Grid style={{width:'100%',marginTop:50}} item container direction='row' justify='center' xs={12} md={4}>
                             <DogadajiUtakmice brojUtakmice={brojUtakmice} live={true}/>

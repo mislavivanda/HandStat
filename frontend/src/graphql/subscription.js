@@ -102,4 +102,67 @@ const brisiDogadaj=gql`
     }
   }
 `
-export {novaUtakmica,promjenaStatusa,promjenaVremena,promjenaRezultata,rezultatUtakmice,statusUtakmice,minutaUtakmice,noviDogadaj,brisiDogadaj};
+
+const promjenaStatistikeIgrac=gql`
+  subscription($broj_utakmice:String!,$klub_id:Int!){
+    statistikaigrac(broj_utakmice:$broj_utakmice,klub_id:$klub_id){
+      golovi
+      pokusaji
+      sedmerac_golovi
+      sedmerac_pokusaji
+      iskljucenja
+      zuti
+      crveni
+      plavi
+      tehnicke
+      asistencije
+      igrac{
+          maticni_broj
+          broj_dresa
+          ime
+          prezime
+      } 
+    }
+  }
+`
+
+const promjenaStatistikeGolman=gql`
+  subscription($broj_utakmice:String!,$klub_id:Int!){
+    statistikagolman(broj_utakmice:$broj_utakmice,klub_id:$klub_id){
+      obrane_ukupno
+      primljeni_ukupno
+      sedmerac_obrane
+      sedmerac_primljeni
+      iskljucenja
+      zuti
+      crveni
+      plavi
+      golovi
+      pokusaji
+      golman{
+          maticni_broj
+          broj_dresa
+          ime
+          prezime
+      } 
+    }
+  }
+`
+
+const promjenaStatistikeStozer=gql`
+  subscription($broj_utakmice:String!,$klub_id:Int!){
+    statistikastozer(broj_utakmice:$broj_utakmice,klub_id:$klub_id){
+      zuti
+      crveni
+      plavi
+      clan{
+          maticni_broj
+          ime
+          prezime
+          rola
+      }
+    }
+  }
+`
+export {novaUtakmica,promjenaStatusa,promjenaVremena,promjenaRezultata,rezultatUtakmice,statusUtakmice,minutaUtakmice,noviDogadaj,brisiDogadaj,promjenaStatistikeIgrac,
+promjenaStatistikeGolman,promjenaStatistikeStozer};

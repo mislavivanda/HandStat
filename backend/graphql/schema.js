@@ -1738,12 +1738,6 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 id:args.dogadaj_id
               }
             });
-            pubsub.publish(BRISI_DOGADAJ_UTAKMICE,{
-              brisidogadajutakmice:{
-                broj_utakmice:spremljenidogadaj.broj_utakmice,
-                id:args.dogadaj_id
-              }
-            });
             if(!(spremljenidogadaj.dogadaj_id===15||spremljenidogadaj.dogadaj_id===16))//za timeout ne treba nikakvu statistiku mijenjat
             {
               const clan=await models.clanovitima.findOne({
@@ -1760,8 +1754,17 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
               if(dogadaj.tip===1&&clan.rola===1)//promjena rezultata od strane igraca
               {
                 //za događaje s promjenom rezultata updateamo i rezultat utakmice
-                if(spremljenidogadaj.tim===1)//uvećali smo domaci rezultat-> smanjimo domaće
+                //POTREBNO PROMIJENIT/SMANJIT REZULTAT U SVIM PRETHODNIM DOGADAJIMA KOJI SE TIČU REZULTATA
+                if(spremljenidogadaj.tim===1)//uvećali smo domaci rezultat-> smanjimo domaće+ sve dogadaje s rezultatima domaci--
                 {
+                  await models.dogadajiutakmice.decrement('rez_domaci',{
+                    where:{
+                      broj_utakmice:spremljenidogadaj.broj_utakmice,//SAMO za tu utakmicu
+                      id:{
+                        [Op.gt]:spremljenidogadaj.id//potrebno mijenjati rezultat samo u dogadajima NAKON-> kako je id sekvencijalan-> po njemu to radimo
+                      }
+                    }
+                  });
                   //sequelize increment/decrement metode vraćaju 3D matricu u kojoj se nalazi uvećani model
                   const utakmica=await models.utakmica.decrement('rezultat_domaci',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
                   pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
@@ -1780,6 +1783,14 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                   })
                 }
                 else{ 
+                  await models.dogadajiutakmice.decrement('rez_gosti',{
+                    where:{
+                      broj_utakmice:spremljenidogadaj.broj_utakmice,//SAMO za tu utakmicu
+                      id:{
+                        [Op.gt]:spremljenidogadaj.id//potrebno mijenjati rezultat samo u dogadajima nakon-> kako je id sekvencijalan-> po njemu to radimo
+                      }
+                    }
+                  });
                   const utakmica=await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
                   pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
                     promjenarezultata:{
@@ -1810,6 +1821,14 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                   //za događaje s promjenom rezultata updateamo i rezultat utakmice
                   if(spremljenidogadaj.tim===1)//uvećali smo domaci rezultat-> smanjimo domaće
                   {
+                    await models.dogadajiutakmice.decrement('rez_domaci',{
+                      where:{
+                        broj_utakmice:spremljenidogadaj.broj_utakmice,//SAMO za tu utakmicu
+                        id:{
+                          [Op.gt]:spremljenidogadaj.id//potrebno mijenjati rezultat samo u dogadajima nakon-> kako je id sekvencijalan-> po njemu to radimo
+                        }
+                      }
+                    });
                     const utakmica=await models.utakmica.decrement('rezultat_domaci',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
                     pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
                       promjenarezultata:{
@@ -1829,6 +1848,14 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                     })
                   }
                   else{
+                    await models.dogadajiutakmice.decrement('rez_gosti',{
+                      where:{
+                        broj_utakmice:spremljenidogadaj.broj_utakmice,//SAMO za tu utakmicu
+                        id:{
+                          [Op.gt]:spremljenidogadaj.id//potrebno mijenjati rezultat samo u dogadajima nakon-> kako je id sekvencijalan-> po njemu to radimo
+                        }
+                      }
+                    });
                     const utakmica=await models.utakmica.decrement('rezultat_gosti',{where:{broj_utakmice:spremljenidogadaj.broj_utakmice}});
                     pubsub.publish(PROMJENA_REZULTATA,{//mijenja se rezultat kod live praćenja
                       promjenarezultata:{
@@ -1966,6 +1993,13 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 })
               }
             }
+            pubsub.publish(BRISI_DOGADAJ_UTAKMICE,{
+              brisidogadajutakmice:{
+                broj_utakmice:spremljenidogadaj.broj_utakmice,
+                dogadaj_id:spremljenidogadaj.dogadaj_id,//za dobit tip dogadaja na frontu da znamo jeli treba ponovno dohvatit dogadaje s promijenjenim rezultatom
+                id:args.dogadaj_id
+              }
+            });
             //obavijestit statistiku,promjenu rezultata i dogadaje u subscriptionsima
             return {//vracamp id izbrisanog dogadaj, dogadaj_id iz kojeg cemo u resokverima moc queryat tip dogadaja i tim da znamo koji rezultat treba umanjit
               id:args.dogadaj_id,

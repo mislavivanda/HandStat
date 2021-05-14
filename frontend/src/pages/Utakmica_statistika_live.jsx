@@ -1,6 +1,7 @@
-import {React,Fragment} from 'react'
+import {React,Fragment,useEffect} from 'react'
 import {Box,Typography,AppBar,Grid} from '@material-ui/core';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles,useTheme} from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import logo from '../images/handstat_logo.png';
 import TimStatistika from '../components/TimStatistika';
 import DogadajiUtakmice from '../components/DogadajiStatistika';
@@ -9,7 +10,7 @@ import OsobljeInfo from '../components/UtakmicaInfoOsoblje';
 import RezultatLiveBox from '../components/RezultatUtakmiceLive';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from '@material-ui/lab/Alert';
-import {odabranTimDomaci,odabranTimGosti} from '../redux/slicers/timovi';
+import {odabranTimDomaci,odabranTimGosti,resetirajTimove} from '../redux/slicers/timovi';
 import { useDispatch } from 'react-redux';
 import {prikazUtakmice} from '../graphql/query';
 import { useQuery } from '@apollo/client';//hook za poziv querya
@@ -36,16 +37,17 @@ const useStyles = makeStyles((theme)=>({
         width:'25%',
         maxWidth:50,
     },
+    utakmicaPodaciBox:{
+        backgroundColor:theme.palette.primary.main
+    },
     ligaBox:{
         display:'flex',
         width:'100%',
         flexDirection:'row',
-        justifyContent:'center',
-        backgroundColor:theme.palette.primary.main
+        justifyContent:'center'
     },
     lijeviDesniBoxContainer:{
-        marginTop:0,
-        backgroundColor:theme.palette.primary.main
+        marginTop:10
     },
     ekipaBox:{
         display:'flex',
@@ -72,12 +74,21 @@ const useStyles = makeStyles((theme)=>({
 function Utakmica_statistika_live(props) {
     const classes=useStyles();
     const dispatch=useDispatch();
+    const theme=useTheme();
+    const media=useMediaQuery(theme.breakpoints.down('sm'));//za centriranje game info i osoblje info kada dođe na razinu sm
     const brojUtakmice=decodeURIComponent(props.match.params.broj_utakmice).toString();
     const { loading, error, data } = useQuery(prikazUtakmice,{
         variables:{
             broj_utakmice:brojUtakmice
         }
     });
+    //kod unmountanja resetirat odabrane timove na null
+    useEffect(()=>{
+        return ()=>{
+           dispatch(resetirajTimove());
+        }
+    },[]);
+
     if(loading) return <CircularProgress className={classes.loadingItem} color='primary'/>
     
     if(error) return (<Alert severity="error">{error.message}</Alert>)
@@ -94,11 +105,11 @@ function Utakmica_statistika_live(props) {
                     <Box style={{ flexGrow:1,display:'flex',alignItems:'center',justifyContent:'center'}}><Typography align='center' variant='h6' style={{color:'#FFFFFF'}}>{'UTAKMICA BROJ: '+ brojUtakmice}</Typography></Box>
             </AppBar>
             <Grid  container direction='column' justify='space-evenly' alignItems='center' style={{marginTop:100}}>{/*glavni container*/}
-                <Grid item  container direction='column' justify='space-evenly' alignItems='center' xs={12}>{/*gornji box sa podacima*/}
+                <Grid item className={classes.utakmicaPodaciBox} container direction='column' justify='space-evenly' alignItems='center' xs={12}>{/*gornji box sa podacima*/}
                     <Grid item container direction='row' justify='center' xs={12}>                                                    {/*tek kada se postave najtecanje i kolo u gameInfo komponenti ih ispisujemo*/}
                         <Box className={classes.ligaBox}><Typography style={{color:'#FFFFFF'}} align='center' variant='h5'>{(data.utakmica.kolo+'. KOLO '+data.utakmica.natjecanje.naziv)}</Typography></Box>
                     </Grid>
-                    <Grid item className={classes.lijeviDesniBoxContainer} container direction='row' justify='space-between' alignItems='stretch' xs={12}>{/*container od retka koji sadrži 2 stupca podataka*/}
+                    <Grid item className={classes.lijeviDesniBoxContainer} container direction='row' justify={(media)?'center':'space-between'} alignItems='stretch' xs={12}>{/*container od retka koji sadrži 2 stupca podataka*/}
                             <GeneralInfo vrijeme={data.utakmica.vrijeme} gledatelji={data.utakmica.gledatelji} datum={data.utakmica.datum} lokacija={{id:data.utakmica.lokacija.id,dvorana:data.utakmica.lokacija.dvorana,mjesto:data.utakmica.lokacija.mjesto}}/>
                             <OsobljeInfo nadzornik={{maticni_broj:data.utakmica.nadzornik.maticni_broj,ime:data.utakmica.nadzornik.ime,prezime:data.utakmica.nadzornik.prezime}}
                                         lijecnik={(data.utakmica.lijecnik)? {maticni_broj:data.utakmica.lijecnik.maticni_broj,ime:data.utakmica.lijecnik.ime,prezime:data.utakmica.lijecnik.prezime}:null} 

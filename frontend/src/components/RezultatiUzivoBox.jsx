@@ -131,11 +131,6 @@ function RezultatiUzivoBox({history}) {
      You shouldn't have to manually manage it unless you want to unsubscribe before then.-> automatski će se unsubscribeat nakon što se komponeneta unmounta-> ne trebamo raditi
      sa hookovima ekvivalent funkcije componentWillUnmount */
 
-     useEffect(()=>{
-         return ()=>{
-             console.log('Unmountala se komponeneta');
-         }
-     },[]);
     if(loading) return  (<CircularProgress color='primary'/>)
 
     if(error)

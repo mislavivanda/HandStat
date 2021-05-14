@@ -99,6 +99,9 @@ const brisiDogadaj=gql`
   subscription($broj_utakmice:String!){
     brisidogadajutakmice(broj_utakmice:$broj_utakmice){
         id
+        dogadaj{
+          tip
+        }
     }
   }
 `

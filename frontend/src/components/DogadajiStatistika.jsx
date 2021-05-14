@@ -54,11 +54,19 @@ function DogadajiStatistika({brojUtakmice,live}) {//inace preko useEffecta dohva
         updateQuery:(prev,{subscriptionData})=>{
             if(!subscriptionData.data) return prev;
             let noviNiz=[];
-            console.log('Primljen dogadaj: '+JSON.stringify(subscriptionData.data));
-            noviNiz=prev.dogadajiutakmice.filter((dogadaj)=>dogadaj.id!==subscriptionData.data.brisidogadajutakmice.id);
-            console.log('Novi niz: '+JSON.stringify(noviNiz));
-            return {
-                dogadajiutakmice:noviNiz
+            if(subscriptionData.data.brisidogadajutakmice.dogadaj.tip===1)
+            {
+                //ako je izbrisan dogadaj promjene rezultata-> u bazi su promijenjei svi prethodni rezultati-> refetchamo sve nove dogadaje s promjenjenima
+                refetch();
+                return prev;
+            }
+            else {
+                console.log('Primljen dogadaj: '+JSON.stringify(subscriptionData.data));
+                noviNiz=prev.dogadajiutakmice.filter((dogadaj)=>dogadaj.id!==subscriptionData.data.brisidogadajutakmice.id);
+                console.log('Novi niz: '+JSON.stringify(noviNiz));
+                return {
+                    dogadajiutakmice:noviNiz
+                }
             }
         }
     })

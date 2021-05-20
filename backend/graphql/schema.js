@@ -3,6 +3,8 @@ const bcrypt=require('bcrypt');
 const {nodelogger}=require('../loaders/logger.js');
 const graphql=require('graphql');
 const config=require('../config');
+const {sequelize}=require('../models');//exporta se otud
+const { QueryTypes } = require('sequelize');
 const { PubSub, withFilter }=require('graphql-subscriptions');//za rukovanje sa subscriptionsima-> pomoću njega publishamo subscription eventove i definiramo resolvere u subscriptionsima
 /*PubSub is a class that exposes a simple publish and subscribe API.-> takav obrazac
 
@@ -694,6 +696,59 @@ const GolPozicija=new GraphQLObjectType({
     }
   })
 })
+const RezultatiKola=new GraphQLObjectType({//SVI rezultati od pojedinog kola
+  name:'RezultatiKola',
+  fields:()=>({
+    kolo:{type:GraphQLInt},
+    rezultati:{
+      type:new GraphQLList(Utakmica),
+      resolve(parent,args){
+        return models.utakmica.findAll({
+          where:{
+            natjecanje_id:parent.natjecanje_id,
+            kolo:parent.kolo,
+            status:6//dohvaćamo samo gotove utakmice za statički prikaz
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška pri dohvaćanju utakmica unutar RezultatiKola objekta '+error);
+        })
+      }
+    }
+  })
+})
+const RezultatiNatjecanja=new GraphQLObjectType({//za vraćanje svih rezultata pojedine lige sortiranih po kolima
+  name:'RezultatiNatjecanja',
+  fields:()=>({
+    natjecanje:{
+      type:Natjecanje,
+      resolve(parent,args){
+        return models.natjecanje.findOne({
+          where:{
+            id:parent.natjecanje_id
+          }
+        })
+      }
+    },
+    kola:{//lista rezultata za svako kolo
+      type:new GraphQLList(RezultatiKola),
+      resolve(parent,args){
+        return sequelize.query("SELECT DISTINCT kolo FROM utakmica WHERE natjecanje_id=:natjecanje AND status=6 ORDER BY kolo ASC",{//uzimamo samo ona kola di postoji barem 1 zavrsena utakmica I SORITRAMO UZLAZNO PO KOLIMA, PRIKAZUJEMO SAMO GOTOVE UTAKMICE-ySTATIČKI PRIKAZ
+          raw:true,
+          type: QueryTypes.SELECT,
+          replacements: {natjecanje:parent.natjecanje_id},
+        }).then((data)=>{
+          return data.map((kolo)=>({//dodaj jos natjecanje_id property uz prethodni kolo property
+            ...kolo,
+            natjecanje_id:parent.natjecanje_id
+          }))
+        }).catch((error)=>{
+            nodelogger.error('Greška u čitanju kola natjecanja unutar RezultatiNatjecanja objekta '+error);
+          })
+      }
+    }
+  })
+
+})
 process.setMaxListeners(50);
 const NOVA_UTAKMICA="NOVA_UTAKMICA";
 const PROMJENA_STATUSA="PROMJENA_STATUSA";//kada se status utakmice mijenja-> kada bude 5-> zavrsi utakmicu
@@ -858,17 +913,10 @@ const RootQuery=new GraphQLObjectType({
     natjecanja:{//dohvat svih najtecanja kod vođenja utakmice-> SAMO ADMIN AUTORIZIRAN
       type:new GraphQLList(Natjecanje),
       resolve(parent,args,context){
-        if(context.req.session.user_id)
-        {
             return models.natjecanje.findAll({}).catch((error)=> {
             nodelogger.error('Greška kod dohvata svih najtecanja '+error);
             throw(error);
           })
-        }
-        else {
-          nodelogger.error('Greska u autorizaciji kod dohvata svih natjecanja');
-          throw(new Error('Niste autorizirani za zadanu operaciju'));
-        }
       }
     },
     dvorane:{
@@ -1114,6 +1162,15 @@ const RootQuery=new GraphQLObjectType({
           nodelogger.error('Greška kod dohvaćanja rezultata,statusa i minute utakmice '+error);
           throw(error);
         })
+      }
+    },
+    rezultatinatjecanja:{
+      type:new GraphQLList(RezultatiNatjecanja),
+      args:{natjecanja_id:{type:new GraphQLNonNull(new GraphQLList(GraphQLInt))}},//prima niz idova natjecanja za koje treba dohvatit rezultate
+      resolve(parent,args){
+        return args.natjecanja_id.map((natjecanje)=>({//formatirat u niz objekata sa propertyima
+          natjecanje_id:natjecanje
+        }))
       }
     }
   }

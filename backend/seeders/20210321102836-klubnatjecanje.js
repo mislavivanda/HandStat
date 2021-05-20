@@ -10,6 +10,22 @@ module.exports = {
     {
       "natjecanje_id":2,
       "klub_id":2
+    },
+    {
+      "natjecanje_id":3,
+      "klub_id":3
+    },
+    {
+      "natjecanje_id":3,
+      "klub_id":4
+    },
+    {
+      "natjecanje_id":4,
+      "klub_id":5
+    },
+    {
+      "natjecanje_id":4,
+      "klub_id":6
     }
   ])
   },

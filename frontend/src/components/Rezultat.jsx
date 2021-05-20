@@ -77,7 +77,14 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
     }
     return (
         <Box>
-          <Typography align='center' style={{marginRight:'9%'}}>{natjecanje}</Typography>{/*oduzmemo 9% margine sta zauzima ikona strelice i minuta pa se onda centira u odnosu na 2 kluba i rezultat*/ }
+          {
+              //za prikaz statickih rezultata nam ne treba naziv natjecanja na rezultatu, vec ga imamo
+              /*oduzmemo 9% margine sta zauzima ikona strelice i minuta pa se onda centira u odnosu na 2 kluba i rezultat*/
+              (natjecanje)?
+              <Typography align='center' style={{marginRight:'9%'}}>{natjecanje}</Typography>
+                :
+                null
+         }
           <Box className={classes.container}>
             <Box className={classes.domaciBox}><Typography align='center' color='secondary'>{domaci}</Typography></Box>
             <Box className={`${classes.rezultatBox}
@@ -99,7 +106,7 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
                 <Typography align='center' style={{color:(renderGostiRezultat)?'#f7ea00':'#FFFFFF'}}>{golovi_gosti}</Typography>
             </Box>
             <Box className={classes.gostiBox}><Typography  align='center' color='secondary'>{gosti}</Typography></Box>{/*koristimo .replace jer se rezultat box može nalazit na više različitih stranica a treba uvijek vodit na isti page u url pa ne možemo samo pushat na history stack*/}
-            <Box className={classes.minutaBox}><Typography align='center' color='primary' style={{fontWeight: 'bold'}}>{minuta}'</Typography></Box>
+            <Box className={classes.minutaBox}><Typography align='center' color='primary' style={{fontWeight: 'bold'}}>{(minuta)? (minuta+' \'') : null}</Typography></Box>
             <IconButton onClick={()=>odvediNaUtakmicu()} size='small' style={{ marginLeft:'auto',width:'5%'}}><ArrowForwardIosIcon/> </IconButton>
           </Box>                       {/*kako .replace mijenja trenutni path na stacku onda ćemo kod povratka nazad se vratiti na pretprethodni dio-> ako se želimo vratit na prethodni onda na history stack stavimo dodatni objekt s istim pathom(znamo ga preko history objekta) kojeg će zamijneit
                                         .replace funkcija a ovi prvi objekt tog patha će ostati na stacku pa ćemo se kod povratka natrag vratiti na pravu prethodnu stranicu */}

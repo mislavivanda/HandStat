@@ -302,6 +302,32 @@ const dohvatiLiveRezultatUtakmice=gql`
         }
     }
 `
+const dohvatiRezultateOdabranihNatjecanja=gql`
+    query($natjecanja_id:[Int]!){
+        rezultatinatjecanja(natjecanja_id:$natjecanja_id){
+            natjecanje{
+                id
+                naziv
+                sezona
+              }
+              kola{
+                kolo
+                rezultati{
+                    broj_utakmice
+                    domaci{
+                    naziv
+                    }
+                    gosti{
+                    naziv
+                    }
+                    rezultat_domaci
+                    rezultat_gosti
+                }
+              }
+        }
+    }
+`
+
 //provjera je li korisnik logiran
 const checkLogin=gql`
     query{
@@ -310,4 +336,4 @@ const checkLogin=gql`
 
 export {prikazUtakmice,dohvatiSvaNatjecanja,dohvatiSveDvorane,dohvatiSveNadzornike,dohvatiSveLijecnike,dohvatiSveZapisnicare,
 dohvatiSveMjerace,dohvatiSveSuce,dohvatiSveKluboveOdNatjecanja,dohvatiSveMoguceDogadaje,dohvatiSveClanoveTima,dohvatiStatistikuTima,dohvatiSveDogadajeUtakmice,checkLogin,
-dohvatiLiveRezultate,dohvatiLiveRezultatUtakmice};
+dohvatiLiveRezultate,dohvatiLiveRezultatUtakmice,dohvatiRezultateOdabranihNatjecanja};

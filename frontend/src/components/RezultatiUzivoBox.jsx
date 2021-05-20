@@ -158,8 +158,8 @@ function RezultatiUzivoBox({history}) {
                                 //kad se promine propovi koje dajemo rezultat komponenti u odnosu na prethodne onda će se ona rerenderat
                             rezultati&&rezultati.map((rezultat)=>(
                                 <Grid key={rezultat.broj_utakmice} item sm={8} xs={12} className={classes.gridItem}>
-                                    <Rezultat key={rezultat.broj_utakmice} history={history} broj_utakmice={rezultat.broj_utakmice}  natjecanje={rezultat.natjecanje} domaci={rezultat.domaci} gosti={rezultat.gosti} golovi_domaci={rezultat.rezultat_domaci} golovi_gosti={rezultat.rezultat_gosti} minuta={rezultat.minuta} status={rezultat.status}/>
-                            </Grid>
+                                    <Rezultat history={history} broj_utakmice={rezultat.broj_utakmice}  natjecanje={rezultat.natjecanje} domaci={rezultat.domaci} gosti={rezultat.gosti} golovi_domaci={rezultat.rezultat_domaci} golovi_gosti={rezultat.rezultat_gosti} minuta={rezultat.minuta} status={rezultat.status}/>
+                                </Grid>
                             ))
                             }
                     </GridList>

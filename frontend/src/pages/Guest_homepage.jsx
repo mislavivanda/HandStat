@@ -1,7 +1,6 @@
 import React from 'react'
 import {Grid,Typography,Box} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles';
-import Navbar from '../components/Navbar';
 import logo from '../images/handstat_logo.png';
 import RezultatiUzivo from '../components/RezultatiUzivoBox';
 const useStyles=makeStyles((theme)=>({
@@ -32,11 +31,7 @@ const useStyles=makeStyles((theme)=>({
 export default function Guest_homepage(props) {//props su defaultni propsi koje dobija svakka komponenta u App.js a omgućavaju ih provideri,u našem slučaju nas zanima browserPrvodier u kojem se nalazi history objekt-> pristupamo mu preko props.history
     const classes=useStyles();
     return (
-        <div>
         <Grid container display='column' justify='center' alignItems='center' spacing={3}>
-           <Grid item xs={12}>
-            <Navbar history={props.history}/>{/* NAVBAR JE POSITION:FIXED PA JE IZBAČEN IZ NORMALNOG FLOWA-> PRVI ČLAN GRIDA ĆE SE POZICIONIRATI KAO DA NJEGA GORE NEMA ODNOSNO PREMA VRHU VIEWPORTA-> STAVIT MARGINU TOP*/}
-            </Grid>
             <Grid style={{marginTop:100}} item container display='row' justify='flex-start' alignItems='center' xs={12}>
                 <Grid item xs={12} sm={6}>
                 <Box className={classes.logoBox}><img className={classes.logo} src={logo} alt='HandStat Logo'/> <Typography style={{fontWeight:'bold',paddingTop:'4%' ,width:'80%', fontSize:'2.8rem', marginTop:'5vh'}}  color='secondary'>HANDSTAT </Typography></Box>
@@ -59,11 +54,8 @@ export default function Guest_homepage(props) {//props su defaultni propsi koje 
                         </Box>
                     </Grid>
                 </Grid>
-                <Grid item container justify='center' xs={12} >
-                    <RezultatiUzivo history={props.history}/>
-                </Grid>
+                <RezultatiUzivo history={props.history}/>
             </Grid>
         </Grid>
-        </div>
     )
 }

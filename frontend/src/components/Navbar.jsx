@@ -41,7 +41,7 @@ const useStyles=makeStyles((theme)=>({
 export default function Navbar({history}) {//propsi od razlicitih providera prosljeđeni preko guest homepagea
     const classes=useStyles();
     const [selected,setSelected]=useState(0);//koja je inicijalno po defaultu sleektirana-> prva->označimo po indeksima dijelove navbara i na svaki klik reagiramo
-    const handleChange = (event, newSelected) => {
+    function handleChange(event, newSelected){
         setSelected(newSelected);
       };
     return (
@@ -53,7 +53,7 @@ export default function Navbar({history}) {//propsi od razlicitih providera pros
                     <Grid item xs={12} md={8}>{/*grid od tabova*/}
                         <Tabs value={selected} onChange={handleChange}>
                            <Tab disableRipple label='POČETNA' component={Link} to='/'/>{/*Link ispod haube zapravo poziva history objekt*/}
-                           <Tab disableRipple label='REZULTATI'/>
+                           <Tab disableRipple label='REZULTATI' component={Link} to='/rezultati'/>
                            <Tab disableRipple label='IGRAČI'/>
                             <Tab disableRipple label='KLUBOVI'/>
                         </Tabs>
@@ -67,13 +67,3 @@ export default function Navbar({history}) {//propsi od razlicitih providera pros
             </AppBar>
     )
 }
-/* <Toolbar>
-                    <Grid container direction='row' justify='flex-start' alignItems="center" spacing={1}>
-                    <Grid item xs={6} sm={3}><Box className={classes.logoBox}><img className={classes.logo} src={logo} alt='HandStat Logo'/> <Typography variant='h6'style={{fontWeight:'bold',paddingTop:'4%'}} align='center' color='secondary'>HANDSTAT </Typography></Box></Grid>
-                    <Grid item xs={3} sm={2}> <Box className={classes.pocetna}><Typography align='center' variant='h6'><Link onClick={handleNavbarClick(1,classes)}>Početna</Link></Typography> </Box></Grid>
-                    <Grid item xs={3} sm={2}> <Box><Typography align='center' variant='h6'><Link onClick={handleNavbarClick(2)}>Rezultati</Link></Typography> </Box></Grid>
-                    <Grid item xs={4} sm={2}>  <Box><Typography align='center' variant='h6'><Link onClick={handleNavbarClick(3)}>Igrači</Link></Typography> </Box></Grid>
-                    <Grid item xs={4} sm={2}> <Box><Typography align='center' variant='h6'> <Link onClick={handleNavbarClick(4)}>Klubovi</LInk></Typography> </Box></Grid>
-                    <Grid item xs={4} sm={1}> <Button  className={classes.adminButton}><Typography  variant='h6' style={{fontWeight:'bold'}} color='secondary'>Admin</Typography></Button></Grid>
-                    </Grid>
-                </Toolbar> */

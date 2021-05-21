@@ -73,6 +73,12 @@ function Guest_rezultati_page(props) {
         /*event.target objekt kod multiple seleecta AKO JE NATIVE=FALSE(a po defaultu je, native je implenentirana za html nativnim seelect elementom i za nju trebamo drukcije handleat multiple seleect ALI ima manji bundle size)
         sadrzavati value od seleect elementa u kojem se nalaze 
         svi odabrani clanovi niza-> klik na neki clan koji je selektrian će ga automatski izbacit u event.target.value nizu, ponovni klik ce ga vratit( to radi materialui u pozadini usporeduje trenutni niz sa odabranin elementom pa odlucuje oce ga izbacit ili ostavit ovisno o tome je li vec postoji u nizu value) */
+        //pozovi dohvat novih rezultata za novo odabrana natjecanja
+        dohvatiRezultate({
+            variables:{
+                natjecanja_id:event.target.value.map((natjecanje)=>natjecanje.id)//formatirat u niz idova
+            }
+        });
         setOdabranaNatjecanja(event.target.value);//niz trenutno odabranih natjecanja
     }
     if(svaNatjecanjaLoading||rezultatiLoading||!odabranaNatjecanja)//ako su odabranaNatjecanja null onda se i dalje ucitava komponeneta
@@ -128,16 +134,12 @@ function Guest_rezultati_page(props) {
                             if(rezultatiData)
                             {
                                 return (
-                                    <Grid className={classes.rezultatiContainerBox} item container direction='column' alignItems='center' justify='space-around' xs={12}>{/*container od gridlistova od pojedinih natjecanja*/}
+                                    <Grid item container direction='column' alignItems='center' justify='space-around' xs={12}>{/*container od gridlistova od pojedinih natjecanja*/}
                                         {
                                               rezultatiData.rezultatinatjecanja&&rezultatiData.rezultatinatjecanja.map((natjecanje_rezultati,index)=>{
                                                 if(natjecanje_rezultati.kola&&natjecanje_rezultati.kola.length>0)// u slucaju da nema nijedno aktivno kolo sa zavrsenim utakmicama ne vraćamo nikakve rezultate od te lige
                                                 {
-                                                    if(index==0)
-                                                    {
-                                                        return <LigaRezultati key={natjecanje_rezultati.natjecanje.id} first={true} natjecanje={natjecanje_rezultati.natjecanje} kola={natjecanje_rezultati.kola} history={props.history}/>
-                                                    }
-                                                    else   return <LigaRezultati key={natjecanje_rezultati.natjecanje.id} first={false} natjecanje={natjecanje_rezultati.natjecanje} kola={natjecanje_rezultati.kola} history={props.history}/>
+                                                     return <LigaRezultati key={natjecanje_rezultati.natjecanje.id} natjecanje={natjecanje_rezultati.natjecanje} kola={natjecanje_rezultati.kola} history={props.history}/>
                                                 }
                                             })
                                         }

@@ -71,12 +71,22 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
     }
     function odvediNaUtakmicu()
     {
-        history.push(`${history.location.pathname}`);
-        let broj=encodeURIComponent(broj_utakmice);
-        history.replace(`utakmica/live/${broj}`);
+        if(status===6)//onda je staticki rezultat-> staticka statistika
+        {
+            history.push(`${history.location.pathname}`);
+            let broj=encodeURIComponent(broj_utakmice);
+            history.replace(`utakmica/${broj}`);
+        }
+        else {//aktivna utakmica-> live statistika
+            history.push(`${history.location.pathname}`);
+            let broj=encodeURIComponent(broj_utakmice);
+            history.replace(`utakmica/live/${broj}`);
+        }
     }
     return (
-        <Box>
+        <Box style={{paddingLeft:'9%'}}>{/*pomaknemo element unutar grid boxa za 9% udesno(JER JE SIRINA BOXA=SIRINI GRID ITEM(jer je samo item a ne container) PA JE 9% GRIDA=9%BOXA A TO JE VELICINA STRELICE) -> smanjimo mu lijevi dio za 9% tako da imamo slucaj da je dio koji sadrzi domaci i gostujuci tim + rezultat centriran jer s lijeve stra
+        ne ima marginu + 9% i s desne strane marginu i 9%-> on ce biti centiran u odnosu na gridlist kao i naslov Rezultati uzivo pa ce biti poravnati
+        imat cemo centriran dio sa rezultatom u odnosu na naslov Rezultati uzivo i REZULTAT BOX CE IMAT VEĆI DESNI KRAJ ZA 9% NA KOJEN CE BIT STRELICA STA NAN PASE*/}
           {
               //za prikaz statickih rezultata nam ne treba naziv natjecanja na rezultatu, vec ga imamo
               /*oduzmemo 9% margine sta zauzima ikona strelice i minuta pa se onda centira u odnosu na 2 kluba i rezultat*/
@@ -93,7 +103,7 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
                  {
                      return classes.poluvremeUtakmica
                  }
-                 else if(status===5)
+                 else if(status===5||status===6)
                  {
                      return classes.krajUtakmica
                  }

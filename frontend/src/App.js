@@ -63,7 +63,7 @@ export default function App() {
           <Route exact path='/rezultati' render={(props)=>(
                <Fragment>
                <Navbar history={props.history} />
-               <GuestRezultatiPage />
+               <GuestRezultatiPage history={props.history} />
              </Fragment>
           )}/>
         </Switch>

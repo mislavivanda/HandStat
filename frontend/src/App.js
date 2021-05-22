@@ -6,6 +6,7 @@ import VodenjeStatistike from './pages/Vodenje_statistike';
 import UtakmicaStatistika from './pages/Utakmica_statistika';
 import UtakmicaStatistikaLive from './pages/Utakmica_statistika_live';
 import GuestRezultatiPage from './pages/Guest_rezultati_page';
+import GuestKluboviPage from './pages/Guest_klubovi_page';
 import Login from './pages/Login';
 import Navbar from './components/Navbar';
 import {checkLogin} from './graphql/query';
@@ -61,11 +62,17 @@ export default function App() {
           <Route exact path='/utakmica/:broj_utakmice' component={UtakmicaStatistika}/>
           <Route exact path='/utakmica/live/:broj_utakmice' component={UtakmicaStatistikaLive}/>
           <Route exact path='/rezultati' render={(props)=>(
-               <Fragment>
+              <Fragment>
                <Navbar history={props.history} />
                <GuestRezultatiPage history={props.history} />
              </Fragment>
           )}/>
+          <Route exact path='/klubovi' render={(props)=>(
+            <Fragment>
+              <Navbar history={props.history}/>
+              <GuestKluboviPage history={props.history}/>
+            </Fragment>
+          )} />
         </Switch>
         {
           (error&&error.message)?

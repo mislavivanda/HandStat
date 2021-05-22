@@ -54,8 +54,7 @@ export default function Navbar({history}) {//propsi od razlicitih providera pros
                         <Tabs value={selected} onChange={handleChange}>
                            <Tab disableRipple label='POČETNA' component={Link} to='/'/>{/*Link ispod haube zapravo poziva history objekt*/}
                            <Tab disableRipple label='REZULTATI' component={Link} to='/rezultati'/>
-                           <Tab disableRipple label='IGRAČI'/>
-                            <Tab disableRipple label='KLUBOVI'/>
+                           <Tab disableRipple label='IGRAČI I KLUBOVI' component={Link} to='/klubovi'/>
                         </Tabs>
                     </Grid>
                     <Grid  item container direction='row' justify='center' alignItems='center' xs={12} md={1}>{/*grid od admin botuna*/}

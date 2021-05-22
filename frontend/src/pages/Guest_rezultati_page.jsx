@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from 'react'
+import React,{useState} from 'react'
 import {Grid,Box,Typography,Select,MenuItem,FormControl,ListItemText,Checkbox,Chip} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
@@ -93,7 +93,7 @@ function Guest_rezultati_page(props) {
     {
         return (
             <div>
-                <Grid container direction='column' alignItems='center' justify='space-around'>{/*parent glavni container */}
+                <Grid style={{marginTop:100}} container direction='column' alignItems='center' justify='space-around'>{/*parent glavni container */}
                     <Grid style={{marginTop:100}} item container direction='column' alignItems='center' justify='space-between' sm={6} xs={12}  >{/*container od natjecanje selectora*/}
                         <Grid item xs={12}>
                             <Typography align='center' variant='h4'>NATJECANJE</Typography>

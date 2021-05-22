@@ -1035,8 +1035,6 @@ const RootQuery=new GraphQLObjectType({
       type:new GraphQLList(Klub),
       args:{natjecanje_id:{type:new GraphQLNonNull(GraphQLInt)}},//dohvat SAMO ONIH KLUBOVA IZ ODABRANOG NATJECANJA-> KOD VOĐENJA UTAKMICE-> OMOGUĆENO SAMO ADMINU
       resolve:async(parent,args,context)=>{
-        if(context.req.session.user_id)
-        {
             return models.klub.findAll({
               include:{
                 model:models.natjecanje,
@@ -1050,11 +1048,6 @@ const RootQuery=new GraphQLObjectType({
             nodelogger.error('Greška kod dohvata svih klubova odabranog natjecanja '+error);
             throw(error);
           })
-        }
-        else {
-          nodelogger.error('Greska u autorizaciji kod dohvata klubova iz natjecanja');
-          throw(new Error('Niste autorizirani za zadanu operaciju'));
-        }
       }
     },
     dogadaji:{//dohvat svih mogućih događaja koji se mogu dogoditi

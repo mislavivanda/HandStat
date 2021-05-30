@@ -1253,48 +1253,90 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
           if(context.req.session.user_id)
           {
             for(let i=0;i<args.igraci_id.length;i++)
-            {
-              await models.igracutakmica.create({//CREATE PO DEFAULTU SAM VRAĆA OBJEKT U KOJEM SE NALAZI NOVO KREIRANI/UNESENI REDAK TABLICE
-                broj_utakmice:args.broj_utakmice,
-                klub_id:args.klub_id,
-                maticni_broj:args.igraci_id[i]
+            {//UKOLIKO POSTOJI VEĆ UNESENO ZA TU UTAKMICU( ZA 1 UTAKMICU SAMO 1 PUT UNESEN REDAK U BAZI)->SLUCAJ U KOJEM JE ISTEKAO SESSION COOKIE PA SE PONOVNO LOGIRAO KORISNIK-> SVE MU JE OSTALO SPREMLJENO OSIM CLANOVA TIMA KOJE MORA OPET UNIJET-> ON ĆE IH UNIJET NA FRONTENDU U STATE A U BAZI SU VEĆ UNESENI ZA TU UTAKMUICU PA SE NEĆE NIŠTA DODATNO NEPOTREBNO DODAVATI
+              await models.igracutakmica.findOrCreate({
+                where:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.igraci_id[i]
+                },
+                default:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.igraci_id[i]
+                }
               });
             }
             for(let i=0;i<args.golmani_id.length;i++)
             {
-              await models.golmanutakmica.create({
-                broj_utakmice:args.broj_utakmice,
-                klub_id:args.klub_id,
-                maticni_broj:args.golmani_id[i]
+              await models.golmanutakmica.findOrCreate({
+                where:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.golmani_id[i]
+                },
+                default:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.golmani_id[i]
+                }
               })
             }
-            await models.stozerutakmica.create({//trener mora bit odabran nije null sig
-              broj_utakmice:args.broj_utakmice,
-              klub_id:args.klub_id,
-              maticni_broj:args.trener_id
+            await models.stozerutakmica.findOrCreate({//trener mora bit odabran nije null sig
+              where:{
+                broj_utakmice:args.broj_utakmice,
+                klub_id:args.klub_id,
+                maticni_broj:args.trener_id
+              },
+              default:{
+                broj_utakmice:args.broj_utakmice,
+                klub_id:args.klub_id,
+                maticni_broj:args.trener_id
+              }
             });
             if(args.sluzpredstavnik_id)//mogu biti null svi osim trenera
             {
-              await models.stozerutakmica.create({
-                broj_utakmice:args.broj_utakmice,
-                klub_id:args.klub_id,
-                maticni_broj:args.sluzpredstavnik_id
+              await models.stozerutakmica.findOrCreate({
+                where:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.sluzpredstavnik_id
+                },
+                default:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.sluzpredstavnik_id
+                }
               });
             }
             if(args.tehniko_id)
             {
-              await models.stozerutakmica.create({
-                broj_utakmice:args.broj_utakmice,
-                klub_id:args.klub_id,
-                maticni_broj:args.tehniko_id
+              await models.stozerutakmica.findOrCreate({
+                where:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.tehniko_id
+                },
+                default:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.tehniko_id
+                }
               });
             }
             if(args.fizio_id)
             {
-              await models.stozerutakmica.create({
-                broj_utakmice:args.broj_utakmice,
-                klub_id:args.klub_id,
-                maticni_broj:args.fizio_id
+              await models.stozerutakmica.findOrCreate({
+                where:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.fizio_id
+                },
+                default:{
+                  broj_utakmice:args.broj_utakmice,
+                  klub_id:args.klub_id,
+                  maticni_broj:args.fizio_id
+                }
               });
             }
             return true;
@@ -1692,6 +1734,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
           await models.utakmica.update({
             sudac1_ocjena:args.sudac1_ocjena,
             sudac2_ocjena:args.sudac2_ocjena,
+            status:6
           },{
             where:{
               broj_utakmice:args.broj_utakmice
@@ -1924,11 +1967,12 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
           return args.broj_utakmice;
         }
         else{
-          nodelogger.error('Greška u autorizaciji kod ažuriranja vremena utakmice');
+          nodelogger.error('Greška u autorizaciji kod završetka utakmice');
           throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
       } catch (error) {
         nodelogger.error('Greška prilikom završavanja utakmice '+error);
+        throw(error);
       } 
       }
     },

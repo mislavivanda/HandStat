@@ -116,7 +116,6 @@ function RezultatiUzivoBox({history}) {
     //rerender(poziv render funkcije odnosno return donji) ne radi unmountanje komponenete-> on samo updatea stanje te dom komponenete
     //komponeneta se unmounta kod refresha npr ili kada odemo na novu stranicu pa više nije potrebna u virtual domu jer se konstruira novi
     useEffect(()=>{
-        console.log("Pozvan useeefect");
         refetch();
           /*DA IZBJEGNEMO SLUČAJ SA DEFAUKT POLICYEN KOJI SAMO QUERYA PRMA CACHEU I AKO VIDI DA U CACHEU IMA PODATAKA NEĆE QUERYAT SERVER
         NPR KADA UĐEMO U UTAKMICU LIVE STTISTIKA PAGE I VRATIMO SE NAZAD ONDA JE PROBLEM ŠTO ĆE SE KORISTIT REZULTATI U CACHEU KOJI SU OSTALI OTKAD SMO UNMOUNTALI TU KOMPONENETU

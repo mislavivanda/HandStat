@@ -139,8 +139,8 @@ export default function Timer() {
    
     return (
         <Fragment>
-            {//kada odaberemo trajanje poluvremena onda se prikazuje timer tek
-            (!spremljenoTrajanje)?
+            {//kada odaberemo trajanje poluvremena onda se prikazuje timer tek, ukoliko je time.ticks razlicit od nule a nije spremljeno trajanje-> situacija isteka session cookieja-> prikazi mu timer sa spremljenim vremenom-> vec je odabrao duljinu trajanja poluvremena
+            (!spremljenoTrajanje&&time.ticks===0)?
                 ( 
                 <Box className={classes.trajanjeBox}>
                     <FormControl style={{width:'80%',margin:'0 auto'}}>

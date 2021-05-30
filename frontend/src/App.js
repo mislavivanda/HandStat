@@ -35,6 +35,7 @@ export default function App() {
   /*Razlika path i url parametraConsider the route "/users/:userId". match.path would be "/users/:userId" 
   while match.url would have the :userId value filled in, e.g. "users/5".*/
   const logged=useSelector((state)=>state.login);
+  const isError=useSelector((state)=>state.error);
   const {loading,error,data}=useQuery(checkLogin,{
     onCompleted:(data)=>{
       if(data.checklogin)
@@ -45,22 +46,26 @@ export default function App() {
   })
 //inace ne treba nista jer je false po defaultu
 //kod svakiog loadanja aplikacije provjeravamo status da vidimo je li postoji valjan session cookie da znamo je li korisnik logiran
-
   if(error) dispatch(postaviError(true));
- console.log(match.path);
   return (
     <ThemeProvider theme={theme}>
-        <Switch>
+        <Switch>{/*exact path da nebi bilo parcijalnog matchanja*/}
           <Route exact path='/' render={(props)=>(
             <Fragment>
               <Navbar history={props.history} />
               <GuestHomePage history={props.history}/>
             </Fragment>
-          )}/>{/*exact path da nebi bilo parcijalnog matchanja*/}
-          {(logged)? <Route exact path='/statistika' component={VodenjeStatistike}/> : null}
+          )}/>
           <Route exact path='/login' component={Login}/>
           <Route exact path='/utakmica/:broj_utakmice' component={UtakmicaStatistika}/>
           <Route exact path='/utakmica/live/:broj_utakmice' component={UtakmicaStatistikaLive}/>
+          {(()=>{
+            if(logged||(!logged&&isError))
+            {
+              return <Route exact path='/statistika' component={VodenjeStatistike}/>
+            }
+            else return <Route  exact path='/statistika' component={null}/>
+          })()}
           <Route exact path='/rezultati' render={(props)=>(
               <Fragment>
                <Navbar history={props.history} />

@@ -23,7 +23,7 @@ function SelectMjeracVremena() {
                 <FormControl style={{width:'80%',margin:'0 auto'}}>
                                 <Box align='right'><TimerIcon/></Box>
                                     <InputLabel> MJERAČ VREMENA</InputLabel>
-                                    <Select disabled={(spremljenGameInfo)? true : false} value={(mjeracVremena)? mjeracVremena : ''} renderValue={(mjeracVremena)=>(mjeracVremena.maticni_broj+' '+mjeracVremena.ime+' '+mjeracVremena.prezime)} onChange={(e)=>dispatch(mjeracOdabran(e.target.value))} >
+                                    <Select disabled={(spremljenGameInfo)? true : false} value={(mjeracVremena)? mjeracVremena : ''} renderValue={(mjeracVremena)=><Typography align='center'>{mjeracVremena.maticni_broj+' '+mjeracVremena.ime+' '+mjeracVremena.prezime}</Typography>} onChange={(e)=>dispatch(mjeracOdabran(e.target.value))} >
                                     {data.mjeracivremena&&data.mjeracivremena.map((mjerac)=><MenuItem key={mjerac.maticni_broj} value={mjerac}><Typography color='secondary'>{mjerac.maticni_broj+' '+mjerac.ime+' '+mjerac.prezime}</Typography></MenuItem>)}
                                     </Select>
                 </FormControl>

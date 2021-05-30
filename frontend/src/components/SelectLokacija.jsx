@@ -23,7 +23,7 @@ function SelectLokacija() { //zasad saljemo props inace cemo ih dobijat preko us
             <FormControl style={{width:'80%',margin:'0 auto'}}>
                                 <Box align='right'><LocationOnIcon/></Box>
                                     <InputLabel >MJESTO I DVORANA</InputLabel>
-                                    <Select disabled={(spremljenGameInfo)? true : false} value={(dvorana)? dvorana : ''} onChange={(e)=>dispatch(lokacijaOdabrana(e.target.value))} renderValue={(selected)=>(selected.dvorana+' '+selected.mjesto)} >
+                                    <Select disabled={(spremljenGameInfo)? true : false} value={(dvorana)? dvorana : ''} onChange={(e)=>dispatch(lokacijaOdabrana(e.target.value))} renderValue={(selected)=><Typography align='center'>{selected.dvorana+' '+selected.mjesto}</Typography>} >
                                     {data.dvorane&&data.dvorane.map((dvorana)=><MenuItem key={dvorana.id} value={dvorana} ><Typography color='secondary'>{dvorana.dvorana+' '+dvorana.mjesto}</Typography></MenuItem>)}
                                     </Select>
                 </FormControl>

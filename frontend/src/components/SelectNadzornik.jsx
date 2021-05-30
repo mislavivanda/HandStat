@@ -23,7 +23,7 @@ function SelectNadzornik() {
                 <FormControl style={{width:'80%',margin:'0 auto'}}>
                                 <Box align='right'><SupervisedUserCircleIcon/></Box>
                                     <InputLabel >NADZORNIK</InputLabel>
-                                    <Select disabled={(spremljenGameInfo)? true : false} value={(nadzornik)? nadzornik : ''}  onChange={(e)=>dispatch(nadzornikOdabran(e.target.value))} renderValue={(nadzornik)=>(nadzornik.maticni_broj+' '+nadzornik.ime+' '+nadzornik.prezime)} >
+                                    <Select disabled={(spremljenGameInfo)? true : false} value={(nadzornik)? nadzornik : ''}  onChange={(e)=>dispatch(nadzornikOdabran(e.target.value))} renderValue={(nadzornik)=><Typography align='center'>{nadzornik.maticni_broj+' '+nadzornik.ime+' '+nadzornik.prezime}</Typography>} >
                                     {data.nadzornici&&data.nadzornici.map((nadzornik)=><MenuItem key={nadzornik.maticni_broj} value={nadzornik}><Typography color='secondary'>{nadzornik.maticni_broj+' '+nadzornik.ime+' '+nadzornik.prezime}</Typography></MenuItem>)}
                                     </Select>
                     </FormControl>

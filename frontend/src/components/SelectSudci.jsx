@@ -61,7 +61,7 @@ if(data)
                                   <FormControl style={{width:'80%',margin:'0 auto'}}>
                                   <Box align='right'><SportsIcon/></Box>
                                     <InputLabel> SUDAC 1</InputLabel>
-                                    <Select disabled={(spremljenGameInfo)? true : false} value={(sudac1)? sudac1 : ''} renderValue={(sudac1)=>(sudac1.maticni_broj+' '+sudac1.ime+' '+sudac1.prezime)} onChange={(e)=>odabranSudac(e.target.value,1)}>{/*//da znamo koji je sudac odabran za postavit state*/}
+                                    <Select disabled={(spremljenGameInfo)? true : false} value={(sudac1)? sudac1 : ''} renderValue={(sudac1)=><Typography align='center'>{sudac1.maticni_broj+' '+sudac1.ime+' '+sudac1.prezime}</Typography>} onChange={(e)=>odabranSudac(e.target.value,1)}>{/*//da znamo koji je sudac odabran za postavit state*/}
                                     {sudacPreostali&&sudacPreostali.map((sudac)=><MenuItem key={sudac.maticni_broj} value={sudac}><Typography color='secondary'>{sudac.maticni_broj+' '+sudac.ime+' '+sudac.prezime}</Typography></MenuItem>)}
                                     </Select>
                                   </FormControl>
@@ -83,7 +83,7 @@ if(data)
                                   <FormControl style={{width:'80%',margin:'0 auto'}}>
                                   <Box align='right'><SportsIcon/></Box>
                                     <InputLabel> SUDAC 2</InputLabel>
-                                    <Select disabled={(spremljenGameInfo)? true : false} value={(sudac2)? sudac2 : ''} renderValue={(sudac2)=>(sudac2.maticni_broj+' '+sudac2.ime+' '+sudac2.prezime)} onChange={(e)=>odabranSudac(e.target.value,2)} >
+                                    <Select disabled={(spremljenGameInfo)? true : false} value={(sudac2)? sudac2 : ''} renderValue={(sudac2)=><Typography align='center'>{sudac2.maticni_broj+' '+sudac2.ime+' '+sudac2.prezime}</Typography>} onChange={(e)=>odabranSudac(e.target.value,2)} >
                                     {sudacPreostali&&sudacPreostali.map((sudac)=><MenuItem key={sudac.maticni_broj} value={sudac}><Typography color='secondary'>{sudac.maticni_broj+' '+sudac.ime+' '+sudac.prezime}</Typography></MenuItem>)}
                                     </Select>
                                   </FormControl>

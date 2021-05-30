@@ -68,7 +68,7 @@ function SelectKlubovi() {
              <Grid  item style={{textAlign: 'center'}}  xs={12} md={5}>
                           <FormControl style={{width:'80%',margin:'0 auto'}}>
                                     <InputLabel>DOMAĆI</InputLabel>
-                                    <Select disabled={(spremljenGameInfo)? true : false} value={(timDomaci)? timDomaci : ''} renderValue={(value)=>value.naziv } onChange={(e)=>odabranTim(e.target.value,1)} >
+                                    <Select disabled={(spremljenGameInfo)? true : false} value={(timDomaci)? timDomaci : ''} renderValue={(value)=><Typography align='center'>{value.naziv}</Typography>} onChange={(e)=>odabranTim(e.target.value,1)} >
                                     {timPreostali&&timPreostali.map((tim)=><MenuItem key={tim.id} value={tim}><Typography color='secondary'>{tim.naziv}</Typography></MenuItem>)}
                                     </Select>
                                   </FormControl>
@@ -79,7 +79,7 @@ function SelectKlubovi() {
                           <Grid  item style={{textAlign: 'center'}} xs={12} md={5}>
                           <FormControl style={{width:'80%',margin:'0 auto'}}>
                                     <InputLabel>GOSTI</InputLabel>
-                                    <Select disabled={(spremljenGameInfo)? true : false} value={(timGosti)? timGosti : ''} renderValue={(value)=> value.naziv} onChange={(e)=>odabranTim(e.target.value,2)} >
+                                    <Select disabled={(spremljenGameInfo)? true : false} value={(timGosti)? timGosti : ''} renderValue={(value)=><Typography align='center'>{value.naziv}</Typography>} onChange={(e)=>odabranTim(e.target.value,2)} >
                                     {timPreostali&&timPreostali.map((tim)=><MenuItem key={tim.id} value={tim}><Typography color='secondary'>{tim.naziv}</Typography></MenuItem>)}
                                     </Select>
                                 </FormControl>

@@ -1,5 +1,5 @@
 import React,{useEffect} from 'react'
-import {Grid,GridList} from '@material-ui/core';
+import {Grid,GridList, Typography} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import Rezultat from './Rezultat';
 import { useQuery} from '@apollo/client';
@@ -156,11 +156,14 @@ function RezultatiUzivoBox({history}) {
                 <GridList  className={classes.gridList} cols={1} cellHeight={50} spacing={20} >
                             {
                                 //kad se promine propovi koje dajemo rezultat komponenti u odnosu na prethodne onda će se ona rerenderat
-                            rezultati&&rezultati.map((rezultat)=>(
+                            (rezultati)?
+                            rezultati.map((rezultat)=>(
                                 <Grid key={rezultat.broj_utakmice} item sm={8} xs={12} className={classes.gridItem}>
                                     <Rezultat history={history} broj_utakmice={rezultat.broj_utakmice}  natjecanje={rezultat.natjecanje} domaci={rezultat.domaci} gosti={rezultat.gosti} golovi_domaci={rezultat.rezultat_domaci} golovi_gosti={rezultat.rezultat_gosti} minuta={rezultat.minuta} status={rezultat.status}/>
                                 </Grid>
                             ))
+                            :
+                            <Typography align='center' color='secondary'> TRENUTNO SE NE IGRA NIJEDNA UTAKMICA</Typography>
                             }
                     </GridList>
         )

@@ -23,7 +23,7 @@ function SelectLijecnik() {
             <FormControl style={{width:'80%',margin:'0 auto'}}>
                                 <Box align='right'><LocalHospitalIcon/></Box>
                                   <InputLabel >LIJEČNIK</InputLabel>
-                                  <Select disabled={(spremljenGameInfo)? true : false} value={(lijecnik)? lijecnik : ''} renderValue={(lijecnik)=>(lijecnik.maticni_broj+' '+lijecnik.ime+' '+lijecnik.prezime)} onChange={(e)=>dispatch(lijecnikOdabran(e.target.value))} >
+                                  <Select disabled={(spremljenGameInfo)? true : false} value={(lijecnik)? lijecnik : ''} renderValue={(lijecnik)=><Typography align='center'>{lijecnik.maticni_broj+' '+lijecnik.ime+' '+lijecnik.prezime}</Typography>} onChange={(e)=>dispatch(lijecnikOdabran(e.target.value))} >
                                   {data.lijecnici&&data.lijecnici.map((lijecnik)=><MenuItem key={lijecnik.maticni_broj} value={lijecnik}><Typography color='secondary'>{lijecnik.maticni_broj+' '+lijecnik.ime+' '+lijecnik.prezime}</Typography></MenuItem>)}
                                   </Select>
               </FormControl>

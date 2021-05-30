@@ -23,7 +23,7 @@ function SelectZapisnicar() {
                 <FormControl style={{width:'80%',margin:'0 auto'}}>
                                 <Box align='right'><EditIcon/></Box>
                                     <InputLabel >ZAPISNIČAR</InputLabel>
-                                    <Select disabled={(spremljenGameInfo)? true : false} value={(zapisnicar)? zapisnicar : ''} renderValue={(zapisnicar)=>(zapisnicar.maticni_broj+' '+zapisnicar.ime+ ' '+zapisnicar.prezime)} onChange={(e)=>dispatch(zapisnicarOdabran(e.target.value))} >
+                                    <Select disabled={(spremljenGameInfo)? true : false} value={(zapisnicar)? zapisnicar : ''} renderValue={(zapisnicar)=><Typography align='center'>{zapisnicar.maticni_broj+' '+zapisnicar.ime+ ' '+zapisnicar.prezime}</Typography>} onChange={(e)=>dispatch(zapisnicarOdabran(e.target.value))} >
                                     {data.zapisnicari&&data.zapisnicari.map((zapisnicar)=><MenuItem key={zapisnicar.maticni_broj} value={zapisnicar}><Typography color='secondary'>{zapisnicar.maticni_broj+' '+zapisnicar.ime+' '+zapisnicar.prezime}</Typography></MenuItem>)}
                                     </Select>
                     </FormControl>

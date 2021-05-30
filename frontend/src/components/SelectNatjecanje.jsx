@@ -22,7 +22,7 @@ function SelectNatjecanje() {
                 <FormControl style={{width:'80%',margin:'0 auto'}}>
                         <Box align='right'><SportsHandballIcon/></Box>
                             <InputLabel >NATJECANJE</InputLabel>
-                            <Select disabled={(spremljenGameInfo)? true : false} value={(natjecanje)? natjecanje : ''}  onChange={(e)=>dispatch(natjecanjeOdabir(e.target.value))} renderValue={(selected)=> (selected.naziv+' '+selected.sezona)} >
+                            <Select disabled={(spremljenGameInfo)? true : false} value={(natjecanje)? natjecanje : ''}  onChange={(e)=>dispatch(natjecanjeOdabir(e.target.value))} renderValue={(selected)=><Typography align='center'>{selected.naziv+' '+selected.sezona}</Typography>} >
                             {data.natjecanja&&data.natjecanja.map((natjecanje)=><MenuItem key={natjecanje.id} value={natjecanje}><Typography color='secondary'>{natjecanje.naziv+' '+natjecanje.sezona}</Typography></MenuItem>)}
                             </Select>
                 </FormControl>

@@ -1685,48 +1685,251 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         sudac1_ocjena:{type:new GraphQLNonNull(GraphQLFloat)},
         sudac2_ocjena:{type:GraphQLFloat}
       },
-      resolve(parent,args,context){
+      resolve:async (parent,args,context)=>{
+      try {
         if(context.req.session.user_id)
         {
-            return models.utakmica.update({
-              sudac1_ocjena:args.sudac1_ocjena,
-              sudac2_ocjena:args.sudac2_ocjena,
-            },{
+          await models.utakmica.update({
+            sudac1_ocjena:args.sudac1_ocjena,
+            sudac2_ocjena:args.sudac2_ocjena,
+          },{
+            where:{
+              broj_utakmice:args.broj_utakmice
+            }
+          })
+            const utakmica=await models.utakmica.findOne({
               where:{
                 broj_utakmice:args.broj_utakmice
               }
-            }).then((data)=>{
-              context.res.clearCookie('user_sid',{//BRISANJE COOKIEJA U BROWSERU
-                path: '/',
-                httpOnly: true,
-                domain:'localhost',
-                sameSite:'lax',
-                secure:false
             });
-            context.req.session.destroy();//IZBRISE SESIJU IZ MEMORY STOREA
-            pubsub.publish(PROMJENA_STATUSA,{
-              promjenastatusa:{
-                broj_utakmice:args.broj_utakmice,
-                status:6//makni rezultat s prikaza
+            //1)izracunaj novu prosjecnu ocjenu i uvecaj broj utakmica sudaca
+            const sudac1=await models.suci.findOne({
+              where:{
+                maticni_broj:utakmica.sudac1_id
               }
             });
-            pubsub.publish(PROMJENA_STATUSA_UTAKMICE,{
-              statusutakmice:{
-                broj_utakmice:args.broj_utakmice,
-                status:6
+              //nova prosjecna ocjena =(prethodni broj utakmica * prosjecna ocjena + nova ocjena)/(prethodni broj utakmica +1)
+            const sudac1_nova=(sudac1.broj_utakmica*sudac1.prosjecna_ocjena+args.sudac1_ocjena)/(sudac1.broj_utakmica+1);
+            await models.suci.update({
+              broj_utakmica:(sudac1.broj_utakmica+1),
+              prosjecna_ocjena:sudac1_nova
+            },{
+              where:{
+                maticni_broj:utakmica.sudac1_id
+              }
+            });
+            if(utakmica.sudac2_id)//ako postoji i drugi sudac isto radimo i za njega
+            {
+              const sudac2=await models.suci.findOne({
+                where:{
+                  maticni_broj:utakmica.sudac2_id
+                }
+              });
+              const sudac2_nova=(sudac2.broj_utakmica*sudac2.prosjecna_ocjena+args.sudac2_ocjena)/(sudac2.broj_utakmica+1);
+              await models.suci.update({
+                broj_utakmica:(sudac2.broj_utakmica+1),
+                prosjecna_ocjena:sudac2_nova
+              },{
+                where:{
+                  maticni_broj:utakmica.sudac2_id
+                }
+              });
+            }
+            //2) dohvati sve clanove timova odnosno njihove maticne brojeve u liste/nizove
+            let klub1_igraci=await models.igracutakmica.findAll({
+              attributes:['maticni_broj'],
+              where:{
+                broj_utakmice:utakmica.broj_utakmice,
+                klub_id:utakmica.domaci_id
+              }
+            });
+            klub1_igraci=klub1_igraci.map((igrac)=>igrac.maticni_broj);
+            let klub1_golmani=await models.golmanutakmica.findAll({
+              attributes:['maticni_broj'],
+              where:{
+                broj_utakmice:utakmica.broj_utakmice,
+                klub_id:utakmica.domaci_id
+              }
+            });
+            klub1_golmani=klub1_golmani.map((golman)=>golman.maticni_broj);
+            let klub1_stozer=await models.stozerutakmica.findAll({
+              attributes:['maticni_broj'],
+              where:{
+                broj_utakmice:utakmica.broj_utakmice,
+                klub_id:utakmica.domaci_id
               }
             })
-            return args.broj_utakmice;
-            }).catch((error) => {
-              nodelogger.error('Greška kod zavrsavanja utakmice '+error);
-              throw(error);
+            klub1_stozer=klub1_stozer.map((stozer)=>stozer.maticni_broj);
+            let klub2_igraci=await models.igracutakmica.findAll({
+              attributes:['maticni_broj'],
+              where:{
+                broj_utakmice:utakmica.broj_utakmice,
+                klub_id:utakmica.gosti_id
+              }
+            });
+            klub2_igraci=klub2_igraci.map((igrac)=>igrac.maticni_broj);
+            let klub2_golmani=await models.golmanutakmica.findAll({
+              attributes:['maticni_broj'],
+              where:{
+                broj_utakmice:utakmica.broj_utakmice,
+                klub_id:utakmica.gosti_id
+              }
+            });
+            klub2_golmani=klub2_golmani.map((golman)=>golman.maticni_broj);
+            let klub2_stozer=await models.stozerutakmica.findAll({
+              attributes:['maticni_broj'],
+              where:{
+                broj_utakmice:utakmica.broj_utakmice,
+                klub_id:utakmica.gosti_id
+              }
             })
+            klub2_stozer=klub2_stozer.map((stozer)=>stozer.maticni_broj);
+            //3) ovisno o pobjedniku utakmice azuriraj: rezultate i klubclanovi tablice
+            if(utakmica.rezultat_domaci>utakmica.rezultat_gosti)
+            {
+              //pobjeda domacina
+              await models.rezultati.increment('pobjede',
+              {
+                where:{
+                  klub_id:utakmica.domaci_id,
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              });
+              await models.rezultati.increment('porazi',{
+                where:{
+                  klub_id:utakmica.gosti_id,
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              });
+              await models.klubclanovi.increment('pobjede',{
+                where:{
+                  do:null,//trenutno u tom klubu
+                  klub_id:utakmica.domaci_id,
+                  maticni_broj:{//bilo koji od maticnih brojeva clanova tima koji igraju tu utakmicu
+                    [Op.or]:[
+                      {[Op.in]:klub1_igraci},
+                      {[Op.in]:klub1_golmani},
+                      {[Op.in]:klub1_stozer}
+                    ]
+                  }
+                }
+              });
+              await models.klubclanovi.increment('porazi',{
+                where:{
+                  do:null,
+                  klub_id:utakmica.gosti_id,
+                  maticni_broj:{
+                    [Op.or]:[
+                      {[Op.in]:klub2_igraci},
+                      {[Op.in]:klub2_golmani},
+                      {[Op.in]:klub2_stozer}
+                    ]
+                  }
+                }
+              });
+            }
+            else if(utakmica.rezultat_domaci<utakmica.rezultat_gosti)
+            {
+              //pobjeda gostiju
+              await models.rezultati.increment('porazi',
+              {
+                where:{
+                  klub_id:utakmica.domaci_id,
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              });
+              await models.rezultati.increment('pobjede',{
+                where:{
+                  klub_id:utakmica.gosti_id,
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              });
+              await models.klubclanovi.increment('porazi',{
+                where:{
+                  do:null,
+                  klub_id:utakmica.domaci_id,
+                  maticni_broj:{
+                    [Op.or]:[
+                      {[Op.in]:klub1_igraci},
+                      {[Op.in]:klub1_golmani},
+                      {[Op.in]:klub1_stozer}
+                    ]
+                  }
+                }
+              });
+              await models.klubclanovi.increment('pobjede',{
+                where:{
+                  do:null,
+                  klub_id:utakmica.gosti_id,
+                  maticni_broj:{
+                    [Op.or]:[
+                      {[Op.in]:klub2_igraci},
+                      {[Op.in]:klub2_golmani},
+                      {[Op.in]:klub2_stozer}
+                    ]
+                  }
+                }
+              });
+            }
+            else {
+              //nerjeseno
+              await models.rezultati.increment('nerjeseni',{
+                where:{
+                  klub_id:{
+                    [Op.in]:[utakmica.domaci_id,utakmica.gosti_id]
+                  },
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              });
+              await models.klubclanovi.increment('nerjeseno',{
+                where:{
+                  do:null,
+                  klub_id:{
+                    [Op.in]:[utakmica.domaci_id,utakmica.gosti_id]
+                  },
+                  maticni_broj:{
+                    [Op.or]:[
+                      {[Op.in]:klub1_igraci},
+                      {[Op.in]:klub1_golmani},
+                      {[Op.in]:klub1_stozer},
+                      {[Op.in]:klub2_igraci},
+                      {[Op.in]:klub2_golmani},
+                      {[Op.in]:klub2_stozer}
+                    ]
+                  }
+                }
+              });
+
+            }
+            context.res.clearCookie('user_sid',{//BRISANJE COOKIEJA U BROWSERU
+              path: '/',
+              httpOnly: true,
+              domain:'localhost',
+              sameSite:'lax',
+              secure:false
+          });
+          context.req.session.destroy();//IZBRISE SESIJU IZ MEMORY STOREA
+          pubsub.publish(PROMJENA_STATUSA,{
+            promjenastatusa:{
+              broj_utakmice:args.broj_utakmice,
+              status:6//makni rezultat s prikaza
+            }
+          });
+          pubsub.publish(PROMJENA_STATUSA_UTAKMICE,{
+            statusutakmice:{
+              broj_utakmice:args.broj_utakmice,
+              status:6
+            }
+          })
+          return args.broj_utakmice;
         }
-        else {
-          nodelogger.error('Greška u autorizaciji kod zavrsavanja utakmice');
+        else{
+          nodelogger.error('Greška u autorizaciji kod ažuriranja vremena utakmice');
           throw(new Error('Niste autorizirani za zadanu operaciju'));
         }
-       
+      } catch (error) {
+        nodelogger.error('Greška prilikom završavanja utakmice '+error);
+      } 
       }
     },
     login:{//kod logiranja provjera unesenih usernamea i passworda

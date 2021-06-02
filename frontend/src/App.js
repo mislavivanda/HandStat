@@ -7,6 +7,7 @@ import UtakmicaStatistika from './pages/Utakmica_statistika';
 import UtakmicaStatistikaLive from './pages/Utakmica_statistika_live';
 import GuestRezultatiPage from './pages/Guest_rezultati_page';
 import GuestKluboviPage from './pages/Guest_klubovi_page';
+import KlubInfoPage from './pages/Klub_info_page'
 import Login from './pages/Login';
 import Navbar from './components/Navbar';
 import {checkLogin} from './graphql/query';
@@ -60,10 +61,14 @@ export default function App() {
           <Route exact path='/utakmica/:broj_utakmice' component={UtakmicaStatistika}/>
           <Route exact path='/utakmica/live/:broj_utakmice' component={UtakmicaStatistikaLive}/>
           {(()=>{
+            //IAKO NAIZGLED IZGLEDA KAO SECURITY BREACH NA NAČIN DA ĆE SVAKI KORISNIK KOJI NIJE LOGIRAN I KAD MU SE DOGODI GREŠKA MOĆI BEZ DA KLIKNE OK Na error popup upisat u browser /statistika i imat pravo vođenja statistike to nije tako
+            //JER NAKON UPISA U BROWSER CIJELA APLIKACIJA SE REFRESHA I POSTAVLJAJU SE INICIJALNI STATEOVI PA ĆE isError biti postavljen a false i vratit će se null stranica
+            //KAKO ERROR DIALOG ONEMOGUĆUJE KORISNIKU KLIKOVE SVUGDI OSIM NA OK BOTUN-> KORISNIK MOŽE SAMO PROBAT S REFRESHANJEN APLIKACIJE A TO JE POKRIVENO
             if(logged||(!logged&&isError))
-            {
+            {//ako je korisnik logiran-> ima pravo pristupa stranici vođenja statistike
+              //ako je korisnik odjavljen i postavljen je error popup-> situacija na stranici vođenja statistike u kojoj je korisniku isteka session cookie i dojavljen mu je erro preko popupa
               return <Route exact path='/statistika' component={VodenjeStatistike}/>
-            }
+            }//inace korisnik ne moze pristupit stranici-> vrati null, nakon sta sitsne ok na error popupu isErrror ce bti false pa će se vratit null
             else return <Route  exact path='/statistika' component={null}/>
           })()}
           <Route exact path='/rezultati' render={(props)=>(
@@ -78,6 +83,12 @@ export default function App() {
               <GuestKluboviPage history={props.history}/>
             </Fragment>
           )} />
+          <Route exact path='/klub/:klub_id' render={(props)=>(
+            <Fragment>
+               <Navbar history={props.history}/>
+               <KlubInfoPage match={props.match} history={props.history}/>{/*potrebni match i history objekti od react routera, kod komponenti prikaza statistike one se prosljeđuju automatski kao props jer koristimo componenet={} sintaksu*/}
+            </Fragment>
+          )}/>
         </Switch>
         {
           (error&&error.message)?

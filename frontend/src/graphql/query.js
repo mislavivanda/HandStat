@@ -164,32 +164,38 @@ const dohvatiSveClanoveTima=gql`
                 broj_dresa
                 ime
                 prezime
+                image_path
             }
             golmani{
                 maticni_broj
                 broj_dresa
                 ime
                 prezime
+                image_path
             }
             treneri{
                 maticni_broj
                 ime
                 prezime
+                image_path
             }
             sluzbenipredstavnici{
                 maticni_broj
                 ime
                 prezime
+                image_path
             }
             tehniko{
                 maticni_broj
                 ime
                 prezime
+                image_path
             }
             fizio{
                 maticni_broj
                 ime
                 prezime
+                image_path
             }
         }
     }
@@ -327,7 +333,48 @@ const dohvatiRezultateOdabranihNatjecanja=gql`
         }
     }
 `
-
+//dohvat svih natjecanja u kojima sudjeluje pojedini klub
+const dohvatiSvaNatjecanjaKluba=gql`
+    query($klub_id:Int!){
+        natjecanjakluba(klub_id:$klub_id){
+            id
+            naziv
+            sezona
+        }
+    }
+`
+//dohvat svih rezultata kluba iz njegovih natjecanja
+const dohvatiSveRezultateKluba=gql`
+    query($klub_id:Int!){
+        rezultatikluba(klub_id:$klub_id){
+            natjecanje{
+                id
+            }
+              pobjede
+              porazi
+              nerjeseni
+        }
+    }
+`
+//dohvat 5 najnovijih rezultata kluba
+const dohvatiNajnovijeRezultateKluba=gql`
+    query($klub_id:Int!){
+        najnovijeutakmicekluba(klub_id:$klub_id){
+        broj_utakmice
+        natjecanje{
+        naziv
+        }
+        domaci{
+        naziv
+        }
+        gosti{
+        naziv
+        }
+        rezultat_domaci
+        rezultat_gosti
+}
+    }
+`
 //provjera je li korisnik logiran
 const checkLogin=gql`
     query{
@@ -336,4 +383,4 @@ const checkLogin=gql`
 
 export {prikazUtakmice,dohvatiSvaNatjecanja,dohvatiSveDvorane,dohvatiSveNadzornike,dohvatiSveLijecnike,dohvatiSveZapisnicare,
 dohvatiSveMjerace,dohvatiSveSuce,dohvatiSveKluboveOdNatjecanja,dohvatiSveMoguceDogadaje,dohvatiSveClanoveTima,dohvatiStatistikuTima,dohvatiSveDogadajeUtakmice,checkLogin,
-dohvatiLiveRezultate,dohvatiLiveRezultatUtakmice,dohvatiRezultateOdabranihNatjecanja};
+dohvatiLiveRezultate,dohvatiLiveRezultatUtakmice,dohvatiRezultateOdabranihNatjecanja,dohvatiSvaNatjecanjaKluba,dohvatiSveRezultateKluba,dohvatiNajnovijeRezultateKluba};

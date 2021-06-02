@@ -75,12 +75,12 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
         {
             history.push(`${history.location.pathname}`);
             let broj=encodeURIComponent(broj_utakmice);
-            history.replace(`utakmica/${broj}`);
+            history.replace(`/utakmica/${broj}`);
         }
         else {//aktivna utakmica-> live statistika
             history.push(`${history.location.pathname}`);
             let broj=encodeURIComponent(broj_utakmice);
-            history.replace(`utakmica/live/${broj}`);
+            history.replace(`/utakmica/live/${broj}`);
         }
     }
     return (

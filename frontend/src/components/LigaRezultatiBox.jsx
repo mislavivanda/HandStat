@@ -24,7 +24,7 @@ const useStyles=makeStyles((theme)=>({
     }
 }))
 //margin od grid liste će biti 20px gore i dole-> prvi clan u grid listi ima kao i svi clanovi padding=10 sto znaci da ce biti udaljen 30px od boxa sa kolom, a elementi grid liste će biti udaljeni 10 px medusobno
-// kod zavrsetka grid liste-> ona je udaljena 20px od boxa iduceg kola-> stavimo margin od kolo boxa na 10px i dobijemo 30px kao i za gornji dio
+// kod zavrsetka grid liste-> ona je udaljena 20px od boxa iduceg kola-> stavimo margin od kolo boxa(ZA SVA KOLA OSIM ZA PRVO KOLO JER ONO NIJE UDALJENO OD NAZIVA LIGE) na 10px->linija 41 i dobijemo 30px kao i za gornji dio
 //jedini problem-> zadnji grid od zadnjeg kola-> nema ispod sebe novi kolo box pa će imati samo marginBottom=20 umjesto 30-> stoga dolje u liniji 48 za zadnji rezultat zadnjeg kola dodajemo padding bottom 10px kako bi dobili tih dodatnih 10px
 function LigaRezultatiBox({natjecanje,kola,history}) {
     const classes=useStyles();
@@ -37,7 +37,7 @@ function LigaRezultatiBox({natjecanje,kola,history}) {
             {
                 kola&&kola.map((rezultati_kola,index1)=>
                     (<React.Fragment key={rezultati_kola.kolo}>{/* za keyed fragmente moramo koristit ovu sintaksu
-                                ZA SVE LABELE KOLA OSIM ZA PRVO KOLO(JER ONO NEMA GRIDLISTU IZNAD SEBE) STAVIMO MARGIN:20 KAO ŠTO IMA GRID LIST OD KOLO LABELE KAKO BI BILI U SYNCU-> TAKO ĆEMO ODRŽAVAT RAZMAK IZMEĐU KOLO LABELE I GRID LISTA IZNAD NJIH*/}
+                                ZA SVE LABELE KOLA OSIM ZA PRVO KOLO(JER ONO NEMA GRIDLISTU IZNAD SEBE) STAVIMO MARGIN:10 KAO ŠTO IMA GRID LIST OD KOLO LABELE KAKO BI BILI U SYNCU-> TAKO ĆEMO ODRŽAVAT RAZMAK IZMEĐU KOLO LABELE I GRID LISTA IZNAD NJIH*/}
                         <Box style={{marginTop:(rezultati_kola.kolo>1)? 10 : 0}} className={classes.koloNazivBox}>
                             <Typography align='center' variant='h5' style={{color:'#FFFFFF'}}>{rezultati_kola.kolo+'.kolo'}</Typography>
                         </Box>

@@ -7,9 +7,8 @@ import Alert from '@material-ui/lab/Alert';
 import SportsHandballIcon from '@material-ui/icons/SportsHandball';
 import {postaviError} from '../redux/slicers/error';
 import { useSelector, useDispatch } from 'react-redux';
-import {dohvatiSvaNatjecanja} from '../graphql/query';
+import {dohvatiSvaNatjecanja,dohvatiSveKluboveOdNatjecanja} from '../graphql/query';
 import { useLazyQuery,useQuery } from '@apollo/client';
-import {dohvatiSveKluboveOdNatjecanja} from '../graphql/query'
 const useStyles=makeStyles((theme)=>({
     loadingItem:{
         position:'fixed',
@@ -70,15 +69,15 @@ function Guest_klubovi_page(props) {
                 <Grid style={{marginTop:100}} container direction='column' alignItems='center' justify='space-around'>{/*parent glavni container */}
                         <Grid style={{marginTop:100}} item container direction='column' alignItems='center' justify='space-between' sm={6} xs={12}  >{/*container od natjecanje selectora*/}
                             <Grid item xs={12}>
-                                <Typography align='center' variant='h4'>NATJECANJE</Typography>
+                                <Typography color='secondary' align='center' variant='h4'>NATJECANJE</Typography>
                             </Grid>
-                            <Grid item container direction='row'>
+                            <Grid item container direction='row' xs={12}>
                                 <FormControl style={{width:'100%'}}>
                                     <Box align='right'><SportsHandballIcon/></Box>
                                     <Select 
                                     value={(odabranoNatjecanje)? odabranoNatjecanje : ''}  
                                     onChange={(e)=>handleNatjecanjeSelect(e)} 
-                                    renderValue={(selected)=> <Typography align='center'>{selected.naziv+' '+selected.sezona}</Typography>} >
+                                    renderValue={(selected)=> <Typography color='secondary' align='center'>{selected.naziv+' '+selected.sezona}</Typography>} >
                                     {
                                     svaNatjecanjaData.natjecanja&&svaNatjecanjaData.natjecanja.map((natjecanje)=><MenuItem key={natjecanje.id} value={natjecanje}><Typography color='secondary'>{natjecanje.naziv+' '+natjecanje.sezona}</Typography></MenuItem>)
                                     }
@@ -95,7 +94,7 @@ function Guest_klubovi_page(props) {
                                 else if(kluboviNatjecanjaData)
                                 {
                                 return (
-                                <Grid style={{marginTop:100}} item container spacing={5} justify='row' xs={12}>
+                                <Grid style={{marginTop:100}} item container spacing={5} direction='row' xs={12}>
                                     {
                                         kluboviNatjecanjaData.klubovi&&kluboviNatjecanjaData.klubovi.map((klub)=>(
                                             <Grid item key={klub.id} xs={12} sm={6} md={4}>

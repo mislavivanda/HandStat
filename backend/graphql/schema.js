@@ -34,6 +34,7 @@ const {GraphQLObjectType,//OUTPUT I INPUT MOGU BITI
         Kind}=graphql;//KIND SADRŽI SVE TIPOVE VARIJABLI AKO JE POTREBNO U RESOLVERIMA PROVJERAVAT JELI PRIMLJENA VARIJALBA ISPRAVNOG TIPA
   const { GraphQLUpload } = require('graphql-upload');//OVO JE TIP KOJI NAM OMOGUĆAVA RUKOVANJE S FILEOVIMA,SVUGDJE DI KORISTIMO FILEOVE KAO INPUT TIP STAVIMO OVAJ SCALAR ZA TIP U GRAPHQL SHEMI MUTACIJA/QUERYA
 const { Console } = require("console");
+const { type } = require("os");
 
 //Definicija našeg vlastitog skalarnog tipa,datum nije defaultni skalarni tip
 const Datum = new GraphQLScalarType({
@@ -747,7 +748,37 @@ const RezultatiNatjecanja=new GraphQLObjectType({//za vraćanje svih rezultata p
       }
     }
   })
+})
 
+const Rezultati=new GraphQLObjectType({
+  name:'Rezultati',
+  fields:()=>({
+    natjecanje:{
+      type:Natjecanje,
+      resolve(parent,args){
+        return models.natjecanje.findOne({
+          where: {
+            id:parent.natjecanje_id
+          }
+        })
+      }
+    },
+    klub:{
+      type:Klub,
+      resolve(parent,args){
+        return models.klub.findOne({
+          where:{
+            id:parent.klub_id
+          }
+        })
+      }
+    },
+    pobjede:{type:GraphQLInt},
+    porazi:{type:GraphQLInt},
+    nerjeseni:{type:GraphQLInt},
+    bodovi:{type:GraphQLInt},
+    gol_razlika:{type:GraphQLInt},
+  })
 })
 process.setMaxListeners(50);
 const NOVA_UTAKMICA="NOVA_UTAKMICA";
@@ -1070,17 +1101,10 @@ const RootQuery=new GraphQLObjectType({
       type:Tim,
       args:{klub_id:{type:new GraphQLNonNull(GraphQLInt)}},
       resolve(parent,args,context){//OVAJ RESOLVER ĆE VRATITI ID OD KLUBA U OBJECT TYPE TIM U KOJEM MU MOŽEMO PRISTUPATI I KOJI ĆE POMOĆU NJEGA DOBITI SVE POTREBNE CLANOVE TIMA
-        if(context.req.session.user_id)
-        {
           return {//NIJE POTREBNO TRY CATCH ERROR HANDLEANJE JER NEMA SINKRONIH OPERAIJA+ KAD SE THROWA ERROR UNUTAR TIM OBJEKTA ON SE NEĆE PROPAGIRATI NAZAD U OVAJ RESOLVER NEGO ĆE IĆI ODMAH NA ERROR HANDLEANJE
             //ODNOSNO PRVI RESOLVERI KAD SE IZVRSE ONI SU GOTOVI I NEMA VIŠE POVRATKA U NJIH, ERROR HANDLEANJE ĆE SE ODRADIT UNUTAR TIM OBJEKTA
             id:args.klub_id
           }
-        }
-        else {
-          nodelogger.error('Greška u autorizaciji kod dohvata clanova tima');
-          throw(new Error('Niste autorizirani za zadanu operaciju'));
-        }
       }
     },
     timstatistika:{//vraća statistike igraca,golmana i stozera za određenu utakmicu od određenog kluba
@@ -1102,7 +1126,10 @@ const RootQuery=new GraphQLObjectType({
           return models.dogadajiutakmice.findAll({
             where:{
               broj_utakmice:args.broj_utakmice
-            }
+            },
+            order:[
+              ['id','ASC']
+            ]//sortiraj uzlazno po idu da idu po vremenu
           }).catch((error)=>{
           nodelogger.error('Greska kod dohvata događaja utakmice '+error);
           throw(error);
@@ -1164,6 +1191,53 @@ const RootQuery=new GraphQLObjectType({
         return args.natjecanja_id.map((natjecanje)=>({//formatirat u niz objekata sa propertyima
           natjecanje_id:natjecanje
         }))
+      }
+    },
+    natjecanjakluba:{
+      type:new GraphQLList(Natjecanje),
+      args:{klub_id:{type:new GraphQLNonNull(GraphQLInt)}},
+      resolve(parent,args){
+        return models.natjecanje.findAll({
+          include:{
+            model:models.klub,
+            as:'natjecanjaodkluba',
+            through: { attributes: [] },
+            where:{
+              id:args.klub_id
+            }
+          }
+        });
+      }
+    },
+    rezultatikluba:{
+      type:new GraphQLList(Rezultati),
+      args:{
+        klub_id:{type:new GraphQLNonNull(GraphQLInt)},
+      },
+      resolve(parent,args){
+        return models.rezultati.findAll({
+          where:{
+            klub_id:args.klub_id
+          }
+        })
+      }
+    },
+    najnovijeutakmicekluba:{
+      type:new GraphQLList(Utakmica),
+      args:{
+        klub_id:{type:new GraphQLNonNull(GraphQLInt)}
+      },
+      resolve(parent,args){
+        return models.utakmica.findAll({
+          where:{
+            status:6,
+            [Op.or]:[{domaci_id:args.klub_id},{gosti_id:args.klub_id}]
+          },
+          order:[
+            ['datum','DESC']
+          ],//sortiraj uzlazno po datumu od najnovije
+          limit:5
+        })
       }
     }
   }
@@ -1838,6 +1912,14 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                   natjecanje_id:utakmica.natjecanje_id
                 }
               });
+              //uvecaj bodove
+              await models.rezultati.increment('bodovi',{
+                by:2,
+                where:{
+                  klub_id:utakmica.domaci_id,
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              })
               await models.rezultati.increment('porazi',{
                 where:{
                   klub_id:utakmica.gosti_id,
@@ -1887,6 +1969,14 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                   natjecanje_id:utakmica.natjecanje_id
                 }
               });
+              //uvecaj bodove
+              await models.rezultati.increment('bodovi',{
+                by:2,
+                where:{
+                  klub_id:utakmica.gosti_id,
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              })
               await models.klubclanovi.increment('porazi',{
                 where:{
                   do:null,
@@ -1924,6 +2014,15 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                   natjecanje_id:utakmica.natjecanje_id
                 }
               });
+              await models.rezultati.increment('bodovi',{
+                by:2,
+                where:{
+                  klub_id:{
+                    [Op.in]:[utakmica.domaci_id,utakmica.gosti_id]
+                  },
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              })
               await models.klubclanovi.increment('nerjeseno',{
                 where:{
                   do:null,

@@ -33,7 +33,7 @@ module.exports=(app,httplogger)=>{//U OVOJ FUNKCIJI LOADAMO SVE ŠTO JE POTREBNO
       secret:config.express_session.secret,
       store: session_store,
       cookie:{
-       path: '/',httpOnly: true,domain:'localhost',sameSite:'lax', secure:false, maxAge: 1000*60*60*3 //3 sat trajanje
+       path: '/',httpOnly: true,domain:'localhost',sameSite:'lax', secure:false, maxAge: 1000*60*2 //3 sat trajanje
        //secure za produkciju samo
       }
     }))

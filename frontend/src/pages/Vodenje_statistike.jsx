@@ -24,6 +24,7 @@ import Sudci from '../components/SelectSudci';
 import Klubovi from '../components/SelectKlubovi';
 import ZavrsiUtakmicu from '../components/ZavrsiUtakmicuButton';
 import OcjenaSudaca from '../components/SudacOcjena';
+import Welcome from '../components/Welcome_component';
 import {MuiPickersUtilsProvider} from '@material-ui/pickers';
 import {useSelector} from 'react-redux';
 import DateFnsUtils from '@date-io/date-fns'; /*funkcije za manipulaciju s dateovima*/
@@ -67,6 +68,7 @@ const spremljenGameInfo=useSelector(state=>state.spremiUtakmicu);
 const utakmicaZavrsena=useSelector(state=>state.zavrsiUtakmicu);
     return (
         <div>
+            <Welcome/>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>{/*za date picker provider*/}
             <AppBar className={classes.appBar}>
                     <Box className={classes.logoBox}><img className={classes.logo} src={logo} alt='HandStat Logo'/> <Typography style={{fontWeight:'bold'}} align='center' color='secondary'>HANDSTAT </Typography></Box>

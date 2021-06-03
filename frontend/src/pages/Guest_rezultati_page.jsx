@@ -96,7 +96,7 @@ function Guest_rezultati_page(props) {
                 <Grid style={{marginTop:100}} container direction='column' alignItems='center' justify='space-around'>{/*parent glavni container */}
                     <Grid style={{marginTop:100}} item container direction='column' alignItems='center' justify='space-between' sm={6} xs={12}  >{/*container od natjecanje selectora*/}
                         <Grid item xs={12}>
-                            <Typography align='center' variant='h4'>NATJECANJE</Typography>
+                            <Typography align='center' variant='h4' color='secondary'>NATJECANJE</Typography>
                         </Grid>
                         <Grid item container direction='row'>
                             <FormControl style={{width:'100%'}}>

@@ -42,6 +42,7 @@ export default function App() {
     onCompleted:(data)=>{
       if(data.checklogin)
       {
+        console.log('user logiran');
         dispatch(adminLoginStatus(true))
       }
     }

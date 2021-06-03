@@ -61,7 +61,6 @@ export default function Timer() {
     useEffect(()=>{
         if(time.ticks===(poluvremeTrajanje*60)&&!paused)//ako je doslo na npr 30:00 a korisnik nije pauzira-> paused=false-> automatski zaustavi i ne uvećavaj counter sve dok korisnik ponovo ne pokrene pause button koji će dispatchat increment timera pa će u sljedećem pozivu ticks bit 1801 pa neće uć u ovaj if
         {
-            console.log('Kraj poluvremena');
             promijeniStatus({//status=poluvreme pauza
                 variables:{
                     broj_utakmice:brojUtakmice,
@@ -72,7 +71,6 @@ export default function Timer() {
         }
         else if(time.ticks===(2*poluvremeTrajanje*60)&&!paused)//kraj utakmice-> promijeni status za kraj,stopiraj pause button i disableaj ga
         {
-            console.log('Kraj utakmice');
             promijeniStatus({
                 variables:{
                     broj_utakmice:brojUtakmice,
@@ -89,7 +87,6 @@ export default function Timer() {
             }
             if(time.ticks===((poluvremeTrajanje*60)+1))//npr 30:01->počelo drugo poluvreme-> nije više pauza
             {
-                console.log('Početak drugog poluvremena');
                 promijeniStatus({
                     variables:{
                         broj_utakmice:brojUtakmice,
@@ -99,7 +96,6 @@ export default function Timer() {
             }//ne stavljamo %60===0 jer nam se onda ne bi promijenilo u 31. minutu zbog toga što u slučaju sa 1800sekundi neće uć u ovaj dio jer je to kraj poluvremena oznaka ili bi se u slučaju kraja utakmice na 60:00 mijenjala minuta u 61
             if(time.ticks%60===1&&time.ticks>1)//ako je okrugli broj minuta+1 sekunda-> ušli u novu minutu-> promijeni minutu utakmice
             {//ne brojimo slučaj s 1 sekundom jer nam je po defaultu vrijeme postavljeno na 1. minutu
-                console.log('Update vremenea');
                 promijeniVrijeme({
                     variables:{
                         broj_utakmice:brojUtakmice,
@@ -112,7 +108,6 @@ export default function Timer() {
     useEffect(()=>{
         if(prviPoziv&&!paused)//ako je prvi put kliknut(paused je pomaknut na iz true na false a prviPoziv je true-> POČELA UTAKMICA I IGRA SE
         {
-            console.log('Prvi poziv promjena statusa'+prviPoziv+paused);
             promijeniStatus({
                 variables:{
                     broj_utakmice:brojUtakmice,

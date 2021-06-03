@@ -52,7 +52,6 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
     const [renderGostiRezultat,setRenderGostiRezultat]=useState(false);
     const [prevRezultatDomaci,setPrevRezultatDomaci]=useState(golovi_domaci);//pamtimo prethodne rezultate kako bi znali koji rezultat treba rerednerat
     const [prevRezultatGosti,setPrevRezultatGosti]=useState(golovi_gosti);//kad se komponeneta tek mounta-> ne znamo prethodni rezultat pa ćemo ga postavit na dobiveni samo
-    console.log('ReRender'+renderDomaciRezultat+' gosti'+renderGostiRezultat+'Rezultat: '+golovi_domaci+' '+golovi_gosti);
     if(golovi_domaci!==prevRezultatDomaci)
     {
             setRenderDomaciRezultat(true);

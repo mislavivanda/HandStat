@@ -53,10 +53,8 @@ function Login(props) {
     },[]);
     const [loginUser,{loading,error}]=useMutation(login,{
         onCompleted:(data)=>{//ako je dobio podatke-> prosao login,inace se javi error
-            props.history.replace('/statistika');//vodimo usera na statistika stranicu
-            //aktiviraj popup sa dobrodoslicom i imenom
-            console.log('Dobrodosli '+data.login.ime+' '+data.login.prezime);
             dispatch(adminLoginStatus(true));//postavi globalni state u true da se zna da je logiran
+            props.history.replace('/statistika');//vodimo usera na statistika stranicu
         },
         onError:(error)=>{//potrebno da resolvamo rejected error promise ,inace se rusi aplikacija
             //makni dosad unesene podatke

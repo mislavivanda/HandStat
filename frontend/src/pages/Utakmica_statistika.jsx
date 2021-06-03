@@ -152,7 +152,7 @@ function Utakmica_statistika(props) {
                 </Grid>
                 <Grid style={{width:'100%',marginTop:50}} item container direction='row' justify='center' xs={12} md={4}>
                          <DogadajiUtakmice brojUtakmice={brojUtakmice} live={false}/>
-                      </Grid>
+                </Grid>
             </Grid>
             </Fragment>
         </div>

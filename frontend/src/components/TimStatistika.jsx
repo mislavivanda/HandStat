@@ -86,7 +86,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
         },
         updateQuery:(prev,{subscriptionData})=>{
             if(!subscriptionData.data) return prev;
-            console.log('Primljena statistika igraca: '+JSON.stringify(subscriptionData.data));
             let noviNiz=[];
             noviNiz=prev.timstatistika.igraci.map((statistika)=>{
                 if(statistika.igrac.maticni_broj===subscriptionData.data.statistikaigrac.igrac.maticni_broj)
@@ -113,7 +112,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
                     igraci:noviNiz//azurirani niz igraca, ostalo ostavit isto
                 }
             }
-            console.log('Novo stanje u cacheu: '+JSON.stringify(format));
             return {
                 timstatistika:{
                     ...prev.timstatistika,
@@ -131,7 +129,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
         },
         updateQuery:(prev,{subscriptionData})=>{
             if(!subscriptionData.data) return prev;
-            console.log('Primljena statistika golmana: '+JSON.stringify(subscriptionData.data));
             let noviNiz=[];
             noviNiz=prev.timstatistika.golmani.map((statistika)=>{
                 if(statistika.golman.maticni_broj===subscriptionData.data.statistikagolman.golman.maticni_broj)
@@ -158,7 +155,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
                    golmani:noviNiz//azurirani niz igraca, ostalo ostavit isto
                 }
             }
-            console.log('Novo stanje u cacheu: '+JSON.stringify(format));
             return {
                 timstatistika:{
                     ...prev.timstatistika,
@@ -176,7 +172,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
         },
         updateQuery:(prev,{subscriptionData})=>{
             if(!subscriptionData.data) return prev;
-            console.log('Primljena statistika stozera: '+JSON.stringify(subscriptionData.data));
             let noviNiz=[];
             noviNiz=prev.timstatistika.stozer.map((statistika)=>{
                 if(statistika.clan.maticni_broj===subscriptionData.data.statistikastozer.clan.maticni_broj)
@@ -196,7 +191,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
                    stozer:noviNiz//azurirani niz igraca, ostalo ostavit isto
                 }
             }
-            console.log('Novo stanje u cacheu: '+JSON.stringify(format));
             return {
                 timstatistika:{
                     ...prev.timstatistika,

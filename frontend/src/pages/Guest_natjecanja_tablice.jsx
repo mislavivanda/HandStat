@@ -110,7 +110,6 @@ function Guest_natjecanja_tablice() {
                                 }
                                 if(tablicaData)
                                 {
-                                    console.log('usao u tablicuuu');
                                     return (
                                         <Grid item  style={{marginTop:100}}  container direction='column' justify='space-evenly' alignItems='center' xs={12}>
                                             <Box className={classes.tablicaStupciBox}>

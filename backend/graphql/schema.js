@@ -170,7 +170,10 @@ const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
           },
           where:{
             rola:1
-          }
+          },
+          order:[
+            ['broj_dresa','ASC']
+          ]
         }).then((data)=>{
           let format=[];
           let temp={};
@@ -204,7 +207,10 @@ const Tim=new GraphQLObjectType({//svi clanovi tima određenim id-om
           },
           where:{
             rola:2
-          }
+          },
+          order:[
+            ['broj_dresa','ASC']
+          ]
         }).then((data)=>{
           let format=[];
           for(let golman of data)

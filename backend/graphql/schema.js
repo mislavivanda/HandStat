@@ -1239,6 +1239,23 @@ const RootQuery=new GraphQLObjectType({
           limit:5
         })
       }
+    },
+    natjecanjetablica:{
+      type:new GraphQLList(Rezultati),
+      args:{
+        natjecanje_id:{type:new GraphQLNonNull(GraphQLInt)}
+      },
+      resolve(parent,args){
+        return models.rezultati.findAll({
+          where:{
+            natjecanje_id:args.natjecanje_id
+          },
+          order:[//prvo sortirat po bodovima pa onda po gol razlici ako je isti broj bodova
+            ['bodovi','DESC'],
+            ['gol_razlika','DESC']
+          ]
+        })
+      }
     }
   }
 })
@@ -1926,6 +1943,23 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                   natjecanje_id:utakmica.natjecanje_id
                 }
               });
+              //uvecaj gol razliku za pobjednika i porazenog
+              //domacin pobjednik-> uvecaj za pozitivno
+              await models.rezultati.increment('gol_razlika',{
+                by:(utakmica.rezultat_domaci-utakmica.rezultat_gosti),
+                where:{
+                  klub_id:utakmica.domaci_id,
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              })
+              //gost porazen-> smanji-> negativni pribrojnik
+              await models.rezultati.increment('gol_razlika',{
+                by:(utakmica.rezultat_gosti-utakmica.rezultat_domaci),
+                where:{
+                  klub_id:utakmica.gosti_id,
+                  natjecanje_id:utakmica.natjecanje_id
+                }
+              })
               await models.klubclanovi.increment('pobjede',{
                 where:{
                   do:null,//trenutno u tom klubu
@@ -1977,6 +2011,22 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                   natjecanje_id:utakmica.natjecanje_id
                 }
               })
+              //gost pobjednik-> uvecaj za pozitivno
+              await models.rezultati.increment('gol_razlika',{
+              by:(utakmica.rezultat_gosti-utakmica.rezultat_domaci),
+              where:{
+                klub_id:utakmica.gosti_id,
+                natjecanje_id:utakmica.natjecanje_id
+              }
+            })
+            //domacin porazen-> smanji-> negativni pribrojnik
+            await models.rezultati.increment('gol_razlika',{
+              by:(utakmica.rezultat_domaci-utakmica.rezultat_gosti),
+              where:{
+                klub_id:utakmica.domaci_id,
+                natjecanje_id:utakmica.natjecanje_id
+              }
+            })
               await models.klubclanovi.increment('porazi',{
                 where:{
                   do:null,

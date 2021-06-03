@@ -12,7 +12,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { useApolloClient } from '@apollo/client';
 const useStyles=makeStyles((theme)=>({
     gridList:{
-        width:'100%',
+        width:'95%',
         height:300,
         borderStyle:'solid',
         borderColor:theme.palette.primary.main,
@@ -155,14 +155,14 @@ function RezultatiUzivoBox({history}) {
                 <GridList  className={classes.gridList} cols={1} cellHeight={50} spacing={20} >
                             {
                                 //kad se promine propovi koje dajemo rezultat komponenti u odnosu na prethodne onda će se ona rerenderat
-                            (rezultati)?
+                            (rezultati.length>0)?
                             rezultati.map((rezultat)=>(
                                 <Grid key={rezultat.broj_utakmice} item sm={8} xs={12} className={classes.gridItem}>
                                     <Rezultat history={history} broj_utakmice={rezultat.broj_utakmice}  natjecanje={rezultat.natjecanje} domaci={rezultat.domaci} gosti={rezultat.gosti} golovi_domaci={rezultat.rezultat_domaci} golovi_gosti={rezultat.rezultat_gosti} minuta={rezultat.minuta} status={rezultat.status}/>
                                 </Grid>
                             ))
                             :
-                            <Typography align='center' color='secondary'> TRENUTNO SE NE IGRA NIJEDNA UTAKMICA</Typography>
+                            <Typography align='center' color='secondary' variant='h6'> TRENUTNO SE NE IGRA NIJEDNA UTAKMICA</Typography>
                             }
                     </GridList>
         )

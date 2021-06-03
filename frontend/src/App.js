@@ -8,6 +8,7 @@ import UtakmicaStatistikaLive from './pages/Utakmica_statistika_live';
 import GuestRezultatiPage from './pages/Guest_rezultati_page';
 import GuestKluboviPage from './pages/Guest_klubovi_page';
 import KlubInfoPage from './pages/Klub_info_page'
+import TablicePage from './pages/Guest_natjecanja_tablice';
 import Login from './pages/Login';
 import Navbar from './components/Navbar';
 import {checkLogin} from './graphql/query';
@@ -53,7 +54,7 @@ export default function App() {
         <Switch>{/*exact path da nebi bilo parcijalnog matchanja*/}
           <Route exact path='/' render={(props)=>(
             <Fragment>
-              <Navbar history={props.history} />
+              <Navbar history={props.history} match={props.match}/>
               <GuestHomePage history={props.history}/>
             </Fragment>
           )}/>
@@ -73,20 +74,26 @@ export default function App() {
           })()}
           <Route exact path='/rezultati' render={(props)=>(
               <Fragment>
-               <Navbar history={props.history} />
+               <Navbar history={props.history} match={props.match}/>
                <GuestRezultatiPage history={props.history} />
              </Fragment>
           )}/>
           <Route exact path='/klubovi' render={(props)=>(
             <Fragment>
-              <Navbar history={props.history}/>
+              <Navbar history={props.history} match={props.match}/>
               <GuestKluboviPage history={props.history}/>
             </Fragment>
           )} />
           <Route exact path='/klub/:klub_id' render={(props)=>(
             <Fragment>
-               <Navbar history={props.history}/>
+               <Navbar history={props.history} match={props.match}/>
                <KlubInfoPage match={props.match} history={props.history}/>{/*potrebni match i history objekti od react routera, kod komponenti prikaza statistike one se prosljeđuju automatski kao props jer koristimo componenet={} sintaksu*/}
+            </Fragment>
+          )}/>
+          <Route exact path='/tablice' render={(props)=>(
+            <Fragment>
+              <Navbar history={props.history} match={props.match}/>
+              <TablicePage/>
             </Fragment>
           )}/>
         </Switch>

@@ -50,7 +50,7 @@ export default function Guest_homepage(props) {//props su defaultni propsi koje 
                 <Grid item container xs={12} justify='center' >
                     <Grid item sm={8} xs={12} >{/*naslov REZULTATI UŽIVO nestamo u ove grid i box iteme da ga uskladimo sa rezultatima u gridlisti kako bi ga mogli realtivno dobro centrirat u odnosu na centar rezultata-> tamo mičemo za 9% ovde za 10% pošto je veći grid(jer nije unutar grid liste) pa treba malo više i pomaknit */}
                         <Box>
-                            <Typography align='center'  variant='h6'style={{fontWeight:'bold',fontSize:'1.5rem'}} color='secondary'>REZULTATI UŽIVO</Typography>
+                            <Typography align='center'  variant='h5'style={{fontWeight:'bold'}} color='secondary'>REZULTATI UŽIVO</Typography>
                         </Box>
                     </Grid>
                 </Grid>

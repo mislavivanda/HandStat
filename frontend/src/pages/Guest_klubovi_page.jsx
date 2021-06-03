@@ -89,7 +89,7 @@ function Guest_klubovi_page(props) {
                             (()=>{
                                 if(kluboviNatjecanjaLoading)
                                 {
-                                    return (<CircularProgress className={classes.loadingItem} color='primary'/>)
+                                    return (<CircularProgress color='primary'/>)
                                 }
                                 else if(kluboviNatjecanjaData)
                                 {
@@ -119,7 +119,7 @@ function Guest_klubovi_page(props) {
                             })()
                         }
                         {
-                                //imamo 2 moguca errora-> error dohvata svih rezultata će se ishandleat gore u zasebnom returnu a drugi error(dohvat klubova od natjecanja) cemo ishandleat ovdje sa error popupom, vratit cemo popup a gore će se vratit null jer ce data bit null i nece bit loadinga
+                                //imamo 2 moguca errora-> error dohvata svih natjecanja će se ishandleat gore u zasebnom returnu a drugi error(dohvat klubova od natjecanja) cemo ishandleat ovdje sa error popupom, vratit cemo popup a gore će se vratit null jer ce data bit null i nece bit loadinga
                             (isError&&kluboviNatjecanjaError.message)?
                             <ErrorDialog errorText={kluboviNatjecanjaError.message}/>
                             :

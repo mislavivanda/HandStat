@@ -1,8 +1,9 @@
 import React, {useState} from 'react'
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles,useTheme} from '@material-ui/core/styles';
 import {Link} from "react-router-dom";
 import logo from '../images/handstat_logo.png';
 import {AppBar,Button,Box,Typography,Grid,Tabs,Tab} from '@material-ui/core';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 const useStyles=makeStyles((theme)=>({
     appBar:{
         color:'primary',
@@ -38,9 +39,27 @@ const useStyles=makeStyles((theme)=>({
         color:'#FFFFFF'
     }
 }));
-export default function Navbar({history}) {//propsi od razlicitih providera prosljeđeni preko guest homepagea
+export default function Navbar({history,match}) {//propsi od razlicitih providera prosljeđeni preko guest homepagea
     const classes=useStyles();
-    const [selected,setSelected]=useState(0);//koja je inicijalno po defaultu sleektirana-> prva->označimo po indeksima dijelove navbara i na svaki klik reagiramo
+    const theme=useTheme();
+    const media=useMediaQuery('(max-width:420px)');// including the screen size given by the breakpoint key.
+    let currentPage;//kod mountanja provjerit na kojoj smo trenutnoj stranici-> NIJE UVIJEK DEFAULT STATE NA 0 JER ako refreshamo dok smo na stranici /rezultati onda će krivi tab biti označen ko aktivan
+    if(match.path==='/')
+    {
+        currentPage=0;
+    }
+    else if(match.path==='/rezultati')
+    {
+        currentPage=1;
+    }
+    else if(match.path==='/klubovi'||match.path==='/klub/:klub_id')
+    {
+        currentPage=2;
+    }
+    else {
+        currentPage=3;//inace je na /tablica
+    }
+    const [selected,setSelected]=useState(currentPage);//koja je inicijalno po defaultu sleektirana-> prva->označimo po indeksima dijelove navbara i na svaki klik reagiramo
     function handleChange(event, newSelected){
         setSelected(newSelected);
       };
@@ -51,10 +70,17 @@ export default function Navbar({history}) {//propsi od razlicitih providera pros
                         <Box className={classes.logoBox}><img className={classes.logo} src={logo} alt='HandStat Logo'/> <Typography variant='h6'style={{fontWeight:'bold'}} align='center' color='secondary'>HANDSTAT </Typography></Box>
                     </Grid>
                     <Grid item xs={12} md={8}>{/*grid od tabova*/}
-                        <Tabs value={selected} onChange={handleChange}>
+                        <Tabs 
+                        value={selected} 
+                        centered={(!media)? true : false}//cenriramo na sirinama iznad 420px a ispod koristimo strelice za skroliranje jer ne smimo istvremeno koristit centered i scrollable props
+                        onChange={handleChange}
+                        variant={(media)? "scrollable" : "standard"}
+                        scrollButtons={(media)? 'on' : 'off'}
+                        >
                            <Tab disableRipple label='POČETNA' component={Link} to='/'/>{/*Link ispod haube zapravo poziva history objekt*/}
                            <Tab disableRipple label='REZULTATI' component={Link} to='/rezultati'/>
-                           <Tab disableRipple label='IGRAČI I KLUBOVI' component={Link} to='/klubovi'/>
+                           <Tab disableRipple label='KLUBOVI I IGRAČI' component={Link} to='/klubovi'/>
+                           <Tab disableRipple label='TABLICE' component={Link} to='/tablice'/>
                         </Tabs>
                     </Grid>
                     <Grid  item container direction='row' justify='center' alignItems='center' xs={12} md={1}>{/*grid od admin botuna*/}

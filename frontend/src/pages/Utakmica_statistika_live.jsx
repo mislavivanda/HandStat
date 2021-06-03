@@ -81,7 +81,7 @@ function Utakmica_statistika_live(props) {
     const classes=useStyles();
     const dispatch=useDispatch();
     const theme=useTheme();
-    const media=useMediaQuery(theme.breakpoints.down('sm'));//za centriranje game info i osoblje info kada dođe na razinu sm
+    const media=useMediaQuery(theme.breakpoints.down('sm'));//za centriranje game info i osoblje info kada dođe na razinu sm, including the screen size given by the breakpoint key.
     const brojUtakmice=decodeURIComponent(props.match.params.broj_utakmice).toString();
     const { loading, error, data } = useQuery(prikazUtakmice,{
         variables:{

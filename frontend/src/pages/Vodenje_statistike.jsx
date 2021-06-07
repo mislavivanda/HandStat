@@ -72,7 +72,7 @@ const utakmicaZavrsena=useSelector(state=>state.zavrsiUtakmicu);
             <MuiPickersUtilsProvider utils={DateFnsUtils}>{/*za date picker provider*/}
             <AppBar className={classes.appBar}>
                     <Box className={classes.logoBox}><img className={classes.logo} src={logo} alt='HandStat Logo'/> <Typography style={{fontWeight:'bold'}} align='center' color='secondary'>HANDSTAT </Typography></Box>
-                    <Box style={{ flexGrow:1,display:'flex',alignItems:'center',justifyContent:'center'}}><Typography align='center' variant='h6' style={{color:'#FFFFFF'}}>STATISTIKA UTAKMICE</Typography></Box>
+                    <Box style={{ flexGrow:1,display:'flex',alignItems:'center',justifyContent:'center'}}><Typography align='center' variant='h6' style={{color:'#FFFFFF'}}>VOĐENJE STATISTIKE</Typography></Box>
             </AppBar>
             <Grid container style={{ margin:'100 auto', marginTop:100}} direction='column' justify='space-evenly' alignItems='center'>{/*container svega ispod navbara*/}
                   {
@@ -160,7 +160,7 @@ const utakmicaZavrsena=useSelector(state=>state.zavrsiUtakmicu);
                    <MoguciDogadaji/>
                </Grid>
                <Grid  style={{minHeight:800}} item container direction='column' alignItems='center' justify='space-evenly' xs={12} sm={7} md={3}>{/*container od gola i liste događaja*/}
-                      <Grid item container justify='center' direction='row' style={{position:'relative'}} xs={12}>{/* gol*/}
+                      <Grid item container justify='center' direction='row' style={{position:'relative',marginTop:20}} xs={12}>{/* gol*/}
                         <Gol/>
                       </Grid>
                       <Grid style={{ borderColor:'#000000',

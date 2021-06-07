@@ -83,9 +83,9 @@ export default function Navbar({history,match}) {//propsi od razlicitih provider
                            <Tab disableRipple label='TABLICE' component={Link} to='/tablice'/>
                         </Tabs>
                     </Grid>
-                    <Grid  item container direction='row' justify='center' alignItems='center' xs={12} md={1}>{/*grid od admin botuna*/}
+                    <Grid  item container direction='row' justify='center' alignItems='center' xs={12} md={2}>{/*grid od admin botuna*/}
                         <Box style={{ display:'flex', marginRight:0,  flexDirection:'row',justifyContent:'center',alignContent:'center' }}>
-                            <Button onClick={()=>history.push('/login')}  className={classes.adminButton}><Typography  style={{fontWeight:'bold'}} color='secondary'>Admin</Typography></Button>
+                            <Button onClick={()=>history.push('/login')}  className={classes.adminButton}><Typography  style={{fontWeight:'bold'}} color='secondary'>Vodi utakmicu!</Typography></Button>
                             </Box>
                     </Grid>
                </Grid>

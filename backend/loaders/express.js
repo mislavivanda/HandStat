@@ -57,7 +57,7 @@ module.exports=(app,httplogger)=>{//U OVOJ FUNKCIJI LOADAMO SVE ŠTO JE POTREBNO
         new SubscriptionServer(
         {//opcije servera
           execute,//graphql funkcija koja se kontrolira resolvanje i fullfill/rejection od querya i mutacija
-          subscribe,//ista stvar kao execute samo za mutacije
+          subscribe,//ista stvar kao execute samo za subscriptionse
           schema: schema,//graphql shema
         },
         {//opcije soketa

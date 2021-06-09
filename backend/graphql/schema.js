@@ -33,8 +33,6 @@ const {GraphQLObjectType,//OUTPUT I INPUT MOGU BITI
         GraphQLBoolean,
         Kind}=graphql;//KIND SADRŽI SVE TIPOVE VARIJABLI AKO JE POTREBNO U RESOLVERIMA PROVJERAVAT JELI PRIMLJENA VARIJALBA ISPRAVNOG TIPA
   const { GraphQLUpload } = require('graphql-upload');//OVO JE TIP KOJI NAM OMOGUĆAVA RUKOVANJE S FILEOVIMA,SVUGDJE DI KORISTIMO FILEOVE KAO INPUT TIP STAVIMO OVAJ SCALAR ZA TIP U GRAPHQL SHEMI MUTACIJA/QUERYA
-const { Console } = require("console");
-const { type } = require("os");
 
 //Definicija našeg vlastitog skalarnog tipa,datum nije defaultni skalarni tip
 const Datum = new GraphQLScalarType({
@@ -733,6 +731,9 @@ const RezultatiNatjecanja=new GraphQLObjectType({//za vraćanje svih rezultata p
           where:{
             id:parent.natjecanje_id
           }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju natjecanja unutar RezultatiNatjecanja objekta '+error);
+          throw(error);
         })
       }
     },
@@ -766,6 +767,9 @@ const Rezultati=new GraphQLObjectType({
           where: {
             id:parent.natjecanje_id
           }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju natjecanja unutar Rezultati objekta '+error);
+          throw(error);
         })
       }
     },
@@ -776,6 +780,9 @@ const Rezultati=new GraphQLObjectType({
           where:{
             id:parent.klub_id
           }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju kluba unutar Rezultati objekta '+error);
+          throw(error);
         })
       }
     },
@@ -784,6 +791,245 @@ const Rezultati=new GraphQLObjectType({
     nerjeseni:{type:GraphQLInt},
     bodovi:{type:GraphQLInt},
     gol_razlika:{type:GraphQLInt},
+  })
+})
+const Povijest=new GraphQLObjectType({//objekt transfera kod izlista povijesti transfera igraca/stozera/strucnog osoblja
+  name:'Povijest',
+  fields:()=>({
+    //NE RADIMO S NATJECANJE I KLUB OBJEKT TIPOVIMA JER U PRETHODNOM KORAKU MOŽEMO DOBIT SVE OVE PODATKE KROZ JOINANJE PA DA NE MORAMO OPET NEPOTREBNO QUERYAT BAZU ZA PRONAĆ PODATKE O KLUBU I NATJECANJU
+    natjecanje:{type:GraphQLString},
+    klub:{type:GraphQLString},
+    goloviobrane_ukupno:{type:GraphQLInt}
+  })
+})
+//OPRAVDAN PRISTUP JER ĆEMO TRANSFER KORISTIT UVIJEK S ISTIM PODACIMA ZA PRIKAZ I ZA ITU SVRHU
+const ClanTimaUtakmica=new GraphQLObjectType({//objekt utakmice s prikazom golova/obrana za igrace/golmane
+  name:'ClanTimaUtakmica',
+  fields:()=>({
+    utakmica:{
+      type:Utakmica,
+      resolve(parent,args){
+        return models.utakmica.findOne({
+          where:{
+            broj_utakmice:parent.broj_utakmice
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju utakmice unutar ClanTimaUtakmica objekta '+error);
+          throw(error);
+        })
+      }
+    },
+      goloviobrane_ukupno:{type:GraphQLInt}
+  })
+})
+
+const GoloviPrikaz=new GraphQLObjectType({
+  name:'Prikazgolova',
+  fields:()=>({
+    //iz ova 4 možemo dobit ukupne zbrojem
+    pozicija:{type:GraphQLInt},
+    pokusajibranka7m:{type:GraphQLInt},
+    golovibranka7m:{type:GraphQLInt},
+    pokusajibrankaostali:{type:GraphQLInt},
+    golovibrankaostali:{type:GraphQLInt},
+  })
+})
+
+const ObranePrikaz=new GraphQLObjectType({
+  name:'Prikazobrana',
+  fields:()=>({
+    //iz ova 4 možemo dobit ukupne zbrojevima
+    pozicija:{type:GraphQLInt},
+    primljenibranka7m:{type:GraphQLInt},//primljeni golovi sa 7m
+    obranebranka7m:{type:GraphQLInt},//obrane-> ukupna statistika=obrane/primljeni+obrane
+    primljenibrankaostali:{type:GraphQLInt},//ukupna statistika=obrane/primljeni + obrane
+    obranebrankaostali:{type:GraphQLInt},
+  })
+})
+
+const IgracPrikaz=new GraphQLObjectType({
+  name:'IgracInfo',
+  fields:()=>({
+    info:{//opce informacije ime,prezime,visina,...
+      type:ClanTima,
+      resolve(parent,args){
+        return models.clanovitima.findOne({
+          where:{
+            maticni_broj:parent.maticni_broj
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju clana tima unutar IgracPrikaz objekta '+error);
+          throw(error);
+        })
+      }
+    },
+    golovi:{
+      type:new GraphQLList(GoloviPrikaz),
+      resolve(parent,args){
+         //zbrajamo sve golove i grupiramo ih po pozicijama gola u utakmicama u kojima je sujdelova za NJEGOV TRENUTNI KLUB-> datum do=null-> jos traje
+        //BITNO VODIT RAČUNA O TOME DA MOŽE BIT VIŠE PUTA ČLAN U ISTOM TIMU PA NE MOŽEMO SAMO JOINAT PO TIMU I ITAKMICAMA KOJE SE ODIGRA ZA TAJ TIM
+        //-> MORAMO JOINAT NA NAČIN DA GLEDAMO SAMO ONE UTAKMICA KOJE JE IGRA ZA TAJ KLUB U KOJIMA JE DATUM IGRANJA NAKON DATUMA ZADNJEG UČLANJENJA IGRAČA U TAJ TIM JER TO PREDSTAVLJA TRENUTNE PODATKE ZA TOG IGRAČA
+        return sequelize.query("SELECT pg.pozicija, SUM(CASE WHEN d.id=5 OR d.id=7 THEN 1 ELSE 0 END) AS pokusajibranka7m, SUM(CASE WHEN d.id=5 THEN 1 ELSE 0 END) AS golovibranka7m, SUM(CASE WHEN d.id=1 OR d.id=3 THEN 1 ELSE 0 END) AS pokusajibrankaostali,SUM(CASE WHEN d.id=1 THEN 1 ELSE 0 END) AS golovibrankaostali FROM klubclanovi kc JOIN pozicijegola pg ON kc.maticni_broj=pg.maticni_broj JOIN dogadaj d ON pg.dogadaj_id=d.id JOIN utakmica u ON pg.broj_utakmice=u.broj_utakmice WHERE kc.maticni_broj=:maticni AND kc.klub_id=:klub AND kc.do IS NULL AND u.datum>kc.od GROUP BY pg.pozicija",{
+          raw:true,
+          type: QueryTypes.SELECT,
+          replacements: {
+            maticni:parent.maticni_broj,
+            klub:parent.klub_id
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju pozicija golova unutar IgracPrikaz objekta '+error);
+          throw(error);
+        })
+      }
+    },
+    utakmice:{
+      type:new GraphQLList(ClanTimaUtakmica),
+      resolve(parent,args){//korelirani podupit s grupiranjem i agregate funkcijom-> za svaki klubclanovi redak vratit će se lista utakmica koje je igrac igrao u tom periodu i za njih ce se zbrajati ukupni golovi koji ce bitit grupiurani po natjecanju klubu i periodu u kojem su se odvijali (od do)-> kad bi grupirali samo po natjecanju i klubu onda bi se spojili periodi(JER SE GRUPIRA PO ISTOM KLUBU I NAZIVU) u kojima igrac igra za isti klub u istom natjecanju u razlicitim periodima-> kako ubacujemo u pricu i periode onda će se oni razlikovat ZA SVAKI REDAK IZ KLUB CLANOVI TABLICE JER ON PREDSTAVLJA DRUGI PERIOD IGRANJA OD OSTALIH PA ĆE SVAKI REDAK KLUB CLANOVI TABLICE DOBIT SVOJ REDAK U KONACNOJ TABLICI ŠTO I ŽELIMO JER ON PREDSTAVLJA PERIOD IGRANJA ODREĐENOG IGRAČA ZA ODREĐENI KLUB ZA KOJI ŽELIMO ZBROJITI GOLOVE
+       return sequelize.query("SELECT u.broj_utakmice,SUM(iu.golovi) AS goloviobrane_ukupno FROM igracutakmica iu JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice 	WHERE iu.maticni_broj=:maticni GROUP BY u.broj_utakmice",{
+        raw:true,
+        type: QueryTypes.SELECT,
+        replacements: {
+          maticni:parent.maticni_broj
+        }
+      }).catch((error)=>{
+        nodelogger.error('Greška u dohvaćanju utakmice unutar IgracPrikaz objekta '+error);
+        throw(error);
+      })
+      }
+    },
+    povijest:{//izvuci niz objkeata {natjecanje,klub i ukupno golove/obrane}
+      type:new GraphQLList(Povijest),
+      resolve(parent,args){//korelirani podupit s grupiranjem i agregate funkcijom-> za svaki klubclanovi redak vratit će se lista utakmica koje je igrac igrao u tom periodu i za njih ce se zbrajati ukupni golovi koji ce bitit grupiurani po natjecanju klubu i periodu u kojem su se odvijali (od do)-> kad bi grupirali samo po natjecanju i klubu onda bi se spojili periodi(JER SE GRUPIRA PO ISTOM KLUBU I NAZIVU) u kojima igrac igra za isti klub u istom natjecanju u razlicitim periodima-> kako ubacujemo u pricu i periode onda će se oni razlikovat ZA SVAKI REDAK IZ KLUB CLANOVI TABLICE JER ON PREDSTAVLJA DRUGI PERIOD IGRANJA OD OSTALIH PA ĆE SVAKI REDAK KLUB CLANOVI TABLICE DOBIT SVOJ REDAK U KONACNOJ TABLICI ŠTO I ŽELIMO JER ON PREDSTAVLJA PERIOD IGRANJA ODREĐENOG IGRAČA ZA ODREĐENI KLUB ZA KOJI ŽELIMO ZBROJITI GOLOVE
+        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje,SUM(iu.golovi) AS goloviobrane_ukupno FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  igracutakmica iu ON kc.maticni_broj=iu.maticni_broj JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
+         raw:true,
+         type: QueryTypes.SELECT,
+         replacements: {
+           maticni:parent.maticni_broj
+         },
+       }).catch((error)=>{
+        nodelogger.error('Greška u dohvaćanju povijesti unutar IgracPrikaz objekta '+error);
+        throw(error);
+      })
+       }
+    }
+
+  })
+})
+
+const GolmanPrikaz=new GraphQLObjectType({
+  name:'GolmanInfo',
+  fields:()=>({
+    info:{//opce informacije ime,prezime,visina,...
+      type:ClanTima,
+      resolve(parent,args){
+        return models.clanovitima.findOne({
+          where:{
+            maticni_broj:parent.maticni_broj
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju clana tima unutar GolmanPrikaz objekta '+error);
+          throw(error);
+        })
+      }
+    },
+   obrane:{
+    type:new GraphQLList(ObranePrikaz),
+    resolve(parent,args){
+      //isti princip kao za golove samo radimo s obranama
+      return sequelize.query("SELECT pg.pozicija, SUM(CASE WHEN d.id=8 THEN 1 ELSE 0 END) AS primljenibranka7m, SUM(CASE WHEN d.id=6 THEN 1 ELSE 0 END) AS obranebranka7m, SUM(CASE WHEN d.id=4 THEN 1 ELSE 0 END) AS primljenibrankaostali,SUM(CASE WHEN d.id=2 THEN 1 ELSE 0 END) AS obranebrankaostali FROM klubclanovi kc JOIN pozicijegola pg ON kc.maticni_broj=pg.maticni_broj JOIN dogadaj d ON pg.dogadaj_id=d.id JOIN utakmica u ON pg.broj_utakmice=u.broj_utakmice WHERE kc.maticni_broj=:maticni AND kc.klub_id=:klub AND kc.do IS NULL AND u.datum>kc.od GROUP BY pg.pozicija",{
+        raw:true,
+        type: QueryTypes.SELECT,
+        replacements: {
+          maticni:parent.maticni_broj,
+          klub:parent.klub_id
+        }
+      }).catch((error)=>{
+        nodelogger.error('Greška u dohvaćanju pozicija obrana unutar GolmanPrikaz objekta '+error);
+        throw(error);
+      })
+    }
+   },
+    utakmice:{
+      type:new GraphQLList(ClanTimaUtakmica),
+      resolve(parent,args){
+        return sequelize.query("SELECT u.broj_utakmice,SUM(gu.obrane_ukupno) AS goloviobrane_ukupno FROM golmanutakmica gu JOIN utakmica u ON gu.broj_utakmice=u.broj_utakmice 	WHERE gu.maticni_broj=:maticni GROUP BY u.broj_utakmice",{
+          raw:true,
+          type: QueryTypes.SELECT,
+          replacements: {
+            maticni:parent.maticni_broj
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju utakmice unutar GolmanPrikaz objekta '+error);
+          throw(error);
+        })
+      }
+    },
+    povijest:{
+      type:new GraphQLList(Povijest),
+      resolve(parent,args){//izvuci niz objkeata {natjecanje,klub i ukupno golove/obrane}
+        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje,SUM(gu.golovi) AS goloviobrane_ukupno FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  golmanutakmica gu ON kc.maticni_broj=gu.maticni_broj JOIN utakmica u ON gu.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
+          raw:true,
+          type: QueryTypes.SELECT,
+          replacements: {
+            maticni:parent.maticni_broj
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju povijesti unutar GolmanPrikaz objekta '+error);
+          throw(error);
+        })
+      }
+    }
+  })
+})
+
+const StozerPrikaz=new GraphQLObjectType({
+  name:'StozerInfo',
+  fields:()=>({
+    info:{//opce informacije ime,prezime,visina,...
+      type:ClanTima,
+      resolve(parent,args){
+        return models.clanovitima.findOne({
+          where:{
+            maticni_broj:parent.maticni_broj
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju clana tima unutar StozerPrikaz objekta '+error);
+          throw(error);
+        })
+      }
+    },
+    utakmice:{
+      type:new GraphQLList(ClanTimaUtakmica),//bez golova/obrana prikaz
+      resolve(parent,args){
+        return models.stozerutakmica.findAll({
+          attributes:['broj_utakmice'],
+          include:{
+            model:models.utakmica
+          },
+          where:{
+            maticni_broj:parent.maticni_broj
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju utakmice unutar StozerPrikaz objekta '+error);
+          throw(error);
+        })
+      }
+    },
+    povijest:{
+      type:new GraphQLList(Povijest),//bez golova prikaz
+      resolve(parent,args){//izvuci niz objekata {natjecanje,klub}
+        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  stozerutakmica su ON kc.maticni_broj=su.maticni_broj JOIN utakmica u ON su.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
+          raw:true,
+          type: QueryTypes.SELECT,
+          replacements: {
+            maticni:parent.maticni_broj
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju povijesti unutar StozerPrikaz objekta '+error);
+          throw(error);
+        })
+      }
+    }
   })
 })
 process.setMaxListeners(50);
@@ -1212,7 +1458,10 @@ const RootQuery=new GraphQLObjectType({
               id:args.klub_id
             }
           }
-        });
+        }).catch((error)=>{
+          nodelogger.error('Greška kod dohvaćanja natjecanja kluba '+error);
+          throw(error);
+        })
       }
     },
     rezultatikluba:{
@@ -1225,6 +1474,9 @@ const RootQuery=new GraphQLObjectType({
           where:{
             klub_id:args.klub_id
           }
+        }).catch((error)=>{
+          nodelogger.error('Greška kod dohvaćanja rezultata kluba '+error);
+          throw(error);
         })
       }
     },
@@ -1243,6 +1495,9 @@ const RootQuery=new GraphQLObjectType({
             ['datum','DESC']
           ],//sortiraj uzlazno po datumu od najnovije
           limit:5
+        }).catch((error)=>{
+          nodelogger.error('Greška kod dohvaćanja najnovijih rezultata kluba '+error);
+          throw(error);
         })
       }
     },
@@ -1260,9 +1515,51 @@ const RootQuery=new GraphQLObjectType({
             ['bodovi','DESC'],
             ['gol_razlika','DESC']
           ]
+        }).catch((error)=>{
+          nodelogger.error('Greška kod tablice za natjecanje '+error);
+          throw(error);
         })
       }
-    }
+    },
+    igracinfo:{
+      type:IgracPrikaz,
+      args:{
+        maticni_broj:{type:GraphQLString},
+        klub_id:{type:GraphQLInt}
+      },
+      resolve(parent,args){
+        return {
+          maticni_broj:args.maticni_broj,
+          klub_id:args.klub_id
+        }
+      }
+    },
+    golmaninfo:{
+      type:GolmanPrikaz,
+      args:{
+        maticni_broj:{type:GraphQLString},
+        klub_id:{type:GraphQLInt}
+      },
+      resolve(parent,args){
+        return {
+          maticni_broj:args.maticni_broj,
+          klub_id:args.klub_id
+        }
+      }
+    },
+    stozerinfo:{
+      type:StozerPrikaz,
+      args:{
+        maticni_broj:{type:GraphQLString},
+        klub_id:{type:GraphQLInt}
+      },
+        resolve(parent,args){
+          return {
+            maticni_broj:args.maticni_broj,
+            klub_id:args.klub_id
+          }
+        }
+      }
   }
 })
 //Kod pisanja u graphiql moramo poceti sa prefiskom mutation zatim u zagrade stavimo argumente i u tijelu specificiramo KOJA POLJA OD NOVO STVORENOG OBJEKTA ŽELIMO DA NAM VRATI GRAPHQL SERVER
@@ -1571,7 +1868,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 }
                 else if(args.dogadaj_id===6)//obrana sedmerca-> samo golman
                 {
-                  await models.golmanutakmica.increment('sedmerac_obrane',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                  await models.golmanutakmica.increment('obrane_ukupno,sedmerac_obrane',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
                 }
                 else if(args.dogadaj_id===7&&clan.rola===1)//sedmerac promasaj od strane igraca
                 {
@@ -1579,7 +1876,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 }
                 else if(args.dogadaj_id===8)//sedmerac primljen-> samo za golmana
                 {
-                  await models.golmanutakmica.increment('sedmerac_primljeni',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                  await models.golmanutakmica.increment('primljeni_ukupno,sedmerac_primljeni',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
                 }
                 else if(args.dogadaj_id===9&&clan.rola===1)//iskljucenje igraca
                 {
@@ -1648,18 +1945,18 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 }
                 else if(clan.rola===2)
                 {
-                  nodelogger.error('Rola=2 usao u golman statistika');
+             
                   const golman_statistika=await models.golmanutakmica.findOne({
                     where:{
                       broj_utakmice:args.broj_utakmice,
                       maticni_broj:args.maticni_broj
                     }
                   })
-                  nodelogger.error('Publish promjena golman statistike');
+            
                   pubsub.publish(PROMJENA_STATISTIKE_GOLMANA,{
                     statistikagolman:golman_statistika
                   })
-                  nodelogger.error('Publishan golman');
+               
                 }
                 else {
                   const stozer_statistika=await models.stozerutakmica.findOne({

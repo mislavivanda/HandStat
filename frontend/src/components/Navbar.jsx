@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState,useEffect} from 'react'
 import {makeStyles,useTheme} from '@material-ui/core/styles';
 import {Link} from "react-router-dom";
 import logo from '../images/handstat_logo.png';
@@ -43,23 +43,24 @@ export default function Navbar({history,match}) {//propsi od razlicitih provider
     const classes=useStyles();
     const theme=useTheme();
     const media=useMediaQuery('(max-width:420px)');// including the screen size given by the breakpoint key.
-    let currentPage;//kod mountanja provjerit na kojoj smo trenutnoj stranici-> NIJE UVIJEK DEFAULT STATE NA 0 JER ako refreshamo dok smo na stranici /rezultati onda će krivi tab biti označen ko aktivan
-    if(match.path==='/')
-    {
-        currentPage=0;
-    }
-    else if(match.path==='/rezultati')
-    {
-        currentPage=1;
-    }
-    else if(match.path==='/klubovi'||match.path==='/klub/:klub_id')
-    {
-        currentPage=2;
-    }
-    else {
-        currentPage=3;//inace je na /tablica
-    }
-    const [selected,setSelected]=useState(currentPage);//koja je inicijalno po defaultu sleektirana-> prva->označimo po indeksima dijelove navbara i na svaki klik reagiramo
+    const [selected,setSelected]=useState(0);//koja je inicijalno po defaultu sleektirana-> prva->označimo po indeksima dijelove navbara i na svaki klik reagiramo//kod mountanja provjerit na kojoj smo trenutnoj stranici-> NIJE UVIJEK DEFAULT STATE NA 0 JER ako refreshamo dok smo na stranici /rezultati onda će krivi tab biti označen ko aktivan
+    useEffect(()=>{
+        if(match.path==='/')
+        {
+          setSelected(0);
+        }
+        else if(match.path==='/rezultati')
+        {
+           setSelected(1);
+        }
+        else if(match.path==='/klubovi'||match.path==='/klub/:klub_id')
+        {
+           setSelected(2);
+        }
+        else {
+          setSelected(3);
+        }
+    },[])
     function handleChange(event, newSelected){
         setSelected(newSelected);
       };

@@ -47,8 +47,8 @@ const useStyles=makeStyles((theme)=>({
       },
       gornjiGolPolje:{
         borderTopWidth:4,
-        borderColor:theme.palette.secondary.main,
-        borderStyle:'solid'
+        borderTopColor:theme.palette.secondary.main,
+        borderTopStyle:'solid'
       },
       mutationErrorItem:{
         position:'fixed',
@@ -183,39 +183,39 @@ function Gol() {
            <img src={gol} alt='handball goal' className={classes.gol}/>
                           <Grid className={classes.golGrid} item container direction='column'>{/*tablica*/}
                             <Grid item container direction='row' xs>{/*redak*/}
-                                                      <Grid item  xs>
-                                                        <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(1)} disableRipple variant='outlined' className={[classes.golPolje,classes.gornjiGolPolje,classes.lijeviGolPolje].join(' ')} ></Button>{/*multiple classNames za lement rjesavamo sa joinanjem u string*/}
-                                                      </Grid>
-                                                      <Grid item  xs>
-                                                      <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(2)} disableRipple variant='outlined'  className={[classes.golPolje,classes.gornjiGolPolje].join(' ')}></Button>
-                                                      </Grid>
-                                                      <Grid item xs>
-                                                      <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(3)} disableRipple variant='outlined'  className={[classes.golPolje,classes.gornjiGolPolje].join(' ')}></Button>
-                                                      </Grid>
-                                                </Grid>
-                                                <Grid item container direction='row' xs>
-                                                      <Grid item xs>
-                                                      <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(4)} disableRipple variant='outlined'  className={[classes.golPolje,classes.lijeviGolPolje].join(' ')}></Button>
-                                                      </Grid>
-                                                      <Grid item xs>
-                                                      <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(5)} disableRipple variant='outlined'  className={classes.golPolje}></Button>
-                                                      </Grid>
-                                                      <Grid item xs>
-                                                      <Button  disabled={(otkljucanGol)? false : true} onClick={()=>odabraniGol(6)} disableRipple variant='outlined'  className={classes.golPolje}></Button>
-                                                      </Grid>
-                                                </Grid>
-                                                <Grid item container direction='row' xs>
-                                                      <Grid item xs>
-                                                      <Button  disabled={(otkljucanGol)? false : true} onClick={()=>odabraniGol(7)} disableRipple variant='outlined'  className={[classes.golPolje,classes.lijeviGolPolje].join(' ')}></Button>
-                                                      </Grid>
-                                                      <Grid item xs>
-                                                      <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(8)} disableRipple variant='outlined'  className={classes.golPolje}></Button>
-                                                      </Grid>
-                                                      <Grid item xs>
-                                                      <Button  disabled={(otkljucanGol)? false : true} onClick={()=>odabraniGol(9)} variant='outlined'  className={classes.golPolje}></Button>
-                                                      </Grid>
-                                                </Grid>
-                                  </Grid>
+                                <Grid item  xs>
+                                  <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(1)} disableRipple variant='outlined' className={[classes.golPolje,classes.gornjiGolPolje,classes.lijeviGolPolje].join(' ')} ></Button>{/*multiple classNames za lement rjesavamo sa joinanjem u string*/}
+                                </Grid>
+                                <Grid item  xs>
+                                  <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(2)} disableRipple variant='outlined'  className={[classes.golPolje,classes.gornjiGolPolje].join(' ')}></Button>
+                                </Grid>
+                                <Grid item xs>
+                                  <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(3)} disableRipple variant='outlined'  className={[classes.golPolje,classes.gornjiGolPolje].join(' ')}></Button>
+                                </Grid>
+                            </Grid>
+                            <Grid item container direction='row' xs>
+                                <Grid item xs>
+                                  <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(4)} disableRipple variant='outlined'  className={[classes.golPolje,classes.lijeviGolPolje].join(' ')}></Button>
+                                </Grid>
+                                <Grid item xs>
+                                  <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(5)} disableRipple variant='outlined'  className={classes.golPolje}></Button>
+                                </Grid>
+                                <Grid item xs>
+                                  <Button  disabled={(otkljucanGol)? false : true} onClick={()=>odabraniGol(6)} disableRipple variant='outlined'  className={classes.golPolje}></Button>
+                                </Grid>
+                            </Grid>
+                            <Grid item container direction='row' xs>
+                                <Grid item xs>
+                                  <Button  disabled={(otkljucanGol)? false : true} onClick={()=>odabraniGol(7)} disableRipple variant='outlined'  className={[classes.golPolje,classes.lijeviGolPolje].join(' ')}></Button>
+                                </Grid>
+                                <Grid item xs>
+                                  <Button  disabled={(otkljucanGol)? false : true}  onClick={()=>odabraniGol(8)} disableRipple variant='outlined'  className={classes.golPolje}></Button>
+                                </Grid>
+                                <Grid item xs>
+                                  <Button  disabled={(otkljucanGol)? false : true} onClick={()=>odabraniGol(9)} variant='outlined'  className={classes.golPolje}></Button>
+                                </Grid>
+                          </Grid>
+                        </Grid>
            {                   
                 ((dogadajError&&dogadajError.message)||(golpozicijaError&&golpozicijaError.message))?//kada se dogodi 1 od errora radimo alert dialog
                 <ErrorDialog errorText={(dogadajError)? dogadajError.message : golpozicijaError.message} /> //kada se dogodi error onda vraćamo dialog komponentu i otvaramo je u onError funkciji

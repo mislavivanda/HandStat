@@ -391,6 +391,135 @@ const dohvatiTablicuNatjecanja=gql`
           }
     }
 `
+//dohvat prikaza igraca
+const dohvatiIgracPrikaz=gql`
+    query($maticni_broj:String!,$klub_id:Int!){
+        igracinfo(maticni_broj:$maticni_broj,klub_id:$klub_id){
+            info{
+                ime
+                prezime
+                image_path
+                visina
+                tezina
+                datum_rodenja
+                nacionalnost
+                broj_dresa
+              }
+              golovi{
+                pozicija
+                  pokusajibranka7m
+                golovibranka7m
+                pokusajibrankaostali
+                golovibrankaostali
+              }
+              povijest{
+                natjecanje
+                klub
+                goloviobrane_ukupno
+              }
+              utakmice{
+                  goloviobrane_ukupno
+                utakmica{
+                    broj_utakmice
+                      natjecanje{
+                      naziv
+                      }
+                      domaci{
+                      naziv
+                      }
+                      gosti{
+                      naziv
+                      }
+                      rezultat_domaci
+                      rezultat_gosti
+                  }
+              
+              }
+        }
+    }
+`
+//dohvat prikaza golmana
+const dohvatiGolmanPrikaz=gql`
+    query($maticni_broj:String!,$klub_id:Int!){
+        golmaninfo(maticni_broj:$maticni_broj,klub_id:$klub_id){
+            info{
+                ime
+                prezime
+                image_path
+                visina
+                tezina
+                datum_rodenja
+                nacionalnost
+                broj_dresa
+              }
+             obrane{
+              pozicija
+              primljenibranka7m
+              obranebranka7m
+              primljenibrankaostali
+              obranebrankaostali
+                }
+              povijest{
+                natjecanje
+                klub
+                goloviobrane_ukupno
+              }
+              utakmice{
+                  goloviobrane_ukupno
+                utakmica{
+                    broj_utakmice
+                      natjecanje{
+                      naziv
+                      }
+                      domaci{
+                      naziv
+                      }
+                      gosti{
+                      naziv
+                      }
+                      rezultat_domaci
+                      rezultat_gosti
+                  }
+              
+              }
+        }
+    }
+`
+//dohvat prikaza stozera
+const dohvatiStozerPrikaz=gql`
+    query($maticni_broj:String!,$klub_id:Int!){
+        stozerinfo(maticni_broj:$maticni_broj,klub_id:$klub_id){
+            info{
+                ime
+                prezime
+                image_path
+                datum_rodenja
+                nacionalnost
+              }
+              povijest{
+                natjecanje
+                klub
+              }
+              utakmice{
+                utakmica{
+                    broj_utakmice
+                      natjecanje{
+                      naziv
+                      }
+                      domaci{
+                      naziv
+                      }
+                      gosti{
+                      naziv
+                      }
+                      rezultat_domaci
+                      rezultat_gosti
+                  }
+              
+              }
+        }
+    }
+`
 //provjera je li korisnik logiran
 const checkLogin=gql`
     query{
@@ -399,4 +528,5 @@ const checkLogin=gql`
 
 export {prikazUtakmice,dohvatiSvaNatjecanja,dohvatiSveDvorane,dohvatiSveNadzornike,dohvatiSveLijecnike,dohvatiSveZapisnicare,
 dohvatiSveMjerace,dohvatiSveSuce,dohvatiSveKluboveOdNatjecanja,dohvatiSveMoguceDogadaje,dohvatiSveClanoveTima,dohvatiStatistikuTima,dohvatiSveDogadajeUtakmice,checkLogin,
-dohvatiLiveRezultate,dohvatiLiveRezultatUtakmice,dohvatiRezultateOdabranihNatjecanja,dohvatiSvaNatjecanjaKluba,dohvatiSveRezultateKluba,dohvatiNajnovijeRezultateKluba, dohvatiTablicuNatjecanja};
+dohvatiLiveRezultate,dohvatiLiveRezultatUtakmice,dohvatiRezultateOdabranihNatjecanja,dohvatiSvaNatjecanjaKluba,dohvatiSveRezultateKluba,dohvatiNajnovijeRezultateKluba, dohvatiTablicuNatjecanja,
+dohvatiIgracPrikaz,dohvatiGolmanPrikaz,dohvatiStozerPrikaz};

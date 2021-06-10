@@ -1,4 +1,4 @@
-import {React,Fragment,useEffect} from 'react'
+import {React,Fragment,useEffect,useState} from 'react'
 import {Box,Typography,AppBar,Grid} from '@material-ui/core';
 import {makeStyles,useTheme} from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -13,7 +13,7 @@ import Alert from '@material-ui/lab/Alert';
 import {odabranTimDomaci,odabranTimGosti,resetirajTimove} from '../redux/slicers/timovi';
 import { useDispatch } from 'react-redux';
 import {prikazUtakmice} from '../graphql/query';
-import { useQuery } from '@apollo/client';//hook za poziv querya
+import { useLazyQuery } from '@apollo/client';//hook za poziv querya
 const useStyles = makeStyles((theme)=>({
     appBar:{
         color:'primary',
@@ -81,13 +81,17 @@ function Utakmica_statistika_live(props) {
     const classes=useStyles();
     const dispatch=useDispatch();
     const theme=useTheme();
+    const [brojUtakmice,setBrojUtakmice]=useState(null);
     const media=useMediaQuery(theme.breakpoints.down('sm'));//za centriranje game info i osoblje info kada dođe na razinu sm, including the screen size given by the breakpoint key.
-    const brojUtakmice=decodeURIComponent(props.match.params.broj_utakmice).toString();
-    const { loading, error, data } = useQuery(prikazUtakmice,{
-        variables:{
-            broj_utakmice:brojUtakmice
-        }
-    });
+    const [podaciUtakmice,{ loading, error, data }] = useLazyQuery(prikazUtakmice)
+    useEffect(()=>{//dohvati broj utakmice
+        setBrojUtakmice(decodeURIComponent(props.match.params.broj_utakmice).toString());//match.params je objekt koji sadrzi djelove URL po key value dijelu-> kod definicije rute za ovaj path stvili smo da se taj dio naziv :broj_utakmice pa ga na taj nacin mozemo i izvadit
+        podaciUtakmice({
+            variables:{
+                broj_utakmice:decodeURIComponent(props.match.params.broj_utakmice).toString()
+            }
+        });
+    },[])
     //kod unmountanja resetirat odabrane timove na null
     useEffect(()=>{
         return ()=>{
@@ -95,11 +99,11 @@ function Utakmica_statistika_live(props) {
         }
     },[]);
 
-    if(loading) return <CircularProgress className={classes.loadingItem} color='primary'/>
+    if(loading||!(brojUtakmice&&data)) return <CircularProgress className={classes.loadingItem} color='primary'/>
     
     if(error) return (<Alert severity="error">{error.message}</Alert>)
 
-    if(data)//kada stignu podaci
+    if(brojUtakmice&&data)//kada stignu podaci
     {
        //postavi odabrane timove kako bi znali rednera dogadaje utakmice
        dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:data.utakmica.domaci.image_path}));

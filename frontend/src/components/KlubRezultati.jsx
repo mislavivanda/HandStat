@@ -68,12 +68,13 @@ function KlubRezultati({klub_id}) {
                              sviRezultatiKlubaData.rezultatikluba.map((rezultat)=>{
                                  if(rezultat.natjecanje.id===odabranoNatjecanje.id)
                                  {
+                                     //jer koristimo map funkciju react ocekuje da cemo vratit listu elemenata pa moramo stavit kljuc kako ne bi dobivali error iako vraćamo samo 1 element
                                      return (
-                                         <Fragment>
+                                        <React.Fragment key={rezultat.natjecanje.id}>
                                             <Box className={classes.rezultatiBox}>
                                                     <Typography style={{color:'#54e346'}} variant='h4'>W</Typography>
                                                     <Typography color='secondary' variant='h4'>{rezultat.pobjede}</Typography>
-                                         </Box>
+                                            </Box>
                                             <Box className={classes.rezultatiBox}>
                                                     <Typography style={{color:'#ec0101'}} variant='h4'>L</Typography>
                                                     <Typography color='secondary' variant='h4'>{rezultat.porazi}</Typography>
@@ -82,8 +83,7 @@ function KlubRezultati({klub_id}) {
                                                     <Typography color='secondary' variant='h4'>X</Typography>
                                                     <Typography color='secondary' variant='h4'>{rezultat.nerjeseni}</Typography>
                                             </Box>
-                                         </Fragment>
-                                     )
+                                        </React.Fragment>)
                                  }
                              })
                              :

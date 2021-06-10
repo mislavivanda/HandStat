@@ -9,6 +9,7 @@ import GuestRezultatiPage from './pages/Guest_rezultati_page';
 import GuestKluboviPage from './pages/Guest_klubovi_page';
 import KlubInfoPage from './pages/Klub_info_page'
 import TablicePage from './pages/Guest_natjecanja_tablice';
+import IgracGolmanPrikaz from './pages/Igrac_golman_prikaz';
 import Login from './pages/Login';
 import Navbar from './components/Navbar';
 import {checkLogin} from './graphql/query';
@@ -97,6 +98,7 @@ export default function App() {
               <TablicePage/>
             </Fragment>
           )}/>
+          <Route exact path={["/igrac/:klub_id/:maticni_broj","/golman/:klub_id/:maticni_broj"]} component={IgracGolmanPrikaz}/>
         </Switch>
         {
           (error&&error.message)?

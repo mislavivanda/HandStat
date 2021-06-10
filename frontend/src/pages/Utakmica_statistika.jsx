@@ -1,4 +1,4 @@
-import {React,Fragment,useEffect} from 'react'
+import {React,Fragment,useEffect,useState} from 'react'
 import {Box,Typography,AppBar,Grid} from '@material-ui/core';
 import {makeStyles,useTheme} from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -12,7 +12,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from '@material-ui/lab/Alert';
 import { useDispatch } from 'react-redux';
 import {prikazUtakmice} from '../graphql/query';
-import { useQuery } from '@apollo/client';//hook za poziv querya
+import { useLazyQuery } from '@apollo/client';//hook za poziv querya
 const useStyles = makeStyles((theme)=>({
     appBar:{
         color:'primary',
@@ -81,26 +81,31 @@ function Utakmica_statistika(props) {
     const classes=useStyles();
     const theme=useTheme();
     const media=useMediaQuery(theme.breakpoints.down('xs'));
+    const [brojUtakmice,setBrojUtakmice]=useState(null);
     const dispatch=useDispatch();
-    const brojUtakmice=decodeURIComponent(props.match.params.broj_utakmice).toString();//match.params je objekt koji sadrzi djelove URL po key value dijelu-> kod definicije rute za ovaj path stvili smo da se taj dio naziv :broj_utakmice pa ga na taj nacin mozemo i izvadit
     //appolo sam vodi racuna o promjenama stanja zahtjeva i ceka na zahtjev, oaj query se poziva odmah cim se komponent mounta
     //KOMPONENTA ĆE SE RENDERAT 2 PUTA JER CE SE PROMIJENIT STANJE LOADINGA PA ĆE TO UZROKOVATI DRUGI RERENDER
-    const { loading, error, data } = useQuery(prikazUtakmice,{
-        variables:{
-            broj_utakmice:brojUtakmice
-        }
-    });
+    const [podaciUtakmice,{ loading, error, data }] = useLazyQuery(prikazUtakmice)
+    useEffect(()=>{//dohvati broj utakmice
+        setBrojUtakmice(decodeURIComponent(props.match.params.broj_utakmice).toString());//match.params je objekt koji sadrzi djelove URL po key value dijelu-> kod definicije rute za ovaj path stvili smo da se taj dio naziv :broj_utakmice pa ga na taj nacin mozemo i izvadit
+        podaciUtakmice({
+            variables:{
+                broj_utakmice:decodeURIComponent(props.match.params.broj_utakmice).toString()
+            }
+        })
+    },[])
      //kod unmountanja resetirat odabrane timove na null
      useEffect(()=>{
         return ()=>{
            dispatch(resetirajTimove());
         }
     },[]);
-    if(loading) return <CircularProgress className={classes.loadingItem} color='primary'/>
+    //dok se učitava ili dok nisu stigli podaci i postavljen broj utakmice
+    if(loading||!(brojUtakmice && data)) return <CircularProgress className={classes.loadingItem} color='primary'/>
     
     if(error) return (<Alert severity="error">{error.message}</Alert>)
 
-    if(data)//kada stignu podaci
+    if(brojUtakmice&&data)//kada stignu podaci i postavljen broj utakmice
     {
         //postavi odabrane timove kako bi znali rednera dogadaje utakmice
         dispatch(odabranTimDomaci({id:data.utakmica.domaci.id,naziv:data.utakmica.domaci.naziv,klub_slika:data.utakmica.gosti.image_path}));

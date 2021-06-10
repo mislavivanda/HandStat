@@ -96,7 +96,6 @@ function DogadajiStatistika({brojUtakmice,live}) {//inace preko useEffecta dohva
         }
     })
     function handleSelect(event){
-        console.log(event.target.value);
         setOdabraniTipoviDogadaja(event.target.value);
 
     }

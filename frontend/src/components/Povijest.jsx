@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme)=>({
 }))
 function Povijest({natjecanje,klub,golovi_obrane}) {
     const classes=useStyles();
-    console.log(natjecanje+klub+golovi_obrane);
     return (
          //box je zapravo div-> blok element-> zauzet ce sav raspolozivi prostor odnosno bit ce sirok ko griditem,dodamo vanjski box da uskladimo prikaz i sirinu s rezultatima
         //dodajemo padding i glavni container da uskaldimo s prikazom rezultata

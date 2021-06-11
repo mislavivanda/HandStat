@@ -10,6 +10,7 @@ import GuestKluboviPage from './pages/Guest_klubovi_page';
 import KlubInfoPage from './pages/Klub_info_page'
 import TablicePage from './pages/Guest_natjecanja_tablice';
 import IgracGolmanPrikaz from './pages/Igrac_golman_prikaz';
+import StozerPrikaz from './pages/Stozer_prikaz';
 import Login from './pages/Login';
 import Navbar from './components/Navbar';
 import {checkLogin} from './graphql/query';
@@ -43,7 +44,6 @@ export default function App() {
     onCompleted:(data)=>{
       if(data.checklogin)
       {
-        console.log('user logiran');
         dispatch(adminLoginStatus(true))
       }
     }
@@ -99,6 +99,7 @@ export default function App() {
             </Fragment>
           )}/>
           <Route exact path={["/igrac/:klub_id/:maticni_broj","/golman/:klub_id/:maticni_broj"]} component={IgracGolmanPrikaz}/>
+          <Route exact path="/stozer/:klub_id/:maticni_broj" component={StozerPrikaz}/>
         </Switch>
         {
           (error&&error.message)?

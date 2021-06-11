@@ -7,7 +7,7 @@ import Povijest from '../components/Povijest'
 import GolPrikaz from '../components/Gol_igrac_golman_prikaz';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from '@material-ui/lab/Alert';
-import {Pie,Cell,PieChart,ResponsiveContainer} from 'recharts'
+import {Pie,Cell,PieChart,ResponsiveContainer,Legend} from 'recharts'
 import {dohvatiIgracPrikaz,dohvatiGolmanPrikaz} from '../graphql/query';
 import { useLazyQuery } from '@apollo/client';
 const useStyles = makeStyles((theme)=>({
@@ -106,7 +106,6 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
         setKlubID(parseInt(match.params.klub_id));
         if(match.path==='/igrac/:klub_id/:maticni_broj')
         {
-            console.log('Igracc');
             dohvatiIgraca({
                 variables:{
                     maticni_broj:decodeURIComponent(match.params.maticni_broj).toString(),
@@ -147,8 +146,8 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         value:golovi_ukupno
                     },
                     {
-                        name:"Pokusaji ukupno",
-                        value:pokusaji_ukupno
+                        name:"Promasaji ukupno",
+                        value:(pokusaji_ukupno-golovi_ukupno)
                     }
                 ],
                 [
@@ -157,8 +156,8 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         value:golovi_7m
                     },
                     {
-                        name:"Pokusaji 7m",
-                        value:pokusaji_7m
+                        name:"Promasaji 7m",
+                        value:(pokusaji_7m-golovi_7m)
                     }
                 ],
                 [
@@ -167,8 +166,8 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         value:golovi_ostalo
                     },
                     {
-                        name:"Pokusaji 6m i 9m",
-                        value:pokusaji_ostalo
+                        name:"Promasaji 6m i 9m",
+                        value:(pokusaji_ostalo-golovi_ostalo)
                     }
                 ]
             ]);
@@ -197,8 +196,8 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         value:golovi_ukupno
                     },
                     {
-                        name:"Udarci ukupno",
-                        value:pokusaji_ukupno
+                        name:"Primljeni ukupno",
+                        value:(pokusaji_ukupno-golovi_ukupno)
                     }
                 ],
                 [
@@ -207,8 +206,8 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         value:golovi_7m
                     },
                     {
-                        name:"Udarci 7m",
-                        value:pokusaji_7m
+                        name:"Primljeni 7m",
+                        value:(pokusaji_7m-golovi_7m)
                     }
                 ],
                 [
@@ -217,8 +216,8 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         value:golovi_ostalo
                     },
                     {
-                        name:"Udarci 6m i 9m",
-                        value:pokusaji_ostalo
+                        name:"Primljeni 6m i 9m",
+                        value:(pokusaji_ostalo-golovi_ostalo)
                     }
                 ]
             ]);
@@ -235,7 +234,6 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
     }
     if(klubID&&maticniBroj&&pieChartData&&(igracData||golmanData))//kada dodu podaci ovisno o tome je li golman ili igrac + klubid i maticni se postave
     {
-        console.log(igracData.igracinfo.info.ime);
         return (
             <div>
                  <AppBar className={classes.appBar}>
@@ -336,20 +334,26 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         </FormControl>
                     </Grid>
                     <Grid item container direction='row' justify='space-evenly' alignItems='center' style={{marginTop:20,marginBottom:20}} xs={12}>{/*container od grafa i slike gola */}
-                        <Grid item style={{borderStyle:'solid',borderColor:'#000000'}} xs={12} sm={5}>
-                            <ResponsiveContainer width='100%' height={300}>
-                                <PieChart >
-                                    <Pie data={pieChartData[odabir.id-1]} label={true} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} endAngle={0} startAngle={360}>
+                        <Grid item  xs={12} sm={6} md={4}>
+                            <ResponsiveContainer width='100%' aspect={1.5748}>{/*stavimo kao kod slike*/}
+                                <PieChart width='100%' height='100%' >
+                                    <Pie data={pieChartData[odabir.id-1]} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} endAngle={0} startAngle={360} label>
                                     {
-                                        pieChartData.map((data,index)=>(
+                                        pieChartData[odabir.id-1].map((data,index)=>(
                                             <Cell key={data.name} fill={(index===0)? '#008000': '#FF0000'}/>
                                         ))
                                     }
                                 </Pie>
+                                {
+                                    ((pieChartData[odabir.id-1][0].value+pieChartData[odabir.id-1][0].value)!==0)?//ako su obe vrijednosti 0 onda neće bit prikazan chart pa nema smisla da bude prikazana legenda
+                                    <Legend verticalAlign="bottom" />/*By default, the content of the legend is generated by the name of Line, Bar, Area, etc. Alternatively, if no name has been set, the dataKey will be used to generate legend content.*/
+                                    :
+                                    null
+                                }
                                 </PieChart>
                             </ResponsiveContainer>
                         </Grid>
-                        <Grid item container  justify='center' direction='row' xs={12} sm={7} md={3} style={{position:'relative'}}>
+                        <Grid item container  justify='center' direction='row' xs={12} sm={5} md={4} style={{position:'relative'}}>
                             <GolPrikaz goloviobrane={(isIgrac)? igracData.igracinfo.golovi : golmanData.golmaninfo.obrane} odabir={odabir.id}/>
                         </Grid>
                     </Grid>
@@ -360,13 +364,13 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         <GridList style={{width:'100%',marginTop:10,marginBottom:10, height:300}} cols={1} cellHeight={'auto'} spacing={20}>
                                     {
                                         (isIgrac)?
-                                            igracData.igracinfo&&igracData.igracinfo.utakmice.map((rezultat)=>(
+                                            igracData.igracinfo.utakmice&&igracData.igracinfo.utakmice.map((rezultat)=>(
                                                 <Grid key={rezultat.utakmica.broj_utakmice} item sm={8} xs={12} style={{margin:'auto'}}>
                                                     <Rezultat history={history} broj_utakmice={rezultat.utakmica.broj_utakmice} domaci={rezultat.utakmica.domaci.naziv} gosti={rezultat.utakmica.gosti.naziv} natjecanje={rezultat.utakmica.natjecanje.naziv} golovi_domaci={rezultat.utakmica.rezultat_domaci} golovi_gosti={rezultat.utakmica.rezultat_gosti} golovi_obrane={rezultat.goloviobrane_ukupno} status={6} />
                                                 </Grid>)
                                             )
                                         :
-                                        golmanData.golmaninfo&&golmanData.golmaninfo.utakmice.map((rezultat)=>(
+                                        golmanData.golmaninfo.utakmice&&golmanData.golmaninfo.utakmice.map((rezultat)=>(
                                             <Grid key={rezultat.utakmica.broj_utakmice} item sm={8} xs={12} style={{margin:'auto'}}>
                                                 <Rezultat history={history} broj_utakmice={rezultat.utakmica.broj_utakmice} domaci={rezultat.utakmica.domaci.naziv} gosti={rezultat.utakmica.gosti.naziv} natjecanje={rezultat.utakmica.natjecanje.naziv}  golovi_domaci={rezultat.utakmica.rezultat_domaci} golovi_gosti={rezultat.utakmica.rezultat_gosti} golovi_obrane={rezultat.goloviobrane_ukupno} status={6} />
                                             </Grid>)

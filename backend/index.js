@@ -1,7 +1,7 @@
 //FILE ZA TESTIRANJE QUERYA BEZ DIZANJA EXPRESS SERVERA,SAMO SA POVEZIVANJEM NA BAZU
 const {nodelogger}=require('./loaders/logger');
 const {sequelize}=require('./models');
-
+const models=require('./models');
 async function DatabaseConnection ()
 {
     nodelogger.info('Connecting to database....');
@@ -16,10 +16,19 @@ async function DatabaseConnection ()
 
 async function init()
 {
-    await DatabaseConnection();//ne trebamo ga handleat sa try catch jer ce u slucaju greske ona sama terminirat proces
-    //async funkcija vraca promise pa je awaitamo
     try {
+        await DatabaseConnection();//ne trebamo ga handleat sa try catch jer ce u slucaju greske ona sama terminirat proces
+        //async funkcija vraca promise pa je awaitamo
      nodelogger.info('Hello');
+     const data=await models.igracutakmica.findAll({
+         include:{
+             model:models.clanovitima
+         },
+         order:[
+             ['clanovitima','broj_dresa','ASC']
+         ]
+    });
+    nodelogger.info(JSON.stringify(data));
     } catch (error) {
         nodelogger.error('Greska u izvodenju'+error);
     }

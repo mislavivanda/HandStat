@@ -444,10 +444,16 @@ const TimStatistika=new GraphQLObjectType({
       type:new GraphQLList(IgracStatistika),
       resolve(parent,args){
           return models.igracutakmica.findAll({
+            include:{
+              model:models.clanovitima
+            },
             where:{
               broj_utakmice:parent.broj_utakmice,//iz parent objekti koji smo dobili iz resolvera u queryu koji samo prosljeduje primljene parametre
               klub_id:parent.klub_id//bitna i utakmica i klub za koji igra(jer su 2 kluba na toj utakmici)
-            }
+            },
+            order:[
+              ['clanovitima','broj_dresa','ASC']//OVAKO SORTIRAMO SA MODELIMA KOJE JOINAMO/INCLUDEMA-> IME MODELA, IME ATRIBUTA MODELA
+            ]
           }).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju statistike igrača unutar TimStaitstika objekta '+error);
           throw(error);
@@ -458,10 +464,16 @@ const TimStatistika=new GraphQLObjectType({
       type:new GraphQLList(GolmanStatistika),
       resolve(parent,args){
           return models.golmanutakmica.findAll({
+            include:{
+              model:models.clanovitima
+            },
             where:{
               broj_utakmice:parent.broj_utakmice,
               klub_id:parent.klub_id
-            }
+            },
+            order:[
+              ['clanovitima','broj_dresa','ASC']
+            ]
           }).catch((error)=>{
           nodelogger.error('Greška u dohvaćanju staitstike golmana unutar TimStatistika objekta '+error);
           throw(error);
@@ -869,7 +881,7 @@ const IgracPrikaz=new GraphQLObjectType({
          //zbrajamo sve golove i grupiramo ih po pozicijama gola u utakmicama u kojima je sujdelova za NJEGOV TRENUTNI KLUB-> datum do=null-> jos traje
         //BITNO VODIT RAČUNA O TOME DA MOŽE BIT VIŠE PUTA ČLAN U ISTOM TIMU PA NE MOŽEMO SAMO JOINAT PO TIMU I ITAKMICAMA KOJE SE ODIGRA ZA TAJ TIM
         //-> MORAMO JOINAT NA NAČIN DA GLEDAMO SAMO ONE UTAKMICA KOJE JE IGRA ZA TAJ KLUB U KOJIMA JE DATUM IGRANJA NAKON DATUMA ZADNJEG UČLANJENJA IGRAČA U TAJ TIM JER TO PREDSTAVLJA TRENUTNE PODATKE ZA TOG IGRAČA
-        return sequelize.query("SELECT pg.pozicija, SUM(CASE WHEN d.id=5 OR d.id=7 THEN 1 ELSE 0 END) AS pokusajibranka7m, SUM(CASE WHEN d.id=5 THEN 1 ELSE 0 END) AS golovibranka7m, SUM(CASE WHEN d.id=1 OR d.id=3 THEN 1 ELSE 0 END) AS pokusajibrankaostali,SUM(CASE WHEN d.id=1 THEN 1 ELSE 0 END) AS golovibrankaostali FROM klubclanovi kc JOIN pozicijegola pg ON kc.maticni_broj=pg.maticni_broj JOIN dogadaj d ON pg.dogadaj_id=d.id JOIN utakmica u ON pg.broj_utakmice=u.broj_utakmice WHERE kc.maticni_broj=:maticni AND kc.klub_id=:klub AND kc.do IS NULL AND u.datum>kc.od GROUP BY pg.pozicija",{
+        return sequelize.query("SELECT pg.pozicija, SUM(CASE WHEN d.id=5 OR d.id=7 THEN 1 ELSE 0 END) AS pokusajibranka7m, SUM(CASE WHEN d.id=5 THEN 1 ELSE 0 END) AS golovibranka7m, SUM(CASE WHEN d.id=1 OR d.id=3 THEN 1 ELSE 0 END) AS pokusajibrankaostali,SUM(CASE WHEN d.id=1 THEN 1 ELSE 0 END) AS golovibrankaostali FROM klubclanovi kc JOIN pozicijegola pg ON kc.maticni_broj=pg.maticni_broj JOIN dogadaj d ON pg.dogadaj_id=d.id JOIN utakmica u ON pg.broj_utakmice=u.broj_utakmice WHERE kc.maticni_broj=:maticni AND kc.klub_id=:klub AND kc.do IS NULL AND u.datum>kc.od GROUP BY pg.pozicija ORDER BY pg.pozicija",{
           raw:true,
           type: QueryTypes.SELECT,
           replacements: {
@@ -884,8 +896,8 @@ const IgracPrikaz=new GraphQLObjectType({
     },
     utakmice:{
       type:new GraphQLList(ClanTimaUtakmica),
-      resolve(parent,args){//korelirani podupit s grupiranjem i agregate funkcijom-> za svaki klubclanovi redak vratit će se lista utakmica koje je igrac igrao u tom periodu i za njih ce se zbrajati ukupni golovi koji ce bitit grupiurani po natjecanju klubu i periodu u kojem su se odvijali (od do)-> kad bi grupirali samo po natjecanju i klubu onda bi se spojili periodi(JER SE GRUPIRA PO ISTOM KLUBU I NAZIVU) u kojima igrac igra za isti klub u istom natjecanju u razlicitim periodima-> kako ubacujemo u pricu i periode onda će se oni razlikovat ZA SVAKI REDAK IZ KLUB CLANOVI TABLICE JER ON PREDSTAVLJA DRUGI PERIOD IGRANJA OD OSTALIH PA ĆE SVAKI REDAK KLUB CLANOVI TABLICE DOBIT SVOJ REDAK U KONACNOJ TABLICI ŠTO I ŽELIMO JER ON PREDSTAVLJA PERIOD IGRANJA ODREĐENOG IGRAČA ZA ODREĐENI KLUB ZA KOJI ŽELIMO ZBROJITI GOLOVE
-       return sequelize.query("SELECT u.broj_utakmice,SUM(iu.golovi) AS goloviobrane_ukupno FROM igracutakmica iu JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice 	WHERE iu.maticni_broj=:maticni GROUP BY u.broj_utakmice",{
+      resolve(parent,args){//korelirani podupit s grupiranjem i agregate funkcijom-> za svaki klubclanovi redak vratit će se lista utakmica(!!!ZAVRŠENIH!!!) koje je igrac igrao u tom periodu i za njih ce se zbrajati ukupni golovi koji ce bitit grupiurani po natjecanju klubu i periodu u kojem su se odvijali (od do)-> kad bi grupirali samo po natjecanju i klubu onda bi se spojili periodi(JER SE GRUPIRA PO ISTOM KLUBU I NAZIVU) u kojima igrac igra za isti klub u istom natjecanju u razlicitim periodima-> kako ubacujemo u pricu i periode onda će se oni razlikovat ZA SVAKI REDAK IZ KLUB CLANOVI TABLICE JER ON PREDSTAVLJA DRUGI PERIOD IGRANJA OD OSTALIH PA ĆE SVAKI REDAK KLUB CLANOVI TABLICE DOBIT SVOJ REDAK U KONACNOJ TABLICI ŠTO I ŽELIMO JER ON PREDSTAVLJA PERIOD IGRANJA ODREĐENOG IGRAČA ZA ODREĐENI KLUB ZA KOJI ŽELIMO ZBROJITI GOLOVE
+       return sequelize.query("SELECT u.broj_utakmice,SUM(iu.golovi) AS goloviobrane_ukupno FROM igracutakmica iu JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice 	WHERE iu.maticni_broj=:maticni AND u.status=6 GROUP BY u.broj_utakmice",{
         raw:true,
         type: QueryTypes.SELECT,
         replacements: {
@@ -899,8 +911,8 @@ const IgracPrikaz=new GraphQLObjectType({
     },
     povijest:{//izvuci niz objkeata {natjecanje,klub i ukupno golove/obrane}
       type:new GraphQLList(Povijest),
-      resolve(parent,args){//korelirani podupit s grupiranjem i agregate funkcijom-> za svaki klubclanovi redak vratit će se lista utakmica koje je igrac igrao u tom periodu i za njih ce se zbrajati ukupni golovi koji ce bitit grupiurani po natjecanju klubu i periodu u kojem su se odvijali (od do)-> kad bi grupirali samo po natjecanju i klubu onda bi se spojili periodi(JER SE GRUPIRA PO ISTOM KLUBU I NAZIVU) u kojima igrac igra za isti klub u istom natjecanju u razlicitim periodima-> kako ubacujemo u pricu i periode onda će se oni razlikovat ZA SVAKI REDAK IZ KLUB CLANOVI TABLICE JER ON PREDSTAVLJA DRUGI PERIOD IGRANJA OD OSTALIH PA ĆE SVAKI REDAK KLUB CLANOVI TABLICE DOBIT SVOJ REDAK U KONACNOJ TABLICI ŠTO I ŽELIMO JER ON PREDSTAVLJA PERIOD IGRANJA ODREĐENOG IGRAČA ZA ODREĐENI KLUB ZA KOJI ŽELIMO ZBROJITI GOLOVE
-        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje,SUM(iu.golovi) AS goloviobrane_ukupno FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  igracutakmica iu ON kc.maticni_broj=iu.maticni_broj JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
+      resolve(parent,args){//korelirani podupit s grupiranjem i agregate funkcijom-> za svaki klubclanovi redak vratit će se lista utakmica (!!!ZAVRŠENIH!!!) koje je igrac igrao u tom periodu i za njih ce se zbrajati ukupni golovi koji ce bitit grupiurani po natjecanju klubu i periodu u kojem su se odvijali (od do)-> kad bi grupirali samo po natjecanju i klubu onda bi se spojili periodi(JER SE GRUPIRA PO ISTOM KLUBU I NAZIVU) u kojima igrac igra za isti klub u istom natjecanju u razlicitim periodima-> kako ubacujemo u pricu i periode onda će se oni razlikovat ZA SVAKI REDAK IZ KLUB CLANOVI TABLICE JER ON PREDSTAVLJA DRUGI PERIOD IGRANJA OD OSTALIH PA ĆE SVAKI REDAK KLUB CLANOVI TABLICE DOBIT SVOJ REDAK U KONACNOJ TABLICI ŠTO I ŽELIMO JER ON PREDSTAVLJA PERIOD IGRANJA ODREĐENOG IGRAČA ZA ODREĐENI KLUB ZA KOJI ŽELIMO ZBROJITI GOLOVE
+        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje,SUM(iu.golovi) AS goloviobrane_ukupno FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  igracutakmica iu ON kc.maticni_broj=iu.maticni_broj JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND u.status=6 AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
          raw:true,
          type: QueryTypes.SELECT,
          replacements: {
@@ -936,7 +948,7 @@ const GolmanPrikaz=new GraphQLObjectType({
     type:new GraphQLList(ObranePrikaz),
     resolve(parent,args){
       //isti princip kao za golove samo radimo s obranama
-      return sequelize.query("SELECT pg.pozicija, SUM(CASE WHEN d.id=8 THEN 1 ELSE 0 END) AS primljenibranka7m, SUM(CASE WHEN d.id=6 THEN 1 ELSE 0 END) AS obranebranka7m, SUM(CASE WHEN d.id=4 THEN 1 ELSE 0 END) AS primljenibrankaostali,SUM(CASE WHEN d.id=2 THEN 1 ELSE 0 END) AS obranebrankaostali FROM klubclanovi kc JOIN pozicijegola pg ON kc.maticni_broj=pg.maticni_broj JOIN dogadaj d ON pg.dogadaj_id=d.id JOIN utakmica u ON pg.broj_utakmice=u.broj_utakmice WHERE kc.maticni_broj=:maticni AND kc.klub_id=:klub AND kc.do IS NULL AND u.datum>kc.od GROUP BY pg.pozicija",{
+      return sequelize.query("SELECT pg.pozicija, SUM(CASE WHEN d.id=8 THEN 1 ELSE 0 END) AS primljenibranka7m, SUM(CASE WHEN d.id=6 THEN 1 ELSE 0 END) AS obranebranka7m, SUM(CASE WHEN d.id=4 THEN 1 ELSE 0 END) AS primljenibrankaostali,SUM(CASE WHEN d.id=2 THEN 1 ELSE 0 END) AS obranebrankaostali FROM klubclanovi kc JOIN pozicijegola pg ON kc.maticni_broj=pg.maticni_broj JOIN dogadaj d ON pg.dogadaj_id=d.id JOIN utakmica u ON pg.broj_utakmice=u.broj_utakmice WHERE kc.maticni_broj=:maticni AND kc.klub_id=:klub AND kc.do IS NULL AND u.datum>kc.od GROUP BY pg.pozicija ORDER BY pg.pozicija",{
         raw:true,
         type: QueryTypes.SELECT,
         replacements: {
@@ -952,7 +964,7 @@ const GolmanPrikaz=new GraphQLObjectType({
     utakmice:{
       type:new GraphQLList(ClanTimaUtakmica),
       resolve(parent,args){
-        return sequelize.query("SELECT u.broj_utakmice,SUM(gu.obrane_ukupno) AS goloviobrane_ukupno FROM golmanutakmica gu JOIN utakmica u ON gu.broj_utakmice=u.broj_utakmice 	WHERE gu.maticni_broj=:maticni GROUP BY u.broj_utakmice",{
+        return sequelize.query("SELECT u.broj_utakmice,SUM(gu.obrane_ukupno) AS goloviobrane_ukupno FROM golmanutakmica gu JOIN utakmica u ON gu.broj_utakmice=u.broj_utakmice 	WHERE gu.maticni_broj=:maticni AND u.status=6 GROUP BY u.broj_utakmice",{
           raw:true,
           type: QueryTypes.SELECT,
           replacements: {
@@ -967,7 +979,7 @@ const GolmanPrikaz=new GraphQLObjectType({
     povijest:{
       type:new GraphQLList(Povijest),
       resolve(parent,args){//izvuci niz objkeata {natjecanje,klub i ukupno golove/obrane}
-        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje,SUM(gu.golovi) AS goloviobrane_ukupno FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  golmanutakmica gu ON kc.maticni_broj=gu.maticni_broj JOIN utakmica u ON gu.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
+        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje,SUM(gu.golovi) AS goloviobrane_ukupno FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  golmanutakmica gu ON kc.maticni_broj=gu.maticni_broj JOIN utakmica u ON gu.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni  AND u.status=6 AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
           raw:true,
           type: QueryTypes.SELECT,
           replacements: {
@@ -1004,7 +1016,10 @@ const StozerPrikaz=new GraphQLObjectType({
         return models.stozerutakmica.findAll({
           attributes:['broj_utakmice'],
           include:{
-            model:models.utakmica
+            model:models.utakmica,
+            where:{
+              status:6
+            }
           },
           where:{
             maticni_broj:parent.maticni_broj
@@ -1018,7 +1033,7 @@ const StozerPrikaz=new GraphQLObjectType({
     povijest:{
       type:new GraphQLList(Povijest),//bez golova prikaz
       resolve(parent,args){//izvuci niz objekata {natjecanje,klub}
-        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  stozerutakmica su ON kc.maticni_broj=su.maticni_broj JOIN utakmica u ON su.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
+        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  stozerutakmica su ON kc.maticni_broj=su.maticni_broj JOIN utakmica u ON su.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND  AND u.status=6 u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
           raw:true,
           type: QueryTypes.SELECT,
           replacements: {
@@ -1759,7 +1774,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
           {
             //1) Spremi događaja u bazu
             //2) Update statistike određenog polja utakmice od zadanog igraca
-            //3) Pushaj nove podatke u subscription zadani
+            //3) Pushaj nove podatke u subscription zadani-> KONZISTENTNOST->DA JE KORINSIK U SYNCU S BAZOM
              const spremljenidogadaj = await models.dogadajiutakmice.create({//AKO NE POŠALJEMO NEKI PARAMETAR U MUTACIJI ON ĆE PO DEFAULTU BITI NULL I SEQUELIZE GA NEĆE UOPĆE SPREMATI U QUERYU NEGO ĆE ON ZAUZET DEFAULT VRIJEDNOST
                 vrijeme:args.vrijeme,
                 tim:args.klubgrb,

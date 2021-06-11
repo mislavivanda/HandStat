@@ -14,7 +14,7 @@ const useStyles=makeStyles((theme)=>({
     },
     domaciBox:{
         display:'flex',
-        width:'38%',
+        width:'35%',
         justifyContent: 'center',//horizontalno centriranje
         alignItems: 'center',//vertikalno centriranje
     },
@@ -37,19 +37,19 @@ const useStyles=makeStyles((theme)=>({
         display:'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        width:'38%'
+        width:'35%'
     },
     minutaBox:{
         display:'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        width:'4%'
+        width:'10%'
     },
     goloviObraneBox:{
         display:'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        width:'4%',
+        width:'10%',//radit po theme.breakpoints
         backgroundColor:theme.palette.primary.main,
         borderRadius:'50%'
     }
@@ -135,7 +135,7 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
                         return (<Box className={classes.goloviObraneBox}><Typography align='center' style={{color:'#FFFFFF'}}>{(golovi_obrane)? golovi_obrane : 0}</Typography></Box>)
                     }
                     else {
-                        return ( <Box style={{width:'4%'}}></Box>)//vrati samo prazni box da zauzme prostor kako bi strelica ostala na istom mjestu
+                        return ( <Box style={{width:'10%'}}></Box>)//vrati samo prazni box da zauzme prostor kako bi strelica ostala na istom mjestu
                     }
                 })()
             }

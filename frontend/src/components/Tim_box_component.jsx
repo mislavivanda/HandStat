@@ -24,7 +24,7 @@ const useStyles=makeStyles((theme)=>({
     width:'100%'
    },
    dres:{
-       width:'10%',
+       width:'12.5%',
        height:'auto',
        backgroundColor:theme.palette.primary.main,
        borderRadius:'50%',
@@ -34,12 +34,25 @@ const useStyles=makeStyles((theme)=>({
     display:'flex',
     flexDirection:'row',
     justifyContent:'center',
-    width:'65%'
+    alignItems:'center',
+    width:'87.5%'
+   },
+   imePrezimeStozerBox:{
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'center',
+    alignItems:'center',
+    width:'87.5%',
+    marginLeft:'12.5%'//da bude poravnato kao kod igraca i golmana
    },
    odabraniBox:{//classa koju imaju odabrani clanovi
-       borderColor:theme.palette.secondary.main,
-       borderStyle:'solid',
-       borderWidth:3.5
+      backgroundColor:'#fa9905'
+   },
+   imePrezimeNeselektiran:{//ostavit ovako u slucaju promjena boje
+       color:theme.palette.secondary.main
+   },
+   imePrezimeSelektiran:{
+       color:'#FFFFFF'
    }
 }))
 //komponenta u kojoj se izlistavaju igraci/golmani i ostali clanovi u tim boxu
@@ -111,9 +124,8 @@ function clanKlubaKlik(maticni_broj,ime,prezime,klub_id,tip)//funkcija koja se p
                   <Button disabled={(timDomaciSpremljen&&timGostiSpremljen)? false : true}  onClick={()=> clanKlubaKlik(maticni_broj,ime,prezime,klub,tip)} disableRipple style={{flexGrow:1}}>
                   {/*sve dok nisu spremljene postave OBA TIMA NE MOŽEMO KLIKAT NA ČLANOVE TIMA ZA DOGAĐAJE,AKO SU OBA SPREMLJENA ONDA MOŽEMO */}
                   <Box className={classes.buttonBox}>{/*overflowWrap govori da ukoliko teskt preolazi širinu koja mu je ododijeljena da će razlomit riječ u više djelova i stavit u novi red*/}
-                      <Box style={{width:'20%',overflowWrap:'break-word'}}><Typography color='secondary'>{maticni_broj}</Typography></Box>
                       <Box className={classes.dres}><Typography style={{color:'#FFFFFF'}}>{dres}</Typography></Box>
-                      <Box className={classes.imePrezimeBox}><Typography color='secondary'>{ime + ' '+prezime}</Typography></Box>
+                      <Box className={classes.imePrezimeBox}><Typography className={`${(odabraniClan && odabraniClan.maticni_broj===maticni_broj)? classes.imePrezimeSelektiran : classes.imePrezimeNeselektiran}`}>{ime + ' '+prezime}</Typography></Box>
                   </Box>
                   </Button>{/*ako je spremljen roster za neku od ekipa onda nemoj prikazat ukloni ikonu-> nema vise mijenjanja, u suprotnome prikazi */}
                   {(spremljenTim)? null : <IconButton onClick={()=>ukloniClanaTima(maticni_broj,dres,ime,prezime,tip)} title='Ukloni' color='secondary'  disableRipple><RemoveCircleIcon/></IconButton>}
@@ -122,8 +134,7 @@ function clanKlubaKlik(maticni_broj,ime,prezime,klub_id,tip)//funkcija koja se p
                   <Box  className={`${classes.glavniBox} ${(odabraniClan && odabraniClan.maticni_broj===maticni_broj)? classes.odabraniBox : ''}`}>
                       <Button disabled={((timDomaciSpremljen&&timGostiSpremljen))? false : true} onClick={()=>clanKlubaKlik(maticni_broj,ime,prezime,klub,tip)} disableRipple style={{flexGrow:1}}>
                       <Box className={classes.buttonBox}>{/*umisto spremljen tim imat state od oba tima jesu li spremljena*/}
-                          <Box><Typography color='secondary'>{maticni_broj}</Typography></Box>
-                          <Box className={classes.imePrezimeBox}><Typography color='secondary'>{ime + ' '+prezime}</Typography></Box>
+                          <Box className={classes.imePrezimeStozerBox}><Typography className={`${(odabraniClan && odabraniClan.maticni_broj===maticni_broj)? classes.imePrezimeSelektiran : classes.imePrezimeNeselektiran}`}>{ime + ' '+prezime}</Typography></Box>
                       </Box>
                       </Button>
                       {(spremljenTim)? null : <IconButton onClick={()=> ukloniClanaTima(maticni_broj,undefined,ime,prezime,tip)}  title='Ukloni' color='secondary'  disableRipple><RemoveCircleIcon/></IconButton>}

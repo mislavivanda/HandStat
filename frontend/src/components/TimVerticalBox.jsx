@@ -388,7 +388,7 @@ function RenderOdabraniFizio()
 
                           //inace vrati save button
                           return (<Box style={{width:'100%',display:'flex',justifyContent:'center',bottom:10, alignItems:'center',marginLeft:'auto',marginRight:'auto',position:'absolute'}}>
-                            <Button disabled={(timSpremljen)? true : false} onClick={()=>spremiTim()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Potvrdi momcad za utakmicu' > SAVE</Button>
+                            <Button disabled={(timSpremljen)? true : false} onClick={()=>spremiTim()} disableRipple size='large' variant='contained' color='secondary' endIcon={<SaveIcon/>} title='Potvrdi momcad za utakmicu' > SPREMI</Button>
                           </Box>)
                        })()}
                     </Box>

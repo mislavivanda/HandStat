@@ -1,6 +1,7 @@
 import React from 'react'
-import {Box,Typography} from '@material-ui/core';
+import {Box,Typography,Hidden,IconButton} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 const useStyles = makeStyles((theme)=>({
     container:{
         display:'flex',
@@ -52,7 +53,9 @@ function Povijest({natjecanje,klub,golovi_obrane}) {
                 ( <Box style={{width:'4%'}} ></Box>)
 
             }
-            <Box style={{width:'5%'}}></Box>{/*kod rezultata je to strelica pa stavljamo ovdje taj box kako bi bili iste sirine ko rezultati i u syncu */}
+            <Box style={{width:'5%'}}>{/*kod rezultata je to strelica pa stavljamo ovdje taj box kako bi bili iste VISINE ko rezultati i u syncu ALI JE NE PRIKAZUJEMO */}
+                    <IconButton style={{visibility:'hidden'}} size='small'><ArrowForwardIosIcon/></IconButton>
+            </Box>
             </Box>
        </Box>
     )

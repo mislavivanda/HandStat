@@ -41,7 +41,7 @@ function LigaRezultatiBox({natjecanje,kola,history}) {
                         <Box style={{marginTop:(rezultati_kola.kolo>1)? 10 : 0}} className={classes.koloNazivBox}>
                             <Typography align='center' variant='h5' style={{color:'#FFFFFF'}}>{rezultati_kola.kolo+'.kolo'}</Typography>
                         </Box>
-                            <GridList style={{width:'100%',marginTop:20,marginBottom:20}} cols={1} cellHeight={'auto'} spacing={20}>
+                            <GridList style={{width:'100%',marginTop:20,marginBottom:20,height:300}} cols={1} cellHeight={'auto'} spacing={20}>
                                 {
                                     rezultati_kola.rezultati&&rezultati_kola.rezultati.map((rezultat,index2)=>(
                                         <Grid key={rezultat.broj_utakmice} item sm={8} xs={12} style={{margin:'auto',paddingBottom:(index1==(kola.length-1)&&index2==(rezultati_kola.rezultati.length-1))? 10 : 0 }}>

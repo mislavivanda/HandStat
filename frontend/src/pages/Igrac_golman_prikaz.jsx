@@ -55,7 +55,27 @@ const useStyles = makeStyles((theme)=>({
         justifyContent:'center',
         width:'100%',
         backgroundColor:theme.palette.secondary.main
-    }
+    },
+    infoGlavniBox:{
+        backgroundColor:theme.palette.secondary.main,
+    },
+    infoBox:{
+        display:'flex',
+        flexDirection:'row',
+        justifyContent:'space-between',
+        alignItems:'center',
+        backgroundColor:theme.palette.primary.main,
+        borderRightColor:theme.palette.secondary.main,
+        borderRightStyle:'solid',
+        borderLeftColor:theme.palette.secondary.main,
+        borderLeftStyle:'solid',
+        margin:'1rem 0 1rem 0'
+    },
+    info:{
+        width:'50%',
+        borderColor:theme.palette.primary.main,
+        borderStyle:'solid'
+    },
 }))
 function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odlucit jel igrac ili golman-> url ce bit golman/maticni ili igrac/maticni
     const classes=useStyles();
@@ -77,14 +97,7 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
     const [isIgrac,setIsIgrac]=useState(null);
     const [maticniBroj,setMaticniBroj]=useState(null);
     const [klubID,setKlubID]=useState(null);
-    const [pieChartData,setPieChartData]=useState([{
-        name:"Mock",
-        value:10
-    },
-    {
-        name:"Mock2",
-        value:5
-    }]);//niz objekata tipa {name,value}
+    const [pieChartData,setPieChartData]=useState(null);//niz objekata tipa {name,value}-> nakon dobivenih podataka u onCompleted ćemo sumirat za sva 3 moguća odabira i pohranit u matricu(niz nizova) onda ovisno o odabiru slat u piechart određene nizove
     function handleOdabirSelect(event){
         setOdabir(event.target.value)
     }
@@ -113,11 +126,106 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
             setIsIgrac(false);
         }
     },[])
-    const [dohvatiIgraca,{data:igracData,loading:igracLoading,error:igracError}]=useLazyQuery(dohvatiIgracPrikaz)
+    const [dohvatiIgraca,{data:igracData,loading:igracLoading,error:igracError}]=useLazyQuery(dohvatiIgracPrikaz,{
+        onCompleted:(data)=>{
+            const niz=[...data.igracinfo.golovi];
+            let golovi_ukupno=0,pokusaji_ukupno=0,golovi_7m=0,pokusaji_7m=0,golovi_ostalo=0,pokusaji_ostalo=0;
+            for(let pozicija of niz)
+            {
+                golovi_ukupno+=pozicija.golovibranka7m+pozicija.golovibrankaostali;
+                pokusaji_ukupno+=pozicija.pokusajibranka7m+pozicija.pokusajibrankaostali;
+                golovi_7m+=pozicija.golovibranka7m;
+                pokusaji_7m+=pozicija.pokusajibranka7m;
+                golovi_ostalo+=pozicija.golovibrankaostali;
+                pokusaji_ostalo+=pozicija.pokusajibrankaostali;
+            }
+            //niz za svaki od 3 moguća odabira
+            setPieChartData([
+                [
+                    {
+                        name:"Golovi ukupno",
+                        value:golovi_ukupno
+                    },
+                    {
+                        name:"Pokusaji ukupno",
+                        value:pokusaji_ukupno
+                    }
+                ],
+                [
+                    {
+                        name:"Golovi 7m",
+                        value:golovi_7m
+                    },
+                    {
+                        name:"Pokusaji 7m",
+                        value:pokusaji_7m
+                    }
+                ],
+                [
+                    {
+                        name:"Golovi 6m i 9m",
+                        value:golovi_ostalo
+                    },
+                    {
+                        name:"Pokusaji 6m i 9m",
+                        value:pokusaji_ostalo
+                    }
+                ]
+            ]);
+        }
+    })
 
-    const [dohvatiGolmana,{data:golmanData,loading:golmanLoading,error:golmanError}]=useLazyQuery(dohvatiGolmanPrikaz)
+    const [dohvatiGolmana,{data:golmanData,loading:golmanLoading,error:golmanError}]=useLazyQuery(dohvatiGolmanPrikaz,{
+        onCompleted:(data)=>{
+            //stvaramo kopiju jer data objekt i state nisu iterable
+            const niz=[...data.golmaninfo.obrane];
+            let golovi_ukupno=0,pokusaji_ukupno=0,golovi_7m=0,pokusaji_7m=0,golovi_ostalo=0,pokusaji_ostalo=0;
+            for(let pozicija of niz)
+            {
+                golovi_ukupno+=pozicija.golovibranka7m+pozicija.golovibrankaostali;
+                pokusaji_ukupno+=pozicija.pokusajibranka7m+pozicija.pokusajibrankaostali;
+                golovi_7m+=pozicija.golovibranka7m;
+                pokusaji_7m+=pozicija.pokusajibranka7m;
+                golovi_ostalo+=pozicija.golovibrankaostali;
+                pokusaji_ostalo+=pozicija.pokusajibrankaostali;
+            }
+            //niz za svaki od 3 moguća odabira
+            setPieChartData([
+                [
+                    {
+                        name:"Obrane ukupno",
+                        value:golovi_ukupno
+                    },
+                    {
+                        name:"Udarci ukupno",
+                        value:pokusaji_ukupno
+                    }
+                ],
+                [
+                    {
+                        name:"Obrane 7m",
+                        value:golovi_7m
+                    },
+                    {
+                        name:"Udarci 7m",
+                        value:pokusaji_7m
+                    }
+                ],
+                [
+                    {
+                        name:"Obrane 6m i 9m",
+                        value:golovi_ostalo
+                    },
+                    {
+                        name:"Udarci 6m i 9m",
+                        value:pokusaji_ostalo
+                    }
+                ]
+            ]);
+        }
+    })
 
-    if(igracLoading||golmanLoading||!maticniBroj||!klubID||!(klubID&&maticniBroj&&(igracData||golmanData)))//dok se loada, dok se ne postave klubID i maticni_broj i dok nije zadovoljen uvjet za data
+    if(igracLoading||golmanLoading||!maticniBroj||!klubID||!(klubID&&maticniBroj&&pieChartData&&(igracData||golmanData)))//dok se loada, dok se ne postave klubID i maticni_broj i dok nije zadovoljen uvjet za data
     {
         return (<CircularProgress className={classes.loadingItem} color='primary'/>)
     }
@@ -125,7 +233,7 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
     {
         return (<Alert className={classes.alertItem} severity="error">{(igracError)? igracError.message : golmanError.message}</Alert>)
     }
-    if(klubID&&maticniBroj&&(igracData||golmanData))//kada dodu podaci ovisno o tome je li golman ili igrac + klubid i maticni se postave
+    if(klubID&&maticniBroj&&pieChartData&&(igracData||golmanData))//kada dodu podaci ovisno o tome je li golman ili igrac + klubid i maticni se postave
     {
         console.log(igracData.igracinfo.info.ime);
         return (
@@ -133,34 +241,84 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                  <AppBar className={classes.appBar}>
                     <Box className={classes.logoBox}><img className={classes.logo} src={logo} alt='HandStat Logo'/> <Typography style={{fontWeight:'bold'}} align='center' color='secondary'>HANDSTAT </Typography></Box>
                 </AppBar>
-                <Grid container direction='column' justify='space-evenly' alignItems='center'>{/*/glavni grid*/}
-                    <Grid item container direction='row' justify='center' alignItems='center' xs={12}>{/*container od podataka i slike*/}
-                        <Grid item container direction='column' justify='space-evenly' alignItems='center' spacing={3} xs={12} sm={3}>
-                            <Grid item xs={12}>
-                                <Typography align='center' color='secondary' variant='h5'>{(isIgrac)? igracData.igracinfo.info.ime : golmanData.golmaninfo.info.ime}</Typography>
+                <Grid container direction='column' justify='space-evenly' alignItems='center' style={{marginTop:70}}>{/*/glavni grid*/}
+                    <Grid item container direction='row' justify='center' alignItems='center' style={{marginTop:20}} xs={12}>{/*container od podataka i slike*/}
+                            <Grid item container direction='column' justify='center' alignItems='center'  xs={12} sm={5}>
+                                <Typography style={{fontWeight:'bold'}} align='center' color='secondary' variant='h4'>{(isIgrac)? (igracData.igracinfo.info.ime+' '+igracData.igracinfo.info.prezime) : (golmanData.golmaninfo.info.ime+' '+golmanData.golmaninfo.info.prezime)}</Typography>
+                                <img src={"http://localhost:3001/zagreb.jpg"} alt="slika člana" className={classes.clanSlika}/>
                             </Grid>
-                            <Grid item xs={12}>
-                                <Typography align='center' color='secondary' variant='h5'>{(isIgrac)? igracData.igracinfo.info.prezime : golmanData.golmaninfo.info.prezime}</Typography>
+                            <Grid className={classes.infoGlavniBox} item container direction='column' justify='space-evenly' alignItems='flex-start' xs={12} sm={4}>{/*container od informacija igraca*/}
+                                <Grid item style={{width:'100%'}}>
+                                    <Box className={classes.infoBox}>
+                                        <Box style={{width:'50%'}}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h6'>IME</Typography>
+                                        </Box>
+                                        <Box className={classes.info}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>{(isIgrac)? igracData.igracinfo.info.ime : golmanData.golmaninfo.info.ime}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                                <Grid item style={{width:'100%'}}>
+                                    <Box className={classes.infoBox}>
+                                        <Box style={{width:'50%'}}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h6'>PREZIME</Typography>
+                                        </Box>
+                                        <Box className={classes.info}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>{(isIgrac)? igracData.igracinfo.info.prezime : golmanData.golmaninfo.info.prezime}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                                <Grid item style={{width:'100%'}}>
+                                    <Box className={classes.infoBox}>
+                                        <Box style={{width:'50%'}}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h6'>NACIONALNOST</Typography>
+                                        </Box>
+                                        <Box className={classes.info}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>{(isIgrac)? igracData.igracinfo.info.nacionalnost : golmanData.golmaninfo.info.nacionalnost}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                                <Grid item style={{width:'100%'}}>
+                                    <Box className={classes.infoBox}>
+                                        <Box style={{width:'50%'}}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h6'>DATUM ROĐENJA</Typography>
+                                        </Box>
+                                        <Box className={classes.info}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>{(isIgrac)? igracData.igracinfo.info.datum_rodenja : golmanData.golmaninfo.info.datum_rodenja}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                                <Grid item style={{width:'100%'}}>
+                                    <Box className={classes.infoBox}>
+                                        <Box style={{width:'50%'}}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h6'>VISINA</Typography>
+                                        </Box>
+                                        <Box className={classes.info}>
+                                            <Typography  style={{color:'#FFFFFF'}} variant='h5'>{(isIgrac)? igracData.igracinfo.info.visina : golmanData.golmaninfo.info.visina} cm</Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                                <Grid item style={{width:'100%'}}>
+                                    <Box className={classes.infoBox}>
+                                        <Box style={{width:'50%'}}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h6'>TEŽINA</Typography>
+                                        </Box>
+                                        <Box className={classes.info}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>{(isIgrac)? igracData.igracinfo.info.tezina : golmanData.golmaninfo.info.tezina} kg</Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                                <Grid item style={{width:'100%'}}>
+                                    <Box className={classes.infoBox}>
+                                        <Box style={{width:'50%'}}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h6'>BROJ DRESA</Typography>
+                                        </Box>
+                                        <Box className={classes.info}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>{(isIgrac)? igracData.igracinfo.info.broj_dresa : golmanData.golmaninfo.info.broj_dresa}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={12}>
-                                <Typography align='center' color='secondary' variant='h5'>{(isIgrac)? igracData.igracinfo.info.nacionalnost : golmanData.golmaninfo.info.nacionalnost}</Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Typography align='center' color='secondary' variant='h5'>{(isIgrac)? igracData.igracinfo.info.datum_rodenja : golmanData.golmaninfo.info.datum_rodenja}</Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Typography align='center' color='secondary' variant='h5'>{(isIgrac)? igracData.igracinfo.info.visina : golmanData.golmaninfo.info.visina} cm</Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Typography align='center' color='secondary' variant='h5'>{(isIgrac)? igracData.igracinfo.info.tezina : golmanData.golmaninfo.info.tezina} kg</Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Typography align='center' color='secondary' variant='h5'>{(isIgrac)? igracData.igracinfo.info.broj_dresa : golmanData.golmaninfo.info.broj_dresa}</Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid item xs={12} sm={5}>
-                            <img src={"http://localhost:3001/zagreb.jpg"} alt="slika člana" className={classes.clanSlika}/>
-                        </Grid>
                     </Grid>
                     <Grid item container direction='row' justify='center' alignItems='center' style={{marginTop:20}} xs={12} sm={6}>{/*select komponeneta za odabir koje golove/obrane prikazati*/}
                         <Grid item xs={12}>
@@ -178,10 +336,10 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         </FormControl>
                     </Grid>
                     <Grid item container direction='row' justify='space-evenly' alignItems='center' style={{marginTop:20,marginBottom:20}} xs={12}>{/*container od grafa i slike gola */}
-                        <Grid item xs={12} sm={5}>
-                            <ResponsiveContainer width='100%' height={200}>
+                        <Grid item style={{borderStyle:'solid',borderColor:'#000000'}} xs={12} sm={5}>
+                            <ResponsiveContainer width='100%' height={300}>
                                 <PieChart >
-                                    <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} endAngle={0} startAngle={360}>
+                                    <Pie data={pieChartData[odabir.id-1]} label={true} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} endAngle={0} startAngle={360}>
                                     {
                                         pieChartData.map((data,index)=>(
                                             <Cell key={data.name} fill={(index===0)? '#008000': '#FF0000'}/>
@@ -192,14 +350,14 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                             </ResponsiveContainer>
                         </Grid>
                         <Grid item container  justify='center' direction='row' xs={12} sm={7} md={3} style={{position:'relative'}}>
-                            <GolPrikaz/>
+                            <GolPrikaz goloviobrane={(isIgrac)? igracData.igracinfo.golovi : golmanData.golmaninfo.obrane} odabir={odabir.id}/>
                         </Grid>
                     </Grid>
                     <Grid item container direction='column' justify='center' alignItems='center' xs={12}>{/*container od utakmica*/}
                         <Box className={classes.boxLabels}>
                             <Typography align='center' variant='h4' style={{color:'#FFFFFF'}}>UTAKMICE</Typography>
                         </Box>
-                        <GridList style={{width:'100%',marginTop:10,marginBottom:10}} cols={1} cellHeight={'auto'} spacing={20}>
+                        <GridList style={{width:'100%',marginTop:10,marginBottom:10, height:300}} cols={1} cellHeight={'auto'} spacing={20}>
                                     {
                                         (isIgrac)?
                                             igracData.igracinfo&&igracData.igracinfo.utakmice.map((rezultat)=>(
@@ -220,7 +378,7 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                         <Box className={classes.boxLabels}>
                             <Typography align='center' variant='h4' style={{color:'#FFFFFF'}}>POVIJEST</Typography>
                         </Box>
-                        <GridList style={{width:'100%',marginTop:10,marginBottom:10}} cols={1} cellHeight={'auto'} spacing={20}>
+                        <GridList style={{width:'100%',marginTop:10,marginBottom:10, height:300,}} cols={1} cellHeight={'auto'} spacing={20}>
                                     {
                                         (isIgrac)?
                                         igracData.igracinfo.povijest&&igracData.igracinfo.povijest.map((povijest)=>(//nije 100% siguran key ali je vrlo vjerovatan jer je teško da će igrat isto natjecanje za isiti klub s isitm brojem golova/obrana više puta

@@ -20,6 +20,10 @@ const useStyles=makeStyles((theme)=>({
         backgroundColor:theme.palette.secondary.main,
         marginTop:50
     },
+    klubIkona:{
+        width:'100%',
+        height:'auto'
+    },
     loadingItem:{
         position:'fixed',
         top:'50%',
@@ -46,6 +50,26 @@ const useStyles=makeStyles((theme)=>({
         height:'auto',
         paddingTop:10,
         paddingBottom:10
+    },
+    infoGlavniBox:{
+        backgroundColor:theme.palette.secondary.main,
+    },
+    infoBox:{
+        display:'flex',
+        flexDirection:'row',
+        justifyContent:'space-between',
+        alignItems:'center',
+        backgroundColor:theme.palette.primary.main,
+        borderRightColor:theme.palette.secondary.main,
+        borderRightStyle:'solid',
+        borderLeftColor:theme.palette.secondary.main,
+        borderLeftStyle:'solid',
+        margin:'1rem 0 1rem 0'
+    },
+    info:{
+        width:'50%',
+        borderColor:theme.palette.primary.main,
+        borderStyle:'solid'
     }
 }))
 function Klub_info_page(props) {
@@ -94,35 +118,39 @@ function Klub_info_page(props) {
     {
         return (
             <Grid container direction='column' justify='space-evenly' alignItems='center' style={{marginTop:100}}>{/*glavni container*/}
-                 <Grid item container direction='row' justify='space-between' alignItems='center'>{/*container od podataka kluba, grba i odabira rezultata */}
-                     <Grid item container direction='column' justify='space-evenly' alignItems='center' xs={12} sm={4}>{/*contaienr od drzave kluba i ogdine osnutka*/}
-                         <Grid item xs={12}>
-                             <Box style={{margin:'1rem 0 1rem 0'}}>
-                                 <Typography align='center' color='secondary' variant='h5'>Država</Typography>
-                                 <Box className={classes.klubInfoBox}>
-                                     <Typography color='secondary' variant='h5'>SJEDINJENE AMERIČKE DRŽAVE(SAD)</Typography>
-                                 </Box>
-                             </Box>
+                 <Grid style={{marginTop:100}} item container direction='column' justify='space-evenly' alignItems='center'>{/*container od podataka kluba, grba i odabira rezultata */}
+                    <Grid item container direction='column' justify='center' alignItems='center' xs={12} sm={4}>{/*container od ikone kluba i naziva*/}
+                            <Grid item xs={12}>
+                                <Typography align='center' color='secondary'  variant='h4'>RK PPD ZAGREB</Typography>
+                            </Grid>
+                            <img className={classes.klubIkona} src={"http://localhost:3001/zagreb.jpg"} alt="grb kluba"/>
+                    </Grid>
+                     <Grid item container direction='row' justify='space-around' alignItems='center' xs={12}>{/*contaienr od podataka kluba + komponente za rezultate*/}
+                         <Grid className={classes.infoGlavniBox} item container direction='column' justify='space-evenly' alignItems='flex-start' xs={12} sm={5}>{/*container s informacijama o klubu*/}
+                            <Grid item style={{width:'100%'}}>
+                                        <Box className={classes.infoBox}>
+                                            <Box style={{width:'50%'}}>
+                                                <Typography style={{color:'#FFFFFF'}} variant='h6'>DRŽAVA</Typography>
+                                            </Box>
+                                            <Box className={classes.info}>
+                                                <Typography style={{color:'#FFFFFF'}} variant='h5'>SJEDINJENE AMERIČKE DRŽAVE(SAD)</Typography>
+                                            </Box>
+                                        </Box>
+                                    </Grid>
+                                    <Grid item style={{width:'100%'}}>
+                                    <Box className={classes.infoBox}>
+                                        <Box style={{width:'50%'}}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h6'>DATUM OSNUTKA</Typography>
+                                        </Box>
+                                        <Box className={classes.info}>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>22.05.1978.</Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
                          </Grid>
-                         <Grid item xs={12}>
-                             <Box style={{margin:'1rem 0 1rem 0'}}>
-                                 <Typography align='center' color='secondary'  variant='h5'>Osnutak</Typography>
-                                 <Box className={classes.klubInfoBox}>
-                                     <Typography color='secondary' variant='h5'>01.01.2021</Typography>
-                                 </Box>
-                             </Box>
-                         </Grid>
-                     </Grid>
-                     <Grid item container direction='column' justify='center' alignItems='center' xs={12} sm={4}>{/*container od ikone kluba i naziva*/}
-                         <Grid item xs={12}>
-                             <Typography align='center' color='secondary'  variant='h4'>RK PPD ZAGREB</Typography>
-                         </Grid>
-                         <Grid item xs={12}>
-                             <img src={"http://localhost:3001/zagreb.jpg"} alt="grb kluba"/>
-                         </Grid>
-                     </Grid>
-                     <Grid item xs={12} sm={4}>
-                         <KlubRezultati klub_id={klubID}/>
+                         <Grid item xs={12} sm={5}>
+                            <KlubRezultati klub_id={klubID}/>
+                        </Grid>
                      </Grid>
                  </Grid>
                  {(()=>{
@@ -238,11 +266,11 @@ function Klub_info_page(props) {
                                              if(najnovijiRezultatiData)
                                              {
                                                  return (
-                                                     <Fragment>
+                                                     <Grid item container direction='column' justify='center' alignItems='center' xs={12}>
                                                           <Box className={classes.titulaNazivBox}>
-                                                             <Typography align='center' variant='h4' style={{color:'#FFFFFF'}}>NAJNOVIJI REZULTATI</Typography>
+                                                             <Typography align='center' variant='h5' style={{color:'#FFFFFF'}}>NAJNOVIJI REZULTATI</Typography>
                                                          </Box>
-                                                         <GridList style={{width:'100%',marginTop:50,marginBottom:50}} cols={1} cellHeight={'auto'} spacing={20}>
+                                                         <GridList style={{width:'100%',marginTop:50,marginBottom:50, height:300}} cols={1} cellHeight={'auto'} spacing={20}>
                                                          {
                                                              najnovijiRezultatiData.najnovijeutakmicekluba&&najnovijiRezultatiData.najnovijeutakmicekluba.map((rezultat)=>(
                                                                  <Grid key={rezultat.broj_utakmice} item sm={8} xs={12} style={{margin:'auto'}}>
@@ -251,7 +279,7 @@ function Klub_info_page(props) {
                                                              ))
                                                          }
                                                          </GridList>
-                                                     </Fragment>
+                                                        </Grid>
                                                  )
                                              }
                                          })()

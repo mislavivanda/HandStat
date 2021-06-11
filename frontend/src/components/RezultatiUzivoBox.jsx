@@ -152,7 +152,7 @@ function RezultatiUzivoBox({history}) {
                 })
             );
         return (
-                <GridList  className={classes.gridList} cols={1} cellHeight={50} spacing={20} >
+                <GridList  className={classes.gridList} cols={1} cellHeight={'auto'} spacing={20} >
                             {
                                 //kad se promine propovi koje dajemo rezultat komponenti u odnosu na prethodne onda će se ona rerenderat
                             (rezultati.length>0)?

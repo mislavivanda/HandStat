@@ -18,7 +18,7 @@ const useStyles=makeStyles((theme)=>({
         margin:'1rem 0 1rem 0'
     },
     leftInfo:{
-        width:'100%',
+        width:'60%',
         borderColor:theme.palette.primary.main,
         borderStyle:'solid'
     },
@@ -29,26 +29,26 @@ function UtakmicaGeneralInfo(props) {//za dohvat nam treba samo broj utakmice ko
             <Grid item className={classes.lijeviInfoGlavniBox} container direction='column' justify='space-evenly' alignItems='flex-start' xs={12} sm={8} md={4}>{/*container sa podacima LIJEVO*/}
                             <Grid item style={{width:'100%'}}>
                                 <Box className={classes.leftInfoBox}>
-                                   <Typography style={{color:'#FFFFFF'}} variant='h6'>DATUM:</Typography>
-                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{props.datum}</Typography></Box>
+                                    <Box style={{width:'40%'}}><Typography style={{color:'#FFFFFF'}} variant='h6'>DATUM:</Typography></Box>
+                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} variant='h6'>{props.datum}</Typography></Box>
                                 </Box>
                             </Grid>
                             <Grid item style={{width:'100%'}}>
                                 <Box className={classes.leftInfoBox}>
-                                   <Typography style={{color:'#FFFFFF'}}  variant='h6'>VRIJEME:</Typography>
-                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{props.vrijeme}</Typography></Box>
+                                    <Box style={{width:'40%'}}><Typography style={{color:'#FFFFFF'}}  variant='h6'>VRIJEME:</Typography></Box>
+                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}}  variant='h6'>{props.vrijeme}</Typography></Box>
                                 </Box>
                             </Grid>
                             <Grid item style={{width:'100%'}}>
                                 <Box className={classes.leftInfoBox}>
-                                   <Typography style={{color:'#FFFFFF'}}  variant='h6'>GLEDATELJA:</Typography>
-                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{props.gledatelji}</Typography></Box>
+                                    <Box style={{width:'40%'}}><Typography style={{color:'#FFFFFF'}}  variant='h6'>GLEDATELJA:</Typography></Box>
+                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}}  variant='h6'>{props.gledatelji}</Typography></Box>
                                 </Box>
                             </Grid>
                             <Grid item style={{width:'100%'}}>
                                 <Box className={classes.leftInfoBox}>
-                                   <Typography style={{color:'#FFFFFF'}}  variant='h6'>LOKACIJA:</Typography>
-                                   <Box className={classes.leftInfo}><Typography style={{color:'#FFFFFF'}} align='center' variant='h6'>{props.lokacija.dvorana +' '+props.lokacija.mjesto}</Typography></Box>
+                                    <Box style={{width:'40%'}}><Typography style={{color:'#FFFFFF'}}  variant='h6'>LOKACIJA:</Typography></Box>
+                                   <Box className={classes.leftInfo} style={{overflow:'break-word'}}><Typography style={{color:'#FFFFFF'}}  variant='h6'>{props.lokacija.dvorana +' '+props.lokacija.mjesto}</Typography></Box>
                                 </Box>
                             </Grid>
                 </Grid>

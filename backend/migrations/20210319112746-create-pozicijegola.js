@@ -10,9 +10,6 @@ module.exports = {
       },
       pozicija: {
         type: Sequelize.SMALLINT
-      },
-      gol: {//jeli bio gol ili promasaj/obrana
-        type: Sequelize.BOOLEAN
       }
     });
   },

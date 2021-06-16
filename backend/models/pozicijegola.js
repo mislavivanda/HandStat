@@ -12,8 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   pozicijegola.init({
-    pozicija: DataTypes.SMALLINT,
-    gol: DataTypes.BOOLEAN
+    pozicija: DataTypes.SMALLINT
   }, {
     sequelize,
     modelName: 'pozicijegola',

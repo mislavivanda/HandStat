@@ -159,7 +159,6 @@ function Gol() {
         variables:{
           broj_utakmice:brojUtakmice,
           pozicija:odabraniDioGola,
-          gol:(odabraniDogadaj.tip===1)? true : false,//ako je gol-> saljemo true
           maticni_broj:odabraniClan.maticni_broj,
           dogadaj_id:odabraniDogadaj.id
         }

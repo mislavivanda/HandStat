@@ -684,7 +684,6 @@ const GolPozicija=new GraphQLObjectType({
   fields:()=>({
     id:{type:GraphQLInt},
     pozicija:{type:GraphQLInt},
-    gol:{type:GraphQLBoolean},
     akter:{
       type:ClanTima,
       resolve(parent,args){
@@ -1033,7 +1032,7 @@ const StozerPrikaz=new GraphQLObjectType({
     povijest:{
       type:new GraphQLList(Povijest),//bez golova prikaz
       resolve(parent,args){//izvuci niz objekata {natjecanje,klub}
-        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  stozerutakmica su ON kc.maticni_broj=su.maticni_broj JOIN utakmica u ON su.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND  AND u.status=6 u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
+        return sequelize.query("SELECT kl.naziv AS klub,n.naziv AS natjecanje FROM klubclanovi kc JOIN klub kl ON kc.klub_id=kl.id JOIN  stozerutakmica su ON kc.maticni_broj=su.maticni_broj JOIN utakmica u ON su.broj_utakmice=u.broj_utakmice JOIN natjecanje n ON u.natjecanje_id=n.id WHERE kc.do IS NOT NULL AND kc.maticni_broj=:maticni AND u.status=6 AND u.broj_utakmice IN (SELECT broj_utakmice FROM utakmica u2 WHERE u2.datum>kc.od AND u2.datum<kc.do) GROUP BY kl.naziv,n.naziv,kc.od,kc.do",{
           raw:true,
           type: QueryTypes.SELECT,
           replacements: {
@@ -2002,7 +2001,6 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
       type:GolPozicija,//vrati id novokreirani ako je dobro sve
       args:{
         pozicija:{type:new GraphQLNonNull(GraphQLInt)},
-        gol:{type:new GraphQLNonNull(GraphQLBoolean)},
         broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
         maticni_broj:{type: new GraphQLNonNull(GraphQLString)},
         dogadaj_id:{type:new GraphQLNonNull(GraphQLInt)}
@@ -2012,7 +2010,6 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         {
             return models.pozicijegola.create({
               pozicija:args.pozicija,
-              gol:args.gol,
               broj_utakmice:args.broj_utakmice,
               maticni_broj:args.maticni_broj,
               dogadaj_id:args.dogadaj_id

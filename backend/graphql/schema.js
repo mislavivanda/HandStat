@@ -385,6 +385,22 @@ const IgracStatistika=new GraphQLObjectType({
           throw(error);
         })
       }
+    },
+    statistikapopup:{//podaci za popup statistike kada klikne s grafon i golon
+      type:new GraphQLList(GoloviPrikaz),
+      resolve(parent,args){
+        return sequelize.query("SELECT pg.pozicija, SUM(CASE WHEN d.id=5 OR d.id=7 THEN 1 ELSE 0 END) AS pokusajibranka7m, SUM(CASE WHEN d.id=5 THEN 1 ELSE 0 END) AS golovibranka7m, SUM(CASE WHEN d.id=1 OR d.id=3 THEN 1 ELSE 0 END) AS pokusajibrankaostali,SUM(CASE WHEN d.id=1 THEN 1 ELSE 0 END) AS golovibrankaostali FROM pozicijegola pg JOIN dogadaj d ON pg.dogadaj_id=d.id WHERE pg.maticni_broj=:maticni AND pg.broj_utakmice=:brojutakmice GROUP BY pg.pozicija ORDER BY pg.pozicija",{
+          raw:true,
+          type: QueryTypes.SELECT,
+          replacements: {
+            maticni:parent.maticni_broj,
+            brojutakmice:parent.broj_utakmice
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška u dohvaćanju pozicija golova unutar IgracStatistika objekta '+error);
+          throw(error);
+        })
+      }
     }
   })
 });
@@ -412,6 +428,22 @@ const GolmanStatistika=new GraphQLObjectType({
           nodelogger.error('Greška u dohvaćanju clana tima unutar GolmanStatistika objekta '+error);
           throw(error);
         })
+    }
+  },
+  statistikapopup:{
+    type:new GraphQLList(ObranePrikaz),
+    resolve(parent,args){
+      return sequelize.query("SELECT pg.pozicija, SUM(CASE WHEN d.id=8 THEN 1 ELSE 0 END) AS primljenibranka7m, SUM(CASE WHEN d.id=6 THEN 1 ELSE 0 END) AS obranebranka7m, SUM(CASE WHEN d.id=4 THEN 1 ELSE 0 END) AS primljenibrankaostali,SUM(CASE WHEN d.id=2 THEN 1 ELSE 0 END) AS obranebrankaostali FROM pozicijegola pg JOIN dogadaj d ON pg.dogadaj_id=d.id WHERE pg.maticni_broj=:maticni AND pg.broj_utakmice=:brojutakmice GROUP BY pg.pozicija ORDER BY pg.pozicija",{
+        raw:true,
+        type: QueryTypes.SELECT,
+        replacements: {
+          maticni:parent.maticni_broj,
+          brojutakmice:parent.broj_utakmice
+        }
+      }).catch((error)=>{
+        nodelogger.error('Greška u dohvaćanju pozicija obrana unutar GolmanStatistika objekta '+error);
+        throw(error);
+      })
     }
   }
   })
@@ -852,8 +884,8 @@ const ObranePrikaz=new GraphQLObjectType({
     //iz ova 4 možemo dobit ukupne zbrojevima
     pozicija:{type:GraphQLInt},
     primljenibranka7m:{type:GraphQLInt},//primljeni golovi sa 7m
-    obranebranka7m:{type:GraphQLInt},//obrane-> ukupna statistika=obrane/primljeni+obrane
-    primljenibrankaostali:{type:GraphQLInt},//ukupna statistika=obrane/primljeni + obrane
+    obranebranka7m:{type:GraphQLInt},
+    primljenibrankaostali:{type:GraphQLInt},
     obranebrankaostali:{type:GraphQLInt},
   })
 })
@@ -895,7 +927,7 @@ const IgracPrikaz=new GraphQLObjectType({
     },
     utakmice:{
       type:new GraphQLList(ClanTimaUtakmica),
-      resolve(parent,args){//korelirani podupit s grupiranjem i agregate funkcijom-> za svaki klubclanovi redak vratit će se lista utakmica(!!!ZAVRŠENIH!!!) koje je igrac igrao u tom periodu i za njih ce se zbrajati ukupni golovi koji ce bitit grupiurani po natjecanju klubu i periodu u kojem su se odvijali (od do)-> kad bi grupirali samo po natjecanju i klubu onda bi se spojili periodi(JER SE GRUPIRA PO ISTOM KLUBU I NAZIVU) u kojima igrac igra za isti klub u istom natjecanju u razlicitim periodima-> kako ubacujemo u pricu i periode onda će se oni razlikovat ZA SVAKI REDAK IZ KLUB CLANOVI TABLICE JER ON PREDSTAVLJA DRUGI PERIOD IGRANJA OD OSTALIH PA ĆE SVAKI REDAK KLUB CLANOVI TABLICE DOBIT SVOJ REDAK U KONACNOJ TABLICI ŠTO I ŽELIMO JER ON PREDSTAVLJA PERIOD IGRANJA ODREĐENOG IGRAČA ZA ODREĐENI KLUB ZA KOJI ŽELIMO ZBROJITI GOLOVE
+      resolve(parent,args){
        return sequelize.query("SELECT u.broj_utakmice,SUM(iu.golovi) AS goloviobrane_ukupno FROM igracutakmica iu JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice 	WHERE iu.maticni_broj=:maticni AND u.status=6 GROUP BY u.broj_utakmice",{
         raw:true,
         type: QueryTypes.SELECT,
@@ -1538,8 +1570,8 @@ const RootQuery=new GraphQLObjectType({
     igracinfo:{
       type:IgracPrikaz,
       args:{
-        maticni_broj:{type:GraphQLString},
-        klub_id:{type:GraphQLInt}
+        maticni_broj:{type:new GraphQLNonNull(GraphQLString)},
+        klub_id:{type: new GraphQLNonNull(GraphQLInt)}
       },
       resolve(parent,args){
         return {
@@ -1551,8 +1583,8 @@ const RootQuery=new GraphQLObjectType({
     golmaninfo:{
       type:GolmanPrikaz,
       args:{
-        maticni_broj:{type:GraphQLString},
-        klub_id:{type:GraphQLInt}
+        maticni_broj:{type:new GraphQLNonNull(GraphQLString)},
+        klub_id:{type:new GraphQLNonNull(GraphQLInt)}
       },
       resolve(parent,args){
         return {
@@ -1564,8 +1596,8 @@ const RootQuery=new GraphQLObjectType({
     stozerinfo:{
       type:StozerPrikaz,
       args:{
-        maticni_broj:{type:GraphQLString},
-        klub_id:{type:GraphQLInt}
+        maticni_broj:{type:new GraphQLNonNull(GraphQLString)},
+        klub_id:{type:new GraphQLNonNull(GraphQLInt)}
       },
         resolve(parent,args){
           return {
@@ -1573,7 +1605,43 @@ const RootQuery=new GraphQLObjectType({
             klub_id:args.klub_id
           }
         }
+    },
+    igracstatistikapopup:{
+      type:IgracStatistika,
+      args:{
+        maticni_broj:{type:new GraphQLNonNull(GraphQLString)},
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}
+      },
+      resolve(parent,args){
+        return models.igracutakmica.findOne({
+          where:{
+            maticni_broj:args.maticni_broj,
+            broj_utakmice:args.broj_utakmice
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška prilikom dohvata statistike igrača za popup '+error);
+          throw(error);
+        })
       }
+    },
+    golmanstatistikapopup:{
+      type:GolmanStatistika,
+      args:{
+        maticni_broj:{type:new GraphQLNonNull(GraphQLString)},
+        broj_utakmice:{type:new GraphQLNonNull(GraphQLString)}
+      },
+      resolve(parent,args){
+        return models.golmanutakmica.findOne({
+          where:{
+            maticni_broj:args.maticni_broj,
+            broj_utakmice:args.broj_utakmice
+          }
+        }).catch((error)=>{
+          nodelogger.error('Greška prilikom dohvata statistike golmana za popup '+error);
+          throw(error);
+        })
+      }
+    }
   }
 })
 //Kod pisanja u graphiql moramo poceti sa prefiskom mutation zatim u zagrade stavimo argumente i u tijelu specificiramo KOJA POLJA OD NOVO STVORENOG OBJEKTA ŽELIMO DA NAM VRATI GRAPHQL SERVER

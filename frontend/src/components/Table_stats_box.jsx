@@ -1,5 +1,6 @@
 import {React,Fragment,useState} from 'react'
-import {Box, Typography} from '@material-ui/core';
+import {Box, Typography,Button} from '@material-ui/core';
+import StatistikaPopup from './StatistikaDialog';
 import {makeStyles} from '@material-ui/core/styles';
 const useStyles=makeStyles((theme)=>({
     glavniBox:{
@@ -32,6 +33,11 @@ const useStyles=makeStyles((theme)=>({
         justifyContent:'center',
         borderRightColor:'#FFFFFF',
         borderRightStyle:'solid'
+    },
+    button:{
+        width:'100%',
+        borderRadius:0,
+        padding:0
     }
 }))
 function Table_stats_box(props) {
@@ -53,7 +59,7 @@ function Table_stats_box(props) {
     const [renderPlavi,setRenderPlavi]=useState(false);
     const [renderObranePrimljeni,setRenderObranePrimljeni]=useState(false);//render oboje
     const [renderSedmeracGoloviPokusaji,setRenderSedmeracGoloviPokusaji]=useState(false);
-
+    const [openPopup,setOpenPopup]=useState(false);//za otvaranje popupa statistike s grafon i rukometnin golom nakon klika
     //gledamo sve zajednicke staitstike za sva 3 tipa-> to su kartoni
         if(props.zuti!==prevZuti)
         {
@@ -124,37 +130,43 @@ function Table_stats_box(props) {
             }
 
         }
-
+    console.log('Table stats box '+ openPopup);
     return (
         <Fragment>
            {(()=>{
             if(props.tip===1)
             {
             return (
-            <Box className={classes.glavniBox}>
-                <Box className={classes.dres}><Typography align='center' style={{color:'#FFFFFF'}}>{props.dres}</Typography></Box>
-                <Box className={classes.imePrezimeBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.sedmerac_golovi>0||props.sedmerac_pokusaji>0)? (props.sedmerac_golovi+'/'+props.sedmerac_pokusaji) : ""}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderIskljucenja)? '#f7ea00':'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderZuti)? '#f7ea00':'#FFFFFF'}}>{props.zuti}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderCrveni)? '#f7ea00':'#FFFFFF'}}>{props.crveni}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderPlavi)? '#f7ea00':'#FFFFFF'}}>{props.plavi}</Typography></Box>
-            </Box>)
+            //otvori popup na klik
+            <Button className={classes.button}  onClick={()=>setOpenPopup(true)}>
+                <Box className={classes.glavniBox}>
+                    <Box className={classes.dres}><Typography align='center' style={{color:'#FFFFFF'}}>{props.dres}</Typography></Box>
+                    <Box className={classes.imePrezimeBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.sedmerac_golovi>0||props.sedmerac_pokusaji>0)? (props.sedmerac_golovi+'/'+props.sedmerac_pokusaji) : ""}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderIskljucenja)? '#f7ea00':'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderZuti)? '#f7ea00':'#FFFFFF'}}>{props.zuti}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderCrveni)? '#f7ea00':'#FFFFFF'}}>{props.crveni}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderPlavi)? '#f7ea00':'#FFFFFF'}}>{props.plavi}</Typography></Box>
+                </Box>
+            </Button>
+            )
             }
             else if(props.tip===2)
             {
             return(
-            <Box className={classes.glavniBox}>
-                <Box className={classes.dres}><Typography align='center' style={{color:'#FFFFFF'}}>{props.dres}</Typography></Box>
-                <Box className={classes.imePrezimeBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderObranePrimljeni)? '#f7ea00':'#FFFFFF'}}>{(props.obrane>0||props.primljeni>0)? (props.obrane+'/'+(props.obrane+props.primljeni)) : ""}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderIskljucenja)? '#f7ea00':'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderZuti)? '#f7ea00':'#FFFFFF'}}>{props.zuti}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderCrveni)? '#f7ea00':'#FFFFFF'}}>{props.crveni}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderPlavi)? '#f7ea00':'#FFFFFF'}}>{props.plavi}</Typography></Box>
-            </Box>
+            <Button className={classes.button} onClick={()=>setOpenPopup(true)}>
+                <Box className={classes.glavniBox}>
+                    <Box className={classes.dres}><Typography align='center' style={{color:'#FFFFFF'}}>{props.dres}</Typography></Box>
+                    <Box className={classes.imePrezimeBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderObranePrimljeni)? '#f7ea00':'#FFFFFF'}}>{(props.obrane>0||props.primljeni>0)? (props.obrane+'/'+(props.obrane+props.primljeni)) : ""}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderIskljucenja)? '#f7ea00':'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderZuti)? '#f7ea00':'#FFFFFF'}}>{props.zuti}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderCrveni)? '#f7ea00':'#FFFFFF'}}>{props.crveni}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderPlavi)? '#f7ea00':'#FFFFFF'}}>{props.plavi}</Typography></Box>
+                </Box>
+            </Button>
             )
             }
             else {
@@ -169,6 +181,12 @@ function Table_stats_box(props) {
             )
             }
         })()} {/*IIFE FUNCTION JER UNUTRA MORA BITI EXPRESSION*/}
+        {
+            ((props.tip==1 || props.tip==2)&&openPopup)?//otvara se popup samo za igrace i golmane
+            <StatistikaPopup open={openPopup} setOpen={setOpenPopup} isIgrac={(props.tip===1)? true : false} maticni_broj={props.maticni_broj} broj_utakmice={props.broj_utakmice}/>
+            :
+            null
+        }
         </Fragment>
     )
 }

@@ -5,9 +5,9 @@ import logo from '../images/handstat_logo.png';
 import Rezultat from '../components/Rezultat';
 import Povijest from '../components/Povijest'
 import GolPrikaz from '../components/Gol_igrac_golman_prikaz';
+import PieChart from '../components/PieChartStatistika';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from '@material-ui/lab/Alert';
-import {Pie,Cell,PieChart,ResponsiveContainer,Legend} from 'recharts'
 import {dohvatiIgracPrikaz,dohvatiGolmanPrikaz} from '../graphql/query';
 import { useLazyQuery } from '@apollo/client';
 const useStyles = makeStyles((theme)=>({
@@ -126,8 +126,9 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
         }
     },[])
     const [dohvatiIgraca,{data:igracData,loading:igracLoading,error:igracError}]=useLazyQuery(dohvatiIgracPrikaz,{
+        fetchPolicy: "network-only",
         onCompleted:(data)=>{
-            const niz=[...data.igracinfo.golovi];
+            const niz=[...data.igracinfo.golovi];//nisu iterable cisti podaci iz querya
             let golovi_ukupno=0,pokusaji_ukupno=0,golovi_7m=0,pokusaji_7m=0,golovi_ostalo=0,pokusaji_ostalo=0;
             for(let pozicija of niz)
             {
@@ -175,49 +176,48 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
     })
 
     const [dohvatiGolmana,{data:golmanData,loading:golmanLoading,error:golmanError}]=useLazyQuery(dohvatiGolmanPrikaz,{
+        fetchPolicy: "network-only",
         onCompleted:(data)=>{
             //stvaramo kopiju jer data objekt i state nisu iterable
             const niz=[...data.golmaninfo.obrane];
-            let golovi_ukupno=0,pokusaji_ukupno=0,golovi_7m=0,pokusaji_7m=0,golovi_ostalo=0,pokusaji_ostalo=0;
+            let obrane_ostalo=0,obrane_7m=0,primljeni_7m=0,primljeni_ostalo=0;
             for(let pozicija of niz)
             {
-                golovi_ukupno+=pozicija.golovibranka7m+pozicija.golovibrankaostali;
-                pokusaji_ukupno+=pozicija.pokusajibranka7m+pozicija.pokusajibrankaostali;
-                golovi_7m+=pozicija.golovibranka7m;
-                pokusaji_7m+=pozicija.pokusajibranka7m;
-                golovi_ostalo+=pozicija.golovibrankaostali;
-                pokusaji_ostalo+=pozicija.pokusajibrankaostali;
+                obrane_ostalo+=pozicija.obranebrankaostali;
+                obrane_7m+=pozicija.obranebranka7m;
+                primljeni_7m+=pozicija.primljenibranka7m;
+                primljeni_ostalo+=pozicija.primljenibrankaostali
             }
             //niz za svaki od 3 moguća odabira
             setPieChartData([
                 [
                     {
                         name:"Obrane ukupno",
-                        value:golovi_ukupno
+                        value:(obrane_ostalo+obrane_7m)
                     },
                     {
                         name:"Primljeni ukupno",
-                        value:(pokusaji_ukupno-golovi_ukupno)
+                        value:(primljeni_ostalo+primljeni_7m)
                     }
                 ],
                 [
                     {
                         name:"Obrane 7m",
-                        value:golovi_7m
+                        value:obrane_7m
                     },
                     {
                         name:"Primljeni 7m",
-                        value:(pokusaji_7m-golovi_7m)
+                        value:primljeni_7m
                     }
                 ],
                 [
                     {
                         name:"Obrane 6m i 9m",
-                        value:golovi_ostalo
+                        value:obrane_ostalo
                     },
                     {
                         name:"Primljeni 6m i 9m",
-                        value:(pokusaji_ostalo-golovi_ostalo)
+                        value:primljeni_ostalo
                     }
                 ]
             ]);
@@ -335,23 +335,7 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                     </Grid>
                     <Grid item container direction='row' justify='space-evenly' alignItems='center' style={{marginTop:20,marginBottom:20}} xs={12}>{/*container od grafa i slike gola */}
                         <Grid item  xs={12} sm={6} md={4}>
-                            <ResponsiveContainer width='100%' aspect={1.5748}>{/*stavimo kao kod slike*/}
-                                <PieChart width='100%' height='100%' >
-                                    <Pie data={pieChartData[odabir.id-1]} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} endAngle={0} startAngle={360} label>
-                                    {
-                                        pieChartData[odabir.id-1].map((data,index)=>(
-                                            <Cell key={data.name} fill={(index===0)? '#008000': '#FF0000'}/>
-                                        ))
-                                    }
-                                </Pie>
-                                {
-                                    ((pieChartData[odabir.id-1][0].value+pieChartData[odabir.id-1][0].value)!==0)?//ako su obe vrijednosti 0 onda neće bit prikazan chart pa nema smisla da bude prikazana legenda
-                                    <Legend verticalAlign="bottom" />/*By default, the content of the legend is generated by the name of Line, Bar, Area, etc. Alternatively, if no name has been set, the dataKey will be used to generate legend content.*/
-                                    :
-                                    null
-                                }
-                                </PieChart>
-                            </ResponsiveContainer>
+                            <PieChart statistika={pieChartData[odabir.id-1]}/>
                         </Grid>
                         <Grid item container  justify='center' direction='row' xs={12} sm={5} md={4} style={{position:'relative'}}>
                             <GolPrikaz goloviobrane={(isIgrac)? igracData.igracinfo.golovi : golmanData.golmaninfo.obrane} odabir={odabir.id}/>

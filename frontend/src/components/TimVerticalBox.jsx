@@ -200,7 +200,7 @@ function RenderOdabraniIgraci(){
           if(timIgraci.length>0)//ako ima nešto za rednrat onda renderaj,inače vrati null odnosno ništa ne renderaj
           {
           return(
-          //kad je null onda nece rednerat nista izbjegavamo greske
+       
           timIgraci.map((igrac,index)=>{
             if(igrac)//razlicit od null
             {                                                                                                                    //saljemo state odabrani clan koji će se mijenjati u timbox componenti nakon klika
@@ -224,7 +224,7 @@ function RenderOdabraniGolmani(){
       if(timGolmani.length>0)
       {
       return(
-      //kad je null onda nece rednerat nista izbjegavamo greske
+   
       timGolmani.map((golman,index)=>{
         if(golman)//razlicit od null
         {

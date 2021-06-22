@@ -83,7 +83,7 @@ function DogadajiStatistika({brojUtakmice,live}) {//inace preko useEffecta dohva
             let noviNiz=[];
             if(subscriptionData.data.brisidogadajutakmice.dogadaj.tip===1)
             {
-                //ako je izbrisan dogadaj promjene rezultata-> u bazi su promijenjei svi prethodni rezultati-> refetchamo sve nove dogadaje s promjenjenima
+                //ako je izbrisan dogadaj promjene rezultata-> u bazi su promijenjei svi prethodni rezultati-> refetchamo sve nove dogadaje s promjenama
                 refetch();
                 return prev;
             }

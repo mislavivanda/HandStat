@@ -106,12 +106,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
                 }
                 else return statistika;
             });
-            let format={
-                timstatistika:{
-                    ...prev.timstatistika,
-                    igraci:noviNiz//azurirani niz igraca, ostalo ostavit isto
-                }
-            }
             return {
                 timstatistika:{
                     ...prev.timstatistika,
@@ -149,12 +143,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
                 }
                 else return statistika;
             });
-            let format={
-                timstatistika:{
-                    ...prev.timstatistika,
-                   golmani:noviNiz//azurirani niz igraca, ostalo ostavit isto
-                }
-            }
             return {
                 timstatistika:{
                     ...prev.timstatistika,
@@ -185,12 +173,6 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
                 }
                 else return statistika;
             });
-            let format={
-                timstatistika:{
-                    ...prev.timstatistika,
-                   stozer:noviNiz//azurirani niz igraca, ostalo ostavit isto
-                }
-            }
             return {
                 timstatistika:{
                     ...prev.timstatistika,
@@ -231,7 +213,7 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'8%'}}><Typography align='center' style={{color:'#FFFFFF'}}>C</Typography></Box>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'8%'}}><Typography align='center' style={{color:'#FFFFFF'}}>P</Typography></Box>
                         </Box>
-                        {data.timstatistika.igraci&&data.timstatistika.igraci.map((igracstat)=><StatistikaBox key={igracstat.igrac.maticni_broj} dres={igracstat.igrac.broj_dresa} ime={igracstat.igrac.ime} prezime={igracstat.igrac.prezime} golovi={igracstat.golovi} pokusaji={igracstat.pokusaji} iskljucenja={igracstat.iskljucenja} zuti={igracstat.zuti} crveni={igracstat.crveni} plavi={igracstat.plavi} sedmerac_golovi={igracstat.sedmerac_golovi} sedmerac_pokusaji={igracstat.sedmerac_pokusaji} tip={1} />)}
+                        {data.timstatistika.igraci&&data.timstatistika.igraci.map((igracstat)=><StatistikaBox key={igracstat.igrac.maticni_broj} broj_utakmice={broj_utakmice} maticni_broj={igracstat.igrac.maticni_broj} dres={igracstat.igrac.broj_dresa} ime={igracstat.igrac.ime} prezime={igracstat.igrac.prezime} golovi={igracstat.golovi} pokusaji={igracstat.pokusaji} iskljucenja={igracstat.iskljucenja} zuti={igracstat.zuti} crveni={igracstat.crveni} plavi={igracstat.plavi} sedmerac_golovi={igracstat.sedmerac_golovi} sedmerac_pokusaji={igracstat.sedmerac_pokusaji} tip={1} />)}
                         <Box className={classes.statistikaBoxTitula}><Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>GOLMANI</Typography></Box>
                         <Box className={classes.statistikaBoxStupciBox}>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'40%'}}><Typography align='center'  style={{color:'#FFFFFF',marginLeft:'12.5%'}}>GOLMAN</Typography></Box>
@@ -242,7 +224,7 @@ function TimStatistika({tim_id,broj_utakmice,klub_slika,naziv,live}) {//parametr
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'8%'}}><Typography align='center' style={{color:'#FFFFFF'}}>C</Typography></Box>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'8%'}}><Typography align='center'style={{color:'#FFFFFF'}}>P</Typography></Box>
                         </Box >
-                        {data.timstatistika.golmani&&data.timstatistika.golmani.map((golmanstat)=><StatistikaBox key={golmanstat.golman.maticni_broj} dres={golmanstat.golman.broj_dresa} ime={golmanstat.golman.ime} prezime={golmanstat.golman.prezime} golovi={golmanstat.golovi} pokusaji={golmanstat.pokusaji} iskljucenja={golmanstat.iskljucenja} zuti={golmanstat.zuti} crveni={golmanstat.crveni} plavi={golmanstat.plavi} obrane={golmanstat.obrane_ukupno} primljeni={golmanstat.primljeni_ukupno} tip={2}/>)}
+                        {data.timstatistika.golmani&&data.timstatistika.golmani.map((golmanstat)=><StatistikaBox key={golmanstat.golman.maticni_broj} broj_utakmice={broj_utakmice} maticni_broj={golmanstat.golman.maticni_broj} dres={golmanstat.golman.broj_dresa} ime={golmanstat.golman.ime} prezime={golmanstat.golman.prezime} golovi={golmanstat.golovi} pokusaji={golmanstat.pokusaji} iskljucenja={golmanstat.iskljucenja} zuti={golmanstat.zuti} crveni={golmanstat.crveni} plavi={golmanstat.plavi} obrane={golmanstat.obrane_ukupno} primljeni={golmanstat.primljeni_ukupno} tip={2}/>)}
                         <Box className={classes.statistikaBoxTitula}><Typography variant='h5' align='center' style={{color:'#FFFFFF'}}>STRUČNI STOŽER</Typography></Box>
                         <Box className={classes.statistikaBoxStupciBox}>
                             <Box className={classes.statistikaBoxStupciZnacenje} style={{width:'40%'}}><Typography align='center' style={{color:'#FFFFFF'}}>IME I PREZIME</Typography></Box>

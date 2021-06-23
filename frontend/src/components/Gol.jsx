@@ -21,9 +21,9 @@ const useStyles=makeStyles((theme)=>({
         position:'absolute',
         marginTop:'3.75%',//VAŽNOOOO!!!-> SVE MARGINE(TOP.BOTTOM,LEFT I RIGHT) SE RAĆUNAJU U ODNOSU NA WIDTH ELEMENTA, VIDIMO DA IVISNA PREĆKE ZAUZIMA 5.9055...% VISINE SLIKE ŠTO JE 3.75% ŠIRINE parenta(podijelit s apsect ratio)
         width:'92.25%',/*kada odbijemo sirine 2 stative dobijemo oko 92% sirinu grida-> sirina 2 stative uzima 8% jer je slika sira ,a sirina prećke zauzima 10% jer je visina manja*/
-        height:'93.9%',/*gol grid je position absolute pa se njegovi postoci odnose na prvi realtivno pozicionirani element-> to je glavni container od gola
+        height:'94.0945%',/*gol grid je position absolute pa se njegovi postoci odnose na prvi realtivno pozicionirani element-> to je glavni container od gola
         znamo da slika gola ima istu sirinu i visinu kao taj container, grid sa botunima nam treba biti visine slike-visina prećke s tim da se visina računa u odnosu na visinu parent containera koji ima istu visinu ko i slika gola
-        -> znamo da prećka oduzima 6.1% visine gola odnosno containera pa stoga visina grida sa botunima mora biti 100-6.1=93.9% i pomaknuta s marginon za visinu precke(koja se kod margina racuna u odnosu na ŠIRINU) */
+        -> znamo da prećka oduzima 5.9055% visine gola odnosno containera pa stoga visina grida sa botunima mora biti 100-5.9055=94.0945% i pomaknuta s marginon za visinu precke(koja se kod margina racuna u odnosu na ŠIRINU) */
         borderBottomWidth:4,
         borderBottomColor:theme.palette.secondary.main,
         borderBottomStyle:'solid',

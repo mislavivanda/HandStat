@@ -243,7 +243,7 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                     <Grid item container direction='row' justify='center' alignItems='center' style={{marginTop:20}} xs={12}>{/*container od podataka i slike*/}
                             <Grid item container direction='column' justify='center' alignItems='center'  xs={12} sm={5}>
                                 <Typography style={{fontWeight:'bold'}} align='center' color='secondary' variant='h4'>{(isIgrac)? (igracData.igracinfo.info.ime+' '+igracData.igracinfo.info.prezime) : (golmanData.golmaninfo.info.ime+' '+golmanData.golmaninfo.info.prezime)}</Typography>
-                                <img src={"http://localhost:3001/zagreb.jpg"} alt="slika člana" className={classes.clanSlika}/>
+                                <img src={"http://localhost:3001/playerimage.jpg"} alt="slika člana" className={classes.clanSlika}/>
                             </Grid>
                             <Grid className={classes.infoGlavniBox} item container direction='column' justify='space-evenly' alignItems='flex-start' xs={12} sm={4}>{/*container od informacija igraca*/}
                                 <Grid item style={{width:'100%'}}>

@@ -40,8 +40,15 @@ const useStyles=makeStyles((theme)=>({
         borderColor:theme.palette.primary.main,
         borderStyle:'solid'
     },
-    clanKlubaCardContent:{
-        backgroundColor:theme.palette.primary.main
+    clanKlubaCardContentIgracGolman:{
+        backgroundColor:theme.palette.primary.main,
+        display:'flex',
+        direction:'row',
+        justifyContent:'space-around',
+        alignItems:'center'
+    },
+    clanKlubaCardContentStozer:{//on nema dresa pa nema potrebe za flexboxon
+        backgroundColor:theme.palette.primary.main,
     },
     clanKlubaCardMedia:{
         margin:'auto',
@@ -70,6 +77,26 @@ const useStyles=makeStyles((theme)=>({
         width:'50%',
         borderColor:theme.palette.primary.main,
         borderStyle:'solid'
+    },
+    dresKrugBox:{
+        height:0,//ne možemo imat sadržaj unutra-> potrebno pozicionirat novi element u razini s ovim
+        paddingTop:'100%',//za odrzavat aspect ratio 1:1
+        width:'100%',
+        borderRadius:'50%',
+        backgroundColor:'#FFFFFF'
+    },
+    brojDresaBox:{
+        position:'absolute',//pozicioniramo se u odnosu na parent box koji je isrok 20% 
+        width: '100%',//ista visina i sirina kao i dresKrugBox
+        height: '100%',
+        textAlign: 'center',
+        top:'50%',
+        left:'50%',
+        transform: 'translate(-50%, -50%)',//ove 3 naredbe su da centriramo box unutar boxa u kojem je i krug-> nakon ovog ce box bit na istoj poziciji kao krug
+        display:'flex',
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'center'//za centriranje broja dresa unutar kruga dsiplayamo po flex i centriramo po obe osi
     }
 }))
 function Klub_info_page(props) {
@@ -174,19 +201,28 @@ function Klub_info_page(props) {
                                          clanoviTimaData&&clanoviTimaData.timclanovi.golmani.map((golman)=>(
                                          <Grid item key={golman.maticni_broj} xs={6} sm={4} md={3}>
                                              <Card className={classes.clanKlubaCard} onClick={(e)=>handleGolmanCardClick(golman.maticni_broj)}>
-                                                 <CardContent className={classes.clanKlubaCardContent}>
-                                                     <Box>
-                                                         <Typography align='center' style={{color:'#FFFFFF'}} variant='h5'>{golman.ime}</Typography>
+                                                 <CardContent className={classes.clanKlubaCardContentIgracGolman}>
+                                                    <Box style={{width:'80%'}}>
+                                                        <Box>
+                                                            <Typography align='center' style={{color:'#FFFFFF'}} variant='h6'>{golman.ime}</Typography>
+                                                        </Box>
+                                                        <Box>
+                                                            <Typography align='center' style={{color:'#FFFFFF'}} variant='h6'>{golman.prezime}</Typography>
+                                                        </Box>
                                                      </Box>
-                                                     <Box>
-                                                         <Typography align='center' style={{color:'#FFFFFF'}} variant='h5'>{golman.prezime}</Typography>
+                                                     <Box style={{position:'relative',width:'20%'}}>
+                                                        <Box className={classes.dresKrugBox}>
+                                                            <Box className={classes.brojDresaBox}>
+                                                                <Typography align='center' color='secondary' variant='h6'>{golman.broj_dresa}</Typography>
+                                                            </Box>
+                                                        </Box>
                                                      </Box>
                                                  </CardContent>
                                                  <CardActionArea>
                                                      <CardMedia
                                                      className={classes.clanKlubaCardMedia}
                                                      component='img'
-                                                     image={(golman.image_path)? golman.image_path : 'http://localhost:3001/unknownclubimage.jpg'}
+                                                     image={(golman.image_path)? golman.image_path : 'http://localhost:3001/playerimage.jpg'}
                                                      />
                                                  </CardActionArea>
                                              </Card>
@@ -202,19 +238,28 @@ function Klub_info_page(props) {
                                          clanoviTimaData&&clanoviTimaData.timclanovi.igraci.map((igrac)=>(
                                          <Grid item key={igrac.maticni_broj} xs={6} sm={4} md={3}>
                                              <Card className={classes.clanKlubaCard} onClick={(e)=>handleIgracCardClick(igrac.maticni_broj)}>
-                                                 <CardContent className={classes.clanKlubaCardContent}>
-                                                     <Box>
-                                                         <Typography align='center' style={{color:'#FFFFFF'}} variant='h5'>{igrac.ime}</Typography>
+                                                 <CardContent className={classes.clanKlubaCardContentIgracGolman}>
+                                                    <Box style={{width:'80%'}}>
+                                                        <Box>
+                                                            <Typography align='center' style={{color:'#FFFFFF'}} variant='h6'>{igrac.ime}</Typography>
+                                                        </Box>
+                                                        <Box>
+                                                            <Typography align='center' style={{color:'#FFFFFF'}} variant='h6'>{igrac.prezime}</Typography>
+                                                        </Box>
                                                      </Box>
-                                                     <Box>
-                                                         <Typography align='center' style={{color:'#FFFFFF'}} variant='h5'>{igrac.prezime}</Typography>
+                                                     <Box style={{position:'relative',width:'20%'}}>
+                                                        <Box className={classes.dresKrugBox}>
+                                                            <Box className={classes.brojDresaBox}>
+                                                                <Typography align='center' color='secondary' variant='h6'>{igrac.broj_dresa}</Typography>
+                                                            </Box>
+                                                        </Box>
                                                      </Box>
                                                  </CardContent>
                                                  <CardActionArea>
                                                      <CardMedia
                                                      className={classes.clanKlubaCardMedia}
                                                      component='img'
-                                                     image={(igrac.image_path)? igrac.image_path : 'http://localhost:3001/unknownclubimage.jpg'}
+                                                     image={(igrac.image_path)? igrac.image_path : 'http://localhost:3001/playerimage.jpg'}
                                                      />
                                                  </CardActionArea>
                                              </Card>
@@ -233,19 +278,19 @@ function Klub_info_page(props) {
                                              return stozer_niz.map((stozer)=>(
                                                  <Grid item key={stozer.maticni_broj} xs={6} sm={4} md={3}>
                                                      <Card className={classes.clanKlubaCard} onClick={(e)=>handleStozerCardClick(stozer.maticni_broj)}>
-                                                         <CardContent className={classes.clanKlubaCardContent}>
+                                                         <CardContent className={classes.clanKlubaCardContentStozer}>
                                                              <Box>
-                                                                 <Typography align='center' style={{color:'#FFFFFF'}} variant='h5'>{stozer.ime}</Typography>
+                                                                 <Typography align='center' style={{color:'#FFFFFF'}} variant='h6'>{stozer.ime}</Typography>
                                                              </Box>
                                                              <Box>
-                                                                 <Typography align='center' style={{color:'#FFFFFF'}} variant='h5'>{stozer.prezime}</Typography>
+                                                                 <Typography align='center' style={{color:'#FFFFFF'}} variant='h6'>{stozer.prezime}</Typography>
                                                              </Box>
                                                          </CardContent>
                                                          <CardActionArea>
                                                              <CardMedia
                                                              className={classes.clanKlubaCardMedia}
                                                              component='img'
-                                                             image={(stozer.image_path)? stozer.image_path : 'http://localhost:3001/unknownclubimage.jpg'}
+                                                             image={(stozer.image_path)? stozer.image_path : 'http://localhost:3001/playerimage.jpg'}
                                                              />
                                                          </CardActionArea>
                                                      </Card>

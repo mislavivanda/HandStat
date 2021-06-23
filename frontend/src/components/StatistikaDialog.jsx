@@ -23,7 +23,8 @@ const useStyles=makeStyles((theme)=>({
     },
     dialogPaper:{
         textAlign: 'center',
-        borderRadius:"10px"
+        borderRadius:"10px",
+        height:'100vh'
     },
     dialogTitle:{
         display:'flex',
@@ -194,7 +195,7 @@ function StatistikaDialog({open,setOpen,isIgrac,maticni_broj,broj_utakmice}) {
     if(pieChartData&&(igracData||golmanData))//kada dodu podaci ovisno o tome je li golman ili igrac
     {
         return (
-            <Dialog open={isOpen} classes={{paper: classes.dialogPaper}} fullScreen>
+            <Dialog open={isOpen} classes={{paper: classes.dialogPaper}}  maxWidth={'md'} fullWidth={true}>
                 <DialogTitle className={classes.dialogTitle}>
                     <IconButton onClick={()=>handleCloseClick()}>
                         <CloseIcon/>

@@ -2,7 +2,7 @@ import React from 'react'
 import {Pie,Cell,PieChart,ResponsiveContainer,Legend} from 'recharts'
 function PieChartStatistika({statistika}) {
     return (
-    <ResponsiveContainer width='100%' aspect={1.5748}>{/*stavimo kao kod slike*/}
+    <ResponsiveContainer width='100%' aspect={1} >{/*stavimo kao kod slike*/}
         <PieChart width='100%' height='100%' >
             <Pie data={statistika} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} endAngle={0} startAngle={360} label>
             {

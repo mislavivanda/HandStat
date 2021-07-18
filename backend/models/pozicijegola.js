@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      this.belongsTo(models.utakmica,{foreignKey:'broj_utakmice'});
      this.belongsTo(models.clanovitima,{foreignKey:'maticni_broj'});
      this.belongsTo(models.dogadaj,{foreignKey:'dogadaj_id'});
+     this.belongsTo(models.dogadajiutakmice,{foreignKey:'dogadaj'});
     }
   };
   pozicijegola.init({

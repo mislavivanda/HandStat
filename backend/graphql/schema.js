@@ -756,7 +756,10 @@ const RezultatiKola=new GraphQLObjectType({//SVI rezultati od pojedinog kola
             natjecanje_id:parent.natjecanje_id,
             kolo:parent.kolo,
             status:6//dohvaćamo samo gotove utakmice za statički prikaz
-          }
+          },
+          order: [
+            ['datum', 'ASC'],
+          ]
         }).catch((error)=>{
           nodelogger.error('Greška pri dohvaćanju utakmica unutar RezultatiKola objekta '+error);
         })
@@ -928,7 +931,7 @@ const IgracPrikaz=new GraphQLObjectType({
     utakmice:{
       type:new GraphQLList(ClanTimaUtakmica),
       resolve(parent,args){
-       return sequelize.query("SELECT u.broj_utakmice,SUM(iu.golovi) AS goloviobrane_ukupno FROM igracutakmica iu JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice 	WHERE iu.maticni_broj=:maticni AND u.status=6 GROUP BY u.broj_utakmice",{
+       return sequelize.query("SELECT u.broj_utakmice,SUM(iu.golovi) AS goloviobrane_ukupno FROM igracutakmica iu JOIN utakmica u ON iu.broj_utakmice=u.broj_utakmice 	WHERE iu.maticni_broj=:maticni AND u.status=6 GROUP BY u.broj_utakmice ORDER BY u.datum",{
         raw:true,
         type: QueryTypes.SELECT,
         replacements: {
@@ -995,7 +998,7 @@ const GolmanPrikaz=new GraphQLObjectType({
     utakmice:{
       type:new GraphQLList(ClanTimaUtakmica),
       resolve(parent,args){
-        return sequelize.query("SELECT u.broj_utakmice,SUM(gu.obrane_ukupno) AS goloviobrane_ukupno FROM golmanutakmica gu JOIN utakmica u ON gu.broj_utakmice=u.broj_utakmice 	WHERE gu.maticni_broj=:maticni AND u.status=6 GROUP BY u.broj_utakmice",{
+        return sequelize.query("SELECT u.broj_utakmice,SUM(gu.obrane_ukupno) AS goloviobrane_ukupno FROM golmanutakmica gu JOIN utakmica u ON gu.broj_utakmice=u.broj_utakmice 	WHERE gu.maticni_broj=:maticni AND u.status=6 GROUP BY u.broj_utakmice ORDER BY u.datum",{
           raw:true,
           type: QueryTypes.SELECT,
           replacements: {
@@ -1405,6 +1408,17 @@ const RootQuery=new GraphQLObjectType({
           }
       }
     },
+    klubinfo:{
+      type:Klub,
+      args:{klub_id:{type:new GraphQLNonNull(GraphQLInt)}},
+      resolve(parent,args){
+        return models.klub.findOne({
+          where:{
+            id:args.klub_id
+          }
+        })
+      }
+    },
     timstatistika:{//vraća statistike igraca,golmana i stozera za određenu utakmicu od određenog kluba
       type:TimStatistika,
       args:{broj_utakmice:{type: new GraphQLNonNull(GraphQLString)},
@@ -1457,7 +1471,7 @@ const RootQuery=new GraphQLObjectType({
               },
                {
                 status:{
-                [Op.lt]: 5
+                [Op.lt]: 6
                }
               }
             ],
@@ -1950,7 +1964,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 }
                 else if(args.dogadaj_id===6)//obrana sedmerca-> samo golman
                 {
-                  await models.golmanutakmica.increment('obrane_ukupno,sedmerac_obrane',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                  await models.golmanutakmica.increment(['obrane_ukupno','sedmerac_obrane'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
                 }
                 else if(args.dogadaj_id===7&&clan.rola===1)//sedmerac promasaj od strane igraca
                 {
@@ -1958,7 +1972,7 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 }
                 else if(args.dogadaj_id===8)//sedmerac primljen-> samo za golmana
                 {
-                  await models.golmanutakmica.increment('primljeni_ukupno,sedmerac_primljeni',{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
+                  await models.golmanutakmica.increment(['primljeni_ukupno','sedmerac_primljeni'],{where:{broj_utakmice:args.broj_utakmice,maticni_broj:args.maticni_broj}});
                 }
                 else if(args.dogadaj_id===9&&clan.rola===1)//iskljucenje igraca
                 {
@@ -2071,7 +2085,8 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
         pozicija:{type:new GraphQLNonNull(GraphQLInt)},
         broj_utakmice:{type:new GraphQLNonNull(GraphQLString)},
         maticni_broj:{type: new GraphQLNonNull(GraphQLString)},
-        dogadaj_id:{type:new GraphQLNonNull(GraphQLInt)}
+        dogadaj_id:{type:new GraphQLNonNull(GraphQLInt)},
+        dogadaj:{type:new GraphQLNonNull(GraphQLInt)}
       },
       resolve(parent,args,context){
         if(context.req.session.user_id)
@@ -2080,7 +2095,8 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
               pozicija:args.pozicija,
               broj_utakmice:args.broj_utakmice,
               maticni_broj:args.maticni_broj,
-              dogadaj_id:args.dogadaj_id
+              dogadaj_id:args.dogadaj_id,
+              dogadaj:args.dogadaj
             }).catch((error)=> {
             nodelogger.error('Greška kod spremanja pozicije gola '+error);
             throw(error);
@@ -2562,6 +2578,16 @@ const Mutation=new GraphQLObjectType({//mutacije-> mijenjanje ili unošenje novi
                 id:args.dogadaj_id
               }
             });
+            if(spremljenidogadaj.tip!==2)//izbrisi poziciju gola ako postoji
+            {
+              await models.pozicijegola.destroy({
+                where:{
+                  broj_utakmice:spremljenidogadaj.broj_utakmice,
+                  maticni_broj:spremljenidogadaj.maticni_broj,
+                  dogadaj:args.dogadaj_id
+                }
+              })
+            }
             await models.dogadajiutakmice.destroy({
               where:{
                 id:args.dogadaj_id

@@ -338,7 +338,7 @@ function Igrac_golman_prikaz({history,match}) {//preko history objekta u URL odl
                             <PieChart statistika={pieChartData[odabir.id-1]}/>
                         </Grid>
                         <Grid item container  justify='center' direction='row' xs={12} sm={5} md={4} style={{position:'relative'}}>
-                            <GolPrikaz goloviobrane={(isIgrac)? igracData.igracinfo.golovi : golmanData.golmaninfo.obrane} odabir={odabir.id}/>
+                            <GolPrikaz goloviobrane={(isIgrac)? igracData.igracinfo.golovi : golmanData.golmaninfo.obrane} isIgrac={isIgrac} odabir={odabir.id}/>
                         </Grid>
                     </Grid>
                     <Grid item container direction='column' justify='center' alignItems='center' xs={12}>{/*container od utakmica*/}

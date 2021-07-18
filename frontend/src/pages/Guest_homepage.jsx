@@ -44,7 +44,7 @@ export default function Guest_homepage(props) {//props su defaultni propsi koje 
                 <Typography  variant='h6'style={{fontWeight:'bold',fontSize:'1.5rem'}} color='secondary'>Zaljubljenik ste u rukomet, a nikako ne možete pronaći mjesto koje će vam ponuditi detaljne informacije o Vašem najdražem klubu, igračima ili ligi te omogućiti kvalitetno praćenje utakmice uživo?</Typography>
             </Grid>
             <Grid item xs={12} style={{marginTop:'2vh'}}>
-            <Typography  variant='h6'style={{ fontWeight:'bold',fontSize:'1.5rem', marginTop:'2vh'}} color='secondary'>Ako ste se pronašli u gornjoj rečenici na pravom ste mjestu. Handstat Vam omogućava detaljno praćenje rezultata uživo, pregled odigranih utakmica, statistike igrača i klubova za pojedina natjecanja . </Typography>
+            <Typography  variant='h6'style={{ fontWeight:'bold',fontSize:'1.5rem', marginTop:'2vh'}} color='secondary'>Ako ste se pronašli u gornjoj rečenici na pravom ste mjestu. Handstat Vam omogućuje detaljno praćenje rezultata uživo, pregled odigranih utakmica, statistike igrača i klubova te tablica za pojedina natjecanja.</Typography>
             </Grid>
             <Grid  className={classes.rezultatiBox} item container display='column' justify='center' alignItems='center' spacing={3}>
                 <Grid item container xs={12} justify='center' >

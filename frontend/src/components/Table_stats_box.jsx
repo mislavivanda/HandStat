@@ -34,7 +34,7 @@ const useStyles=makeStyles((theme)=>({
         borderRightColor:'#FFFFFF',
         borderRightStyle:'solid'
     },
-    button:{
+    button:{//!!!!!button ne moze biti display:flex!!!!!!-> zato ga stavljamo ko parent i width na 100% pa unutar njega nestamo box koji displayamo kao flex
         width:'100%',
         borderRadius:0,
         padding:0
@@ -142,12 +142,12 @@ function Table_stats_box(props) {
                 <Box className={classes.glavniBox}>
                     <Box className={classes.dres}><Typography align='center' style={{color:'#FFFFFF'}}>{props.dres}</Typography></Box>
                     <Box className={classes.imePrezimeBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.sedmerac_golovi>0||props.sedmerac_pokusaji>0)? (props.sedmerac_golovi+'/'+props.sedmerac_pokusaji) : ""}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderIskljucenja)? '#f7ea00':'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderZuti)? '#f7ea00':'#FFFFFF'}}>{props.zuti}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderCrveni)? '#f7ea00':'#FFFFFF'}}>{props.crveni}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderPlavi)? '#f7ea00':'#FFFFFF'}}>{props.plavi}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderGoloviPokusaji)? '#1BA236':'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderGoloviPokusaji)? '#1BA236':'#FFFFFF'}}>{(props.sedmerac_golovi>0||props.sedmerac_pokusaji>0)? (props.sedmerac_golovi+'/'+props.sedmerac_pokusaji) : ""}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderIskljucenja)? '#1BA236':'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderZuti)? '#1BA236':'#FFFFFF'}}>{props.zuti}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderCrveni)? '#1BA236':'#FFFFFF'}}>{props.crveni}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderPlavi)? '#1BA236':'#FFFFFF'}}>{props.plavi}</Typography></Box>
                 </Box>
             </Button>
             )
@@ -159,12 +159,12 @@ function Table_stats_box(props) {
                 <Box className={classes.glavniBox}>
                     <Box className={classes.dres}><Typography align='center' style={{color:'#FFFFFF'}}>{props.dres}</Typography></Box>
                     <Box className={classes.imePrezimeBox}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderObranePrimljeni)? '#f7ea00':'#FFFFFF'}}>{(props.obrane>0||props.primljeni>0)? (props.obrane+'/'+(props.obrane+props.primljeni)) : ""}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderGoloviPokusaji)? '#f7ea00':'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderIskljucenja)? '#f7ea00':'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderZuti)? '#f7ea00':'#FFFFFF'}}>{props.zuti}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderCrveni)? '#f7ea00':'#FFFFFF'}}>{props.crveni}</Typography></Box>
-                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderPlavi)? '#f7ea00':'#FFFFFF'}}>{props.plavi}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderObranePrimljeni)? '#1BA236':'#FFFFFF'}}>{(props.obrane>0||props.primljeni>0)? (props.obrane+'/'+(props.obrane+props.primljeni)) : ""}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'14%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderGoloviPokusaji)? '#1BA236':'#FFFFFF'}}>{(props.golovi>0||props.pokusaji>0)? (props.golovi+'/'+props.pokusaji) : ""}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderIskljucenja)? '#1BA236':'#FFFFFF'}}>{props.iskljucenja}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderZuti)? '#1BA236':'#FFFFFF'}}>{props.zuti}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderCrveni)? '#1BA236':'#FFFFFF'}}>{props.crveni}</Typography></Box>
+                    <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography align='center' style={{color:(renderPlavi)? '#1BA236':'#FFFFFF'}}>{props.plavi}</Typography></Box>
                 </Box>
             </Button>
             )
@@ -174,9 +174,9 @@ function Table_stats_box(props) {
             <Box className={classes.glavniBox}>
                 <Box style={{ display:'flex',width:'40%',flexDirection:'row',justifyContent:'center',alignItems:'center', borderLeftColor:'#FFFFFF',borderLeftStyle:'solid',borderRightColor:'#FFFFFF',borderRightStyle:'solid'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.ime + ' '+props.prezime}</Typography></Box>
                 <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'36%',display:'flex',alignItems:'center',justifyContent:'center'}}><Typography align='center' style={{color:'#FFFFFF'}}>{props.titula}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center'  style={{color:(renderZuti)? '#f7ea00':'#FFFFFF'}}>{props.zuti}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderCrveni)? '#f7ea00':'#FFFFFF'}}>{props.crveni}</Typography></Box>
-                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderPlavi)? '#f7ea00':'#FFFFFF'}}>{props.plavi}</Typography></Box>
+                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center'  style={{color:(renderZuti)? '#1BA236':'#FFFFFF'}}>{props.zuti}</Typography></Box>
+                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderCrveni)? '#1BA236':'#FFFFFF'}}>{props.crveni}</Typography></Box>
+                <Box style={{borderRightColor:'#FFFFFF',borderRightStyle:'solid',width:'8%',display:'flex',alignItems:'center', justifyContent:'center'}}><Typography  align='center' style={{color:(renderPlavi)? '#1BA236':'#FFFFFF'}}>{props.plavi}</Typography></Box>
             </Box>
             )
             }

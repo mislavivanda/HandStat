@@ -5,8 +5,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from '@material-ui/lab/Alert';
 import KlubRezultati from '../components/KlubRezultati';
 import Rezultat from '../components/Rezultat';
-import {dohvatiSveClanoveTima,dohvatiNajnovijeRezultateKluba} from '../graphql/query';
-import { useLazyQuery } from '@apollo/client';
+import {dohvatiSveClanoveTima,dohvatiKlubInfo,dohvatiNajnovijeRezultateKluba} from '../graphql/query';
+import { useLazyQuery} from '@apollo/client';
 const useStyles=makeStyles((theme)=>({
     klubInfoBox:{
         borderBottomColor:theme.palette.primary.main,
@@ -52,7 +52,6 @@ const useStyles=makeStyles((theme)=>({
     },
     clanKlubaCardMedia:{
         margin:'auto',
-        paddingBottom:16,
         width:'95%',
         height:'auto',
         paddingTop:10,
@@ -104,6 +103,11 @@ function Klub_info_page(props) {
     const [klubID,setKlubID]=useState(null);
     useEffect(()=>{
         setKlubID(parseInt(props.match.params.klub_id));//NEPOTREBNO URI ENCODE I DECODE JER JE KLUB_ID UVIJEK INTEGER ZA RAZLIKU OD BORJA UTAKMICE KOJI MOŽE SADRŽAVAT \
+        klubInfo({
+            variables:{
+                klub_id:parseInt(props.match.params.klub_id)
+            }
+        })
         dohvatiClanove({
             variables:{
                 klub_id:parseInt(props.match.params.klub_id)//ne mozemo koristit klubID jer se jos ne seta state,asinkrono
@@ -116,6 +120,7 @@ function Klub_info_page(props) {
         })
     },[])
     //koistimo lazy jer čekamo da se postavi state od klubID dohvaćenog iz URL kako ne bi slali null
+    const [klubInfo,{data:klub,loading:klubInfoLoading,error:klubInfoError}]=useLazyQuery(dohvatiKlubInfo);
     const [dohvatiClanove,{data:clanoviTimaData,loading:clanoviTimaLoading,error:clanoviTimaError}]=useLazyQuery(dohvatiSveClanoveTima)
     const [dohvatiRezultate,{data:najnovijiRezultatiData,loading:najnovijiRezultatiLoading,error:najnovijiRezultatiError}]=useLazyQuery(dohvatiNajnovijeRezultateKluba);
     function handleGolmanCardClick(maticni_broj){
@@ -133,24 +138,24 @@ function Klub_info_page(props) {
         let maticni_encoded=encodeURIComponent(maticni_broj)
         props.history.replace(`/stozer/${klubID}/${maticni_encoded}`);
     }
-    if(clanoviTimaLoading||najnovijiRezultatiLoading||!klubID||!(klubID&&najnovijiRezultatiData&&clanoviTimaData))//kad je klubid null ili se ucitava ili nisu stigli svi podaci i nije postavljen klubID
+    if(clanoviTimaLoading||klubInfoLoading||najnovijiRezultatiLoading||!klubID||!(klubID&&najnovijiRezultatiData&&clanoviTimaData))//kad je klubid null ili se ucitava ili nisu stigli svi podaci i nije postavljen klubID
     {
         return (<CircularProgress className={classes.loadingItem} color='primary'/>)
     }
-    if(clanoviTimaError||najnovijiRezultatiError)
+    if(clanoviTimaError||klubInfoError||najnovijiRezultatiError)
     {
         return (<Alert className={classes.alertItem} severity="error">{(clanoviTimaError)? clanoviTimaError.message : najnovijiRezultatiError.message}</Alert>)
     }
-    if(klubID&&najnovijiRezultatiData&&clanoviTimaData)//kad nije null klubid i podaci onda mozemo renderat i slat zahjteve u drugim komponeentama
+    if(klubID&&najnovijiRezultatiData&&clanoviTimaData&&klub)//kad nije null klubid i podaci onda mozemo renderat i slat zahjteve u drugim komponeentama
     {
         return (
             <Grid container direction='column' justify='space-evenly' alignItems='center' style={{marginTop:100}}>{/*glavni container*/}
                  <Grid style={{marginTop:100}} item container direction='column' justify='space-evenly' alignItems='center'>{/*container od podataka kluba, grba i odabira rezultata */}
                     <Grid item container direction='column' justify='center' alignItems='center' xs={12} sm={4}>{/*container od ikone kluba i naziva*/}
                             <Grid item xs={12}>
-                                <Typography align='center' color='secondary'  variant='h4'>RK PPD ZAGREB</Typography>
+                                <Typography align='center' color='secondary'  variant='h4'>{klub.klubinfo.naziv}</Typography>
                             </Grid>
-                            <img className={classes.klubIkona} src={"http://localhost:3001/zagreb.jpg"} alt="grb kluba"/>
+                            <img className={classes.klubIkona} src={klub.klubinfo.image_path} alt="grb kluba"/>
                     </Grid>
                      <Grid item container direction='row' justify='space-around' alignItems='center' xs={12}>{/*contaienr od podataka kluba + komponente za rezultate*/}
                          <Grid className={classes.infoGlavniBox} item container direction='column' justify='space-evenly' alignItems='flex-start' xs={12} sm={5}>{/*container s informacijama o klubu*/}
@@ -160,7 +165,7 @@ function Klub_info_page(props) {
                                                 <Typography style={{color:'#FFFFFF'}} variant='h6'>DRŽAVA</Typography>
                                             </Box>
                                             <Box className={classes.info}>
-                                                <Typography style={{color:'#FFFFFF'}} variant='h5'>SJEDINJENE AMERIČKE DRŽAVE(SAD)</Typography>
+                                                <Typography style={{color:'#FFFFFF'}} variant='h5'>{klub.klubinfo.drzava}</Typography>
                                             </Box>
                                         </Box>
                                     </Grid>
@@ -170,7 +175,7 @@ function Klub_info_page(props) {
                                             <Typography style={{color:'#FFFFFF'}} variant='h6'>DATUM OSNUTKA</Typography>
                                         </Box>
                                         <Box className={classes.info}>
-                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>22.05.1978.</Typography>
+                                            <Typography style={{color:'#FFFFFF'}} variant='h5'>{klub.klubinfo.osnutak}</Typography>
                                         </Box>
                                     </Box>
                                 </Grid>

@@ -46,8 +46,8 @@ const spremiDogadaj=gql`
 `;
 //vrati id ako je dobro spremilo
 const spremiGolPozicija=gql`
-    mutation($pozicija:Int!,$broj_utakmice:String!,$maticni_broj:String!,$dogadaj_id:Int!){
-        spremigolpoziciju(pozicija:$pozicija,broj_utakmice:$broj_utakmice,maticni_broj:$maticni_broj,dogadaj_id:$dogadaj_id){
+    mutation($pozicija:Int!,$broj_utakmice:String!,$maticni_broj:String!,$dogadaj_id:Int!,$dogadaj:Int!){
+        spremigolpoziciju(pozicija:$pozicija,broj_utakmice:$broj_utakmice,maticni_broj:$maticni_broj,dogadaj_id:$dogadaj_id,dogadaj:$dogadaj){
             id
         }
     }

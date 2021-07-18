@@ -141,7 +141,7 @@ function RezultatUtakmiceLive(props) {
                                     {
                                         return classes.poluvremeUtakmica
                                     }
-                                    else if(data.rezultatutakmice.status===5)
+                                    else if(data.rezultatutakmice.status===5||data.rezultatutakmice.status===6)
                                     {
                                         return classes.krajUtakmica
                                     }
@@ -149,9 +149,9 @@ function RezultatUtakmiceLive(props) {
                                     })
                                     ()} 
                                     `} >
-                                    <Typography  align='center' variant='h5' style={{color:(renderDomaci)?'#f7ea00':'#FFFFFF'}}> {data.rezultatutakmice.rezultat_domaci}</Typography>
+                                    <Typography  align='center' variant='h5' style={{color:(renderDomaci)?'#1BA236':'#FFFFFF'}}> {data.rezultatutakmice.rezultat_domaci}</Typography>
                                     <Typography align='center'  variant='h5' style={{color:'#FFFFFF'}}>:</Typography>
-                                    <Typography align='center'  variant='h5' style={{color:(renderGosti)?'#f7ea00':'#FFFFFF'}}>{data.rezultatutakmice.rezultat_gosti}</Typography>
+                                    <Typography align='center'  variant='h5' style={{color:(renderGosti)?'#1BA236':'#FFFFFF'}}>{data.rezultatutakmice.rezultat_gosti}</Typography>
                                 </Box>
                             </Grid>
                             <Grid item container direction='row' justify='space-around' alignItems='center' xs={12} md={5}>

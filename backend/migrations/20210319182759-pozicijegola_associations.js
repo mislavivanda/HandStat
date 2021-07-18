@@ -41,6 +41,19 @@ module.exports = {
       onUpdate: "CASCADE",
       onDelete: "SET NULL",
     }
+     ),
+     queryInterface.addColumn(
+       'pozicijegola',
+       'dogadaj',
+       {
+         type:Sequelize.INTEGER,
+         references:{
+           model:'dogadajiutakmice',
+           key:'id'
+         },
+         onUpdate: "CASCADE",
+         onDelete: "SET NULL",        
+       }
      )
    ])
   },
@@ -58,6 +71,10 @@ module.exports = {
     queryInterface.removeColumn(
       'pozicijegola',
       'dogadaj_id'
+    ),
+    queryInterface.removeColumn(
+      'pozicijegola',
+      'dogadaj'
     )
   ]);
   }

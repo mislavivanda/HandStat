@@ -223,7 +223,7 @@ function StatistikaDialog({open,setOpen,isIgrac,maticni_broj,broj_utakmice}) {
                                     <PieChart statistika={pieChartData[odabir.id-1]}/>
                                 </Grid>
                                 <Grid item container  justify='center' direction='row' xs={12} sm={5} md={4} style={{position:'relative'}}>
-                                    <GolPrikaz goloviobrane={(isIgrac)? igracData.igracstatistikapopup.statistikapopup : golmanData.golmanstatistikapopup.statistikapopup} odabir={odabir.id}/>
+                                    <GolPrikaz goloviobrane={(isIgrac)? igracData.igracstatistikapopup.statistikapopup : golmanData.golmanstatistikapopup.statistikapopup} isIgrac={isIgrac} odabir={odabir.id}/>
                                 </Grid>
                             </Grid>
                         </Grid>

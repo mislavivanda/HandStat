@@ -8,8 +8,12 @@ import {dohvatiStatistikuTima} from '../graphql/query';
 import Alert from '@material-ui/lab/Alert';
 const useStyles=makeStyles((theme)=>({
     statistikaGlavniBox:{
-        borderColor:theme.palette.secondary.main,
-        borderStyle:'solid',
+        borderBottomColor:theme.palette.secondary.main,
+        borderBottomStyle:'solid',
+        borderLeftColor:theme.palette.secondary.main,
+        borderLeftStyle:'solid',
+        borderRightColor:theme.palette.secondary.main,
+        borderRightStyle:'solid',
         marginTop:50
     },
     klubSlika:{

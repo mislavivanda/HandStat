@@ -138,9 +138,9 @@ export default function Rezultat({history,broj_utakmice,natjecanje,domaci,gosti,
                 })
                  ()} 
                 `}>
-                <Typography  align='center' style={{color:(renderDomaciRezultat)?'#f7ea00':'#FFFFFF'}}> {golovi_domaci}</Typography>
+                <Typography  align='center' style={{color:(renderDomaciRezultat)?'#1BA236':'#FFFFFF'}}> {golovi_domaci}</Typography>
                 <Typography align='center' style={{color:'#FFFFFF'}}>:</Typography>
-                <Typography align='center' style={{color:(renderGostiRezultat)?'#f7ea00':'#FFFFFF'}}>{golovi_gosti}</Typography>
+                <Typography align='center' style={{color:(renderGostiRezultat)?'#1BA236':'#FFFFFF'}}>{golovi_gosti}</Typography>
             </Box>
             <Box className={classes.gostiBox}><Typography  align='center' color='secondary'>{gosti}</Typography></Box>
             {
